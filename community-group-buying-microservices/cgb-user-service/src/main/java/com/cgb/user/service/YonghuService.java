@@ -1,6 +1,7 @@
 package com.cgb.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cgb.common.R;
 import com.cgb.user.entity.YonghuEntity;
 
 public interface YonghuService {
@@ -10,4 +11,6 @@ public interface YonghuService {
     YonghuEntity getById(Long id);
     YonghuEntity getByZhanghao(String zhanghao);
     IPage<YonghuEntity> queryPage(YonghuEntity params);
+    R<?> login(YonghuEntity params, String clientIP);
+    R<?> register(YonghuEntity params);
 }

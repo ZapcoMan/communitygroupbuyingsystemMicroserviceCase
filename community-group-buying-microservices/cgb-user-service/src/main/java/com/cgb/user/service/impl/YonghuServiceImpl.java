@@ -108,7 +108,6 @@ public class YonghuServiceImpl implements YonghuService {
         // 返回脱敏信息
         YonghuVO vo = new YonghuVO();
         BeanUtils.copyProperties(user, vo);
-        vo.setMima(null);
         return R.ok("登录成功", vo, token);
     }
 

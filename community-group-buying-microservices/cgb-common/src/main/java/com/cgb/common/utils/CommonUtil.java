@@ -140,6 +140,25 @@ public class CommonUtil {
         return code.toString();
     }
 
+    /** 对象转 Map（用于查询参数传递） */
+    @SuppressWarnings("unchecked")
+    public static <T> Map<String, Object> convert(Object obj, Class<T> clazz) {
+        if (obj == null) return new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        try {
+            for (java.lang.reflect.Field field : obj.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(obj);
+                if (value != null) {
+                    map.put(field.getName(), value);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            // ignore
+        }
+        return map;
+    }
+
     /** 生成指定长度随机字符串 */
     public static String generateRandomStr(int length) {
         return IdUtil.fastSimpleUUID().substring(0, length);

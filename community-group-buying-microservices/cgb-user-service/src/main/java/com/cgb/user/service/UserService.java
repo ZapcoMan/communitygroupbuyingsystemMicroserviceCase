@@ -1,6 +1,7 @@
 package com.cgb.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cgb.common.R;
 import com.cgb.user.entity.UserEntity;
 
 public interface UserService {
@@ -10,4 +11,5 @@ public interface UserService {
     UserEntity getById(Long id);
     UserEntity getByUsername(String username);
     IPage<UserEntity> queryPage(UserEntity params);
+    R<?> login(UserEntity params, String clientIP);
 }
