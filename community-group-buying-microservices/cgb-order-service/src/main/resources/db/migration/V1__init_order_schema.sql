@@ -1,0 +1,54 @@
+-- 订单服务数据库初始化
+-- 数据库名: cgb_order
+
+CREATE TABLE IF NOT EXISTS `cart` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `userid` BIGINT NOT NULL COMMENT '用户ID',
+  `shangpinid` BIGINT NOT NULL COMMENT '商品ID',
+  `shuliang` INT DEFAULT 1 COMMENT '数量',
+  `addtime` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updatetime` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `isdelete` TINYINT DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_product` (`userid`, `shangpinid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='购物车表';
+
+CREATE TABLE IF NOT EXISTS `orders` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `orderid` VARCHAR(64) NOT NULL COMMENT '订单编号',
+  `userid` BIGINT NOT NULL COMMENT '用户ID',
+  `shangpinid` BIGINT NOT NULL COMMENT '商品ID',
+  `shangpinming` VARCHAR(200) DEFAULT NULL COMMENT '商品名称',
+  `shangpintupian` VARCHAR(200) DEFAULT NULL COMMENT '商品图片',
+  `shuliang` INT DEFAULT 1 COMMENT '数量',
+  `jiage` DECIMAL(10,2) NOT NULL COMMENT '单价',
+  `zongjia` DECIMAL(10,2) NOT NULL COMMENT '总价',
+  `lianxidianhua` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
+  `shouhuodizhi` VARCHAR(200) DEFAULT NULL COMMENT '收货地址',
+  `zhuangtai` TINYINT DEFAULT 0 COMMENT '状态 0待支付 1已支付 2已取消 3已发货 4已完成',
+  `fukuanfangshi` INT DEFAULT NULL COMMENT '付款方式',
+  `beizhu` VARCHAR(500) DEFAULT NULL COMMENT '备注',
+  `tuanduiid` BIGINT DEFAULT NULL COMMENT '团购ID',
+  `addtime` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updatetime` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `isdelete` TINYINT DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_orderid` (`orderid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
+
+CREATE TABLE IF NOT EXISTS `address` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `userid` BIGINT NOT NULL COMMENT '用户ID',
+  `dizhimingchen` VARCHAR(100) DEFAULT NULL COMMENT '地址名称',
+  `lianxidianhua` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
+  `shouhuoren` VARCHAR(50) DEFAULT NULL COMMENT '收货人',
+  `provinces` VARCHAR(50) DEFAULT NULL COMMENT '省',
+  `citys` VARCHAR(50) DEFAULT NULL COMMENT '市',
+  `areas` VARCHAR(50) DEFAULT NULL COMMENT '区/县',
+  `detailedaddress` VARCHAR(200) DEFAULT NULL COMMENT '详细地址',
+  `isdefault` TINYINT DEFAULT 0 COMMENT '是否默认 0否 1是',
+  `addtime` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updatetime` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `isdelete` TINYINT DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收货地址表';

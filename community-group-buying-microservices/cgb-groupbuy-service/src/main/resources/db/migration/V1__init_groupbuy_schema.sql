@@ -1,0 +1,35 @@
+-- 团购服务数据库初始化
+-- 数据库名: cgb_groupbuy
+
+CREATE TABLE IF NOT EXISTS `tuanwei` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `mingcheng` VARCHAR(200) NOT NULL COMMENT '团购名称',
+  `tupian` VARCHAR(200) DEFAULT NULL COMMENT '团购图片',
+  `jieshao` TEXT DEFAULT NULL COMMENT '团购介绍',
+  `shangpinid` BIGINT DEFAULT NULL COMMENT '关联商品ID',
+  `zhuangtai` TINYINT DEFAULT 0 COMMENT '状态 0进行中 1已成团 2已过期',
+  `lirenjia` INT NOT NULL COMMENT '成团人数',
+  `xianxiarenshu` INT DEFAULT 1 COMMENT '当前人数',
+  `yuanjia` DECIMAL(10,2) DEFAULT 0.00 COMMENT '原价',
+  `tejia` DECIMAL(10,2) NOT NULL COMMENT '团购价',
+  `jieshushijian` DATETIME DEFAULT NULL COMMENT '截止时间',
+  `userid` BIGINT DEFAULT NULL COMMENT '团长用户ID',
+  `addtime` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updatetime` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `isdelete` TINYINT DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='团长表';
+
+CREATE TABLE IF NOT EXISTS `tuanxinxi` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `tuanduiid` BIGINT NOT NULL COMMENT '团购ID',
+  `userid` BIGINT NOT NULL COMMENT '参团用户',
+  `shangpinid` BIGINT NOT NULL COMMENT '商品ID',
+  `shuliang` INT DEFAULT 1 COMMENT '购买数量',
+  `jiage` DECIMAL(10,2) NOT NULL COMMENT '购买价格',
+  `zhuangtai` TINYINT DEFAULT 0 COMMENT '状态 0待支付 1已支付 2已取消',
+  `addtime` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updatetime` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `isdelete` TINYINT DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='参团记录表';

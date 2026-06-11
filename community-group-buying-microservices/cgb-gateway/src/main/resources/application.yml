@@ -1,0 +1,99 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: cgb-gateway
+
+  # Redis 配置
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # 云网关配置（生产环境使用）
+  cloud:
+    gateway:
+      # 全局 CORS
+      global-cors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+      # 默认过滤器
+      default-filters:
+        - name: RequestSize
+          args:
+            maxSize: 10MB
+      # 路由配置
+      routes:
+        # 用户服务
+        - id: cgb-user-service
+          uri: lb://cgb-user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        # 商品服务
+        - id: cgb-product-service
+          uri: lb://cgb-product-service
+          predicates:
+            - Path=/product/**
+          filters:
+            - StripPrefix=1
+        # 团购服务
+        - id: cgb-groupbuy-service
+          uri: lb://cgb-groupbuy-service
+          predicates:
+            - Path=/groupbuy/**
+          filters:
+            - StripPrefix=1
+        # 订单服务
+        - id: cgb-order-service
+          uri: lb://cgb-order-service
+          predicates:
+            - Path=/order/**
+          filters:
+            - StripPrefix=1
+        # 内容服务
+        - id: cgb-content-service
+          uri: lb://cgb-content-service
+          predicates:
+            - Path=/content/**
+          filters:
+            - StripPrefix=1
+
+# JWT 密钥（需替换为实际密钥）
+jwt:
+  secret: cgb-community-group-buying-secret-key-2024-change-this-in-production
+  expiration: 3600
+
+# 限流配置
+rate-limit:
+  default-count: 100
+  default-period: 60
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    org.springframework.cloud.gateway: debug
