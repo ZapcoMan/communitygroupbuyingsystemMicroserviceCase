@@ -1,5 +1,6 @@
 package com.cgb.common.utils;
 
+import com.cgb.common.EIException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;

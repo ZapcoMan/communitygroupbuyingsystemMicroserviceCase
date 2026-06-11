@@ -19,6 +19,7 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(409, "用户已存在"),
     PASSWORD_ERROR(400, "密码错误"),
     DATA_NOT_FOUND(404, "数据不存在"),
+    RESOURCE_NOT_FOUND(404, "资源不存在"),
     DATA_CONFLICT(409, "数据已存在"),
     PERMISSION_DENIED(403, "权限不足");
 

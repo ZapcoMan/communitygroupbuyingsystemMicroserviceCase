@@ -2,6 +2,7 @@ package com.cgb.common.utils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,9 +37,9 @@ public class Query<T> {
         Page<T> page = new Page<>(curPage, limit);
         // 升序/降序
         if ("asc".equalsIgnoreCase(orderDirection)) {
-            page.setAsc(orderField);
+            page.addOrder(OrderItem.asc(orderField));
         } else {
-            page.setDesc(orderField);
+            page.addOrder(OrderItem.desc(orderField));
         }
 
         return page;
