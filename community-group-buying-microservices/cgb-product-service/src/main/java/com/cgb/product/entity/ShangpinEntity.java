@@ -3,6 +3,7 @@ package com.cgb.product.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.math.BigDecimal;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
