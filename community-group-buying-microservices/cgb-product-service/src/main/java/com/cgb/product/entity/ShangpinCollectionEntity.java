@@ -1,4 +1,4 @@
-package com.cgb.product.entity;
+﻿package com.cgb.product.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("shangpin_collection")
-public class ShangpinCollectionEntity implements Serializable {
+public class ProductCollectionEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)

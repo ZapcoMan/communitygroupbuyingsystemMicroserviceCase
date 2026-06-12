@@ -1,11 +1,11 @@
-package com.cgb.content.service;
+﻿package com.cgb.content.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.content.entity.MessagesEntity;
+import com.cgb.content.entity.MessageBoardEntity;
 
-public interface MessagesService {
-    void save(MessagesEntity entity);
+public interface MessageBoardService {
+    void save(MessageBoardEntity entity);
     void delete(Long id);
-    IPage<MessagesEntity> queryPage(MessagesEntity params);
+    IPage<MessageBoardEntity> queryPage(MessageBoardEntity params);
     void reply(Long id, String replyContent);
 }

@@ -1,9 +1,9 @@
-package com.cgb.content.controller;
+﻿package com.cgb.content.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.content.entity.MessagesEntity;
-import com.cgb.content.service.MessagesService;
+import com.cgb.content.entity.MessageBoardEntity;
+import com.cgb.content.service.MessageBoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/messages")
 @RequiredArgsConstructor
-public class MessagesController {
+public class MessageBoardController {
 
-    private final MessagesService messagesService;
+    private final MessageBoardService messagesService;
 
     @Operation(summary = "留言")
     @PostMapping
     @RateLimit(key = "message_post", count = 20, period = 1, unit = RateLimit.TimeUnit.MINUTES)
-    public R<?> save(@RequestBody MessagesEntity entity, HttpServletRequest request) {
+    public R<?> save(@RequestBody MessageBoardEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserId(userId);
         messagesService.save(entity);
@@ -32,8 +32,8 @@ public class MessagesController {
 
     @Operation(summary = "留言列表")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) MessagesEntity params) {
-        IPage<MessagesEntity> result = messagesService.queryPage(params);
+    public R<?> list(@Parameter(hidden = true) MessageBoardEntity params) {
+        IPage<MessageBoardEntity> result = messagesService.queryPage(params);
         return R.ok(result);
     }
 

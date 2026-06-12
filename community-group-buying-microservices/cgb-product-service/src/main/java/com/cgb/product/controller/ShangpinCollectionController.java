@@ -1,9 +1,9 @@
-package com.cgb.product.controller;
+﻿package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.product.entity.ShangpinCollectionEntity;
-import com.cgb.product.service.ShangpinCollectionService;
+import com.cgb.product.entity.ProductCollectionEntity;
+import com.cgb.product.service.ProductCollectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/shangpin/collection")
 @RequiredArgsConstructor
-public class ShangpinCollectionController {
+public class ProductCollectionController {
 
-    private final ShangpinCollectionService collectionService;
+    private final ProductCollectionService collectionService;
 
     @Operation(summary = "收藏/取消收藏商品")
     @PostMapping
-    public R<?> toggle(@RequestBody ShangpinCollectionEntity entity, HttpServletRequest request) {
+    public R<?> toggle(@RequestBody ProductCollectionEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserId(userId);
-        ShangpinCollectionEntity exist = collectionService.getByUserAndProduct(userId, entity.getShangpinid());
+        ProductCollectionEntity exist = collectionService.getByUserAndProduct(userId, entity.getShangpinid());
         if (exist != null) {
             collectionService.delete(exist.getId());
             return R.ok("取消收藏成功");
@@ -35,19 +35,19 @@ public class ShangpinCollectionController {
 
     @Operation(summary = "我的收藏列表")
     @GetMapping("/my")
-    public R<?> myList(@Parameter(hidden = true) ShangpinCollectionEntity params,
+    public R<?> myList(@Parameter(hidden = true) ProductCollectionEntity params,
                        @RequestParam(defaultValue = "1") Integer page,
                        @RequestParam(defaultValue = "10") Integer limit) {
-        IPage<ShangpinCollectionEntity> result = collectionService.queryPage(params);
+        IPage<ProductCollectionEntity> result = collectionService.queryPage(params);
         return R.ok(result);
     }
 
     @Operation(summary = "管理员查询所有收藏")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) ShangpinCollectionEntity params,
+    public R<?> list(@Parameter(hidden = true) ProductCollectionEntity params,
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
-        IPage<ShangpinCollectionEntity> result = collectionService.queryPage(params);
+        IPage<ProductCollectionEntity> result = collectionService.queryPage(params);
         return R.ok(result);
     }
 

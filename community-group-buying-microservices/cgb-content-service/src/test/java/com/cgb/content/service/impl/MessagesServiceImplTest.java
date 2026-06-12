@@ -1,8 +1,8 @@
-package com.cgb.content.service.impl;
+﻿package com.cgb.content.service.impl;
 
 import com.cgb.common.EIException;
-import com.cgb.content.dao.MessagesDao;
-import com.cgb.content.entity.MessagesEntity;
+import com.cgb.content.dao.MessageBoardDao;
+import com.cgb.content.entity.MessageBoardEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,16 +18,16 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("留言板服务测试")
-class MessagesServiceImplTest {
+class MessageBoardServiceImplTest {
 
     @Mock
-    private MessagesDao messagesDao;
+    private MessageBoardDao messagesDao;
 
     @InjectMocks
-    private MessagesServiceImpl messagesService;
+    private MessageBoardServiceImpl messagesService;
 
-    private MessagesEntity buildMessage(Long id, Long userId) {
-        MessagesEntity entity = new MessagesEntity();
+    private MessageBoardEntity buildMessage(Long id, Long userId) {
+        MessageBoardEntity entity = new MessageBoardEntity();
         entity.setId(id);
         entity.setUserId(userId);
         entity.setUsername("testuser");
@@ -41,8 +41,8 @@ class MessagesServiceImplTest {
         @Test
         @DisplayName("保存留言 - 成功")
         void save_success() {
-            MessagesEntity entity = buildMessage(null, 100L);
-            when(messagesDao.insert(any(MessagesEntity.class))).thenReturn(1);
+            MessageBoardEntity entity = buildMessage(null, 100L);
+            when(messagesDao.insert(any(MessageBoardEntity.class))).thenReturn(1);
 
             messagesService.save(entity);
 
@@ -70,13 +70,13 @@ class MessagesServiceImplTest {
         @Test
         @DisplayName("回复留言 - 成功")
         void reply_success() {
-            MessagesEntity entity = buildMessage(1L, 100L);
+            MessageBoardEntity entity = buildMessage(1L, 100L);
             when(messagesDao.selectById(1L)).thenReturn(entity);
-            when(messagesDao.updateById(any(MessagesEntity.class))).thenReturn(1);
+            when(messagesDao.updateById(any(MessageBoardEntity.class))).thenReturn(1);
 
             messagesService.reply(1L, "感谢您的反馈");
 
-            ArgumentCaptor<MessagesEntity> captor = ArgumentCaptor.forClass(MessagesEntity.class);
+            ArgumentCaptor<MessageBoardEntity> captor = ArgumentCaptor.forClass(MessageBoardEntity.class);
             verify(messagesDao).updateById(captor.capture());
             assertEquals("感谢您的反馈", captor.getValue().getReplycontent());
         }

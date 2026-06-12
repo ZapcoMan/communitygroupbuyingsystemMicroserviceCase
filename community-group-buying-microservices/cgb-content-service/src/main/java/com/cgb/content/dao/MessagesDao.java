@@ -1,9 +1,9 @@
-package com.cgb.content.dao;
+﻿package com.cgb.content.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cgb.content.entity.MessagesEntity;
+import com.cgb.content.entity.MessageBoardEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface MessagesDao extends BaseMapper<MessagesEntity> {
+public interface MessageBoardDao extends BaseMapper<MessageBoardEntity> {
 }

@@ -1,9 +1,9 @@
-package com.cgb.product.mq;
+﻿package com.cgb.product.mq;
 
 import com.cgb.common.mq.MQTopics;
 import com.cgb.common.mq.OrderStatusMessage;
-import com.cgb.product.dao.ShangpinDao;
-import com.cgb.product.entity.ShangpinEntity;
+import com.cgb.product.dao.ProductDao;
+import com.cgb.product.entity.ProductEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProductOrderMessageConsumer implements RocketMQListener<OrderStatusMessage> {
 
-    private final ShangpinDao shangpinDao;
+    private final ProductDao shangpinDao;
 
     @Override
     public void onMessage(OrderStatusMessage message) {
