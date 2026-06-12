@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 团购信息表（参团记录）
  */
 @Data
-@TableName("tuanxinxi")
+@TableName("group_info")
 public class GroupBuyEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("tuan_comment")
+@TableName("group_comment")
 public class GroupBuyCommentEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -1,4 +1,4 @@
-﻿package com.cgb.user.entity;
+package com.cgb.user.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 用户实体（买家端）
  */
 @Data
-@TableName("yonghu")
+@TableName("member")
 public class MemberEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

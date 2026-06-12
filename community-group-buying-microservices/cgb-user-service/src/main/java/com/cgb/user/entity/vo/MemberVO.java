@@ -1,4 +1,4 @@
-﻿package com.cgb.user.entity.vo;
+package com.cgb.user.entity.vo;
 
 import lombok.Data;
 import java.time.LocalDateTime;

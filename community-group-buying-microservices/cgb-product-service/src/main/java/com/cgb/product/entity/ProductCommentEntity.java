@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 商品评价实体
  */
 @Data
-@TableName("shangpin_comment")
+@TableName("product_comment")
 public class ProductCommentEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

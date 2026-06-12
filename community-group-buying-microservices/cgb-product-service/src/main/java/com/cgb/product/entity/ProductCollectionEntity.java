@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 商品收藏实体
  */
 @Data
-@TableName("shangpin_collection")
+@TableName("product_collection")
 public class ProductCollectionEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

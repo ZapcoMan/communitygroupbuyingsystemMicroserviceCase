@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 团购资讯实体
  */
 @Data
-@TableName("zixun")
+@TableName("information")
 public class InformationEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

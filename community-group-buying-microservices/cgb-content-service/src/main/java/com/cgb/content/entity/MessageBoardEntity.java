@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 留言板实体
  */
 @Data
-@TableName("messages")
+@TableName("message_board")
 public class MessageBoardEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
