@@ -36,6 +36,12 @@ public class TuanxinxiController {
         return R.ok(result.getRecords());
     }
 
+    @Operation(summary = "参团详情")
+    @GetMapping("/{id}")
+    public R<?> detail(@PathVariable Long id) {
+        return R.ok(tuanxinxiService.getById(id));
+    }
+
     @Operation(summary = "取消参团")
     @DeleteMapping("/{id}")
     public R<?> delete(@PathVariable Long id) {

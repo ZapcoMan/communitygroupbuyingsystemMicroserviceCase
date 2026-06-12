@@ -43,4 +43,18 @@ public class ShangpinCommentController {
         commentService.delete(id);
         return R.ok("删除成功");
     }
+
+    @Operation(summary = "更新评论/回复")
+    @PutMapping
+    public R<?> update(@RequestBody ShangpinCommentEntity entity) {
+        commentService.update(entity);
+        return R.ok("更新成功");
+    }
+
+    @Operation(summary = "批量删除评论")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(commentService::delete);
+        return R.ok("批量删除成功");
+    }
 }

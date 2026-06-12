@@ -57,6 +57,13 @@ public class ShangpinController {
         return R.ok("删除成功");
     }
 
+    @Operation(summary = "批量删除商品")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(shangpinService::delete);
+        return R.ok("批量删除成功");
+    }
+
     /** 内部接口 */
     @GetMapping("/internal/productDetail")
     public R<?> internalProductDetail(@RequestParam Long id) {

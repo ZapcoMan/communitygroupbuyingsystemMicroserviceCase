@@ -41,4 +41,27 @@ public class ShangpinCollectionController {
         IPage<ShangpinCollectionEntity> result = collectionService.queryPage(params);
         return R.ok(result.getRecords());
     }
+
+    @Operation(summary = "管理员查询所有收藏")
+    @GetMapping("/list")
+    public R<?> list(@Parameter(hidden = true) ShangpinCollectionEntity params,
+                     @RequestParam(defaultValue = "1") Integer page,
+                     @RequestParam(defaultValue = "10") Integer limit) {
+        IPage<ShangpinCollectionEntity> result = collectionService.queryPage(params);
+        return R.ok(result.getRecords());
+    }
+
+    @Operation(summary = "管理员删除收藏")
+    @DeleteMapping("/{id}")
+    public R<?> delete(@PathVariable Long id) {
+        collectionService.delete(id);
+        return R.ok("删除成功");
+    }
+
+    @Operation(summary = "批量删除收藏")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(collectionService::delete);
+        return R.ok("批量删除成功");
+    }
 }

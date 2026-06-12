@@ -54,4 +54,11 @@ public class TuanweiController {
         tuanweiService.delete(id);
         return R.ok("删除成功");
     }
+
+    @Operation(summary = "批量删除团购")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(tuanweiService::delete);
+        return R.ok("批量删除成功");
+    }
 }

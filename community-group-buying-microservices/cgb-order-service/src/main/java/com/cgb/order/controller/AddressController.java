@@ -42,6 +42,14 @@ public class AddressController {
         return R.ok("更新成功");
     }
 
+    @Operation(summary = "修改地址(带ID)")
+    @PutMapping("/{id}")
+    public R<?> updateById(@PathVariable Long id, @RequestBody AddressEntity entity) {
+        entity.setId(id);
+        addressService.update(entity);
+        return R.ok("更新成功");
+    }
+
     @Operation(summary = "删除地址")
     @DeleteMapping("/{id}")
     public R<?> delete(@PathVariable Long id) {
@@ -50,10 +58,26 @@ public class AddressController {
     }
 
     @Operation(summary = "设为默认地址")
-    @PostMapping("/default/{id}")
+    @PutMapping("/default/{id}")
     public R<?> setDefault(@PathVariable Long id, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         addressService.setDefault(id, userId);
         return R.ok("设置成功");
+    }
+
+    @Operation(summary = "管理员查询所有地址")
+    @GetMapping("/list")
+    public R<?> list(@Parameter(hidden = true) AddressEntity params,
+                     @RequestParam(defaultValue = "1") Integer page,
+                     @RequestParam(defaultValue = "10") Integer limit) {
+        IPage<AddressEntity> result = addressService.queryPage(params);
+        return R.ok(result.getRecords());
+    }
+
+    @Operation(summary = "批量删除地址")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(addressService::delete);
+        return R.ok("批量删除成功");
     }
 }

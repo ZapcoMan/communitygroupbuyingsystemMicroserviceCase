@@ -45,10 +45,34 @@ public class CartController {
         return R.ok("清空成功");
     }
 
+    @Operation(summary = "更新购物车项")
+    @PutMapping("/{id}")
+    public R<?> update(@PathVariable Long id, @RequestBody CartEntity entity) {
+        entity.setId(id);
+        cartService.update(entity);
+        return R.ok("更新成功");
+    }
+
     @Operation(summary = "删除购物车项")
     @DeleteMapping("/{id}")
     public R<?> delete(@PathVariable Long id) {
         cartService.delete(id);
         return R.ok("删除成功");
+    }
+
+    @Operation(summary = "管理员查询所有购物车")
+    @GetMapping("/list")
+    public R<?> list(@Parameter(hidden = true) CartEntity params,
+                     @RequestParam(defaultValue = "1") Integer page,
+                     @RequestParam(defaultValue = "10") Integer limit) {
+        IPage<CartEntity> result = cartService.queryPage(params);
+        return R.ok(result.getRecords());
+    }
+
+    @Operation(summary = "批量删除购物车")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(cartService::delete);
+        return R.ok("批量删除成功");
     }
 }

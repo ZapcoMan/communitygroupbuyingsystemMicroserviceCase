@@ -51,4 +51,11 @@ public class NewsController {
         newsService.delete(id);
         return R.ok("删除成功");
     }
+
+    @Operation(summary = "批量删除公告")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(newsService::delete);
+        return R.ok("批量删除成功");
+    }
 }
