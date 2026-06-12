@@ -1,4 +1,4 @@
-﻿package com.cgb.user.dao;
+package com.cgb.user.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cgb.user.entity.MemberEntity;

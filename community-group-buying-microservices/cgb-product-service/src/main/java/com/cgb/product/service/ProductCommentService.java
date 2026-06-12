@@ -1,4 +1,4 @@
-﻿package com.cgb.product.service;
+package com.cgb.product.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.product.entity.ProductCommentEntity;

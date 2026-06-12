@@ -1,4 +1,4 @@
-﻿package com.cgb.groupbuy.service;
+package com.cgb.groupbuy.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.groupbuy.entity.GroupBuyCommentEntity;
