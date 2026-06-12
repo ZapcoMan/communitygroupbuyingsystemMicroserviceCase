@@ -1,4 +1,4 @@
-﻿package com.cgb.user.service;
+package com.cgb.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;

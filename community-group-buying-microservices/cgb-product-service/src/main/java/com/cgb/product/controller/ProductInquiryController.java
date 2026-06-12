@@ -1,4 +1,4 @@
-﻿package com.cgb.product.controller;
+package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;

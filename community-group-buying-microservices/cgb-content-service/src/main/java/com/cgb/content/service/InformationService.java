@@ -1,4 +1,4 @@
-﻿package com.cgb.content.service;
+package com.cgb.content.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.content.entity.InformationEntity;

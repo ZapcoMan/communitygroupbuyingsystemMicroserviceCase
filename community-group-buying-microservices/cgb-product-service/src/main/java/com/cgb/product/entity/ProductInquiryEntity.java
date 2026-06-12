@@ -1,4 +1,4 @@
-﻿package com.cgb.product.entity;
+package com.cgb.product.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;

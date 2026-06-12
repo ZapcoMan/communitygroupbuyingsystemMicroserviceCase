@@ -1,4 +1,4 @@
-﻿package com.cgb.product.controller;
+package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
@@ -24,7 +24,7 @@ public class ProductCollectionController {
     public R<?> toggle(@RequestBody ProductCollectionEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserId(userId);
-        ProductCollectionEntity exist = collectionService.getByUserAndProduct(userId, entity.getShangpinid());
+        ProductCollectionEntity exist = collectionService.getByUserAndProduct(userId, entity.getProductId());
         if (exist != null) {
             collectionService.delete(exist.getId());
             return R.ok("取消收藏成功");
