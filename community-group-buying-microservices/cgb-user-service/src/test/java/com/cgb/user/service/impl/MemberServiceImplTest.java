@@ -1,4 +1,4 @@
-﻿package com.cgb.user.service.impl;
+package com.cgb.user.service.impl;
 
 import com.cgb.common.EIException;
 import com.cgb.common.R;

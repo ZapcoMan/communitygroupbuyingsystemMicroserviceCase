@@ -1,4 +1,4 @@
-﻿package com.cgb.product.service.impl;
+package com.cgb.product.service.impl;
 
 import com.cgb.product.dao.ProductCommentDao;
 import com.cgb.product.entity.ProductCommentEntity;

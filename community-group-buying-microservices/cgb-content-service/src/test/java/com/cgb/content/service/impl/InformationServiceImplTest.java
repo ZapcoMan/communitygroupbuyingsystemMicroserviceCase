@@ -1,4 +1,4 @@
-﻿package com.cgb.content.service.impl;
+package com.cgb.content.service.impl;
 
 import com.cgb.content.dao.InformationDao;
 import com.cgb.content.entity.InformationEntity;

@@ -1,4 +1,4 @@
-﻿package com.cgb.product.service.impl;
+package com.cgb.product.service.impl;
 
 import com.cgb.common.EIException;
 import com.cgb.product.dao.ProductDao;

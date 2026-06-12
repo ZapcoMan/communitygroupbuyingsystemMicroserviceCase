@@ -1,4 +1,4 @@
-﻿package com.cgb.content.service.impl;
+package com.cgb.content.service.impl;
 
 import com.cgb.common.EIException;
 import com.cgb.content.dao.MessageBoardDao;

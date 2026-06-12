@@ -1,4 +1,4 @@
-﻿package com.cgb.groupbuy.service.impl;
+package com.cgb.groupbuy.service.impl;
 
 import com.cgb.groupbuy.dao.GroupBuyDao;
 import com.cgb.groupbuy.entity.GroupBuyEntity;
