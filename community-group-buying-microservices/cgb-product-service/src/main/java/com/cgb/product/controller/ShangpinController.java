@@ -1,10 +1,10 @@
-package com.cgb.product.controller;
+﻿package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
 import com.cgb.common.annotation.RateLimit;
-import com.cgb.product.entity.ShangpinEntity;
-import com.cgb.product.service.ShangpinService;
+import com.cgb.product.entity.ProductEntity;
+import com.cgb.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/shangpin")
 @RequiredArgsConstructor
-public class ShangpinController {
+public class ProductController {
 
-    private final ShangpinService shangpinService;
+    private final ProductService shangpinService;
 
     @Operation(summary = "发布商品")
     @PostMapping
     @RateLimit(key = "product_create", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
-    public R<?> save(@RequestBody ShangpinEntity entity, HttpServletRequest request) {
+    public R<?> save(@RequestBody ProductEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setMerchantId(userId);
         shangpinService.save(entity);
@@ -32,8 +32,8 @@ public class ShangpinController {
 
     @Operation(summary = "商品列表")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) ShangpinEntity params) {
-        IPage<ShangpinEntity> result = shangpinService.queryPage(params);
+    public R<?> list(@Parameter(hidden = true) ProductEntity params) {
+        IPage<ProductEntity> result = shangpinService.queryPage(params);
         return R.ok(result);
     }
 
@@ -45,7 +45,7 @@ public class ShangpinController {
 
     @Operation(summary = "修改商品")
     @PutMapping
-    public R<?> update(@RequestBody ShangpinEntity entity) {
+    public R<?> update(@RequestBody ProductEntity entity) {
         shangpinService.update(entity);
         return R.ok("更新成功");
     }
@@ -75,7 +75,7 @@ public class ShangpinController {
     @Operation(summary = "内部-商品名称")
     @GetMapping("/internal/productName")
     public R<?> internalProductName(@RequestParam Long id) {
-        ShangpinEntity entity = shangpinService.getById(id);
+        ProductEntity entity = shangpinService.getById(id);
         return R.ok(entity != null ? entity.getProductName() : null);
     }
 

@@ -1,12 +1,12 @@
-package com.cgb.product.service;
+﻿package com.cgb.product.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.product.entity.ShangpinCommentEntity;
+import com.cgb.product.entity.ProductCommentEntity;
 
-public interface ShangpinCommentService {
-    void save(ShangpinCommentEntity entity);
-    void update(ShangpinCommentEntity entity);
+public interface ProductCommentService {
+    void save(ProductCommentEntity entity);
+    void update(ProductCommentEntity entity);
     void delete(Long id);
-    IPage<ShangpinCommentEntity> queryPage(ShangpinCommentEntity params);
+    IPage<ProductCommentEntity> queryPage(ProductCommentEntity params);
     Double getAverageScore(Long productId);
 }

@@ -1,12 +1,12 @@
-package com.cgb.product.service;
+﻿package com.cgb.product.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.product.entity.ShangpinCollectionEntity;
+import com.cgb.product.entity.ProductCollectionEntity;
 
-public interface ShangpinCollectionService {
-    void save(ShangpinCollectionEntity entity);
+public interface ProductCollectionService {
+    void save(ProductCollectionEntity entity);
     void delete(Long id);
-    ShangpinCollectionEntity getByUserAndProduct(Long userId, Long productId);
-    IPage<ShangpinCollectionEntity> queryPage(ShangpinCollectionEntity params);
+    ProductCollectionEntity getByUserAndProduct(Long userId, Long productId);
+    IPage<ProductCollectionEntity> queryPage(ProductCollectionEntity params);
     boolean isCollected(Long userId, Long productId);
 }

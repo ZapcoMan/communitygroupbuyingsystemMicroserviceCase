@@ -1,9 +1,9 @@
-package com.cgb.product.controller;
+﻿package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.product.entity.ShangpinleixingEntity;
-import com.cgb.product.service.ShangpinleixingService;
+import com.cgb.product.entity.ProductCategoryEntity;
+import com.cgb.product.service.ProductCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,29 +14,29 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/shangpinleixing")
 @RequiredArgsConstructor
-public class ShangpinleixingController {
+public class ProductCategoryController {
 
-    private final ShangpinleixingService service;
+    private final ProductCategoryService service;
 
     @Operation(summary = "分页查询商品类型")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) ShangpinleixingEntity params,
+    public R<?> list(@Parameter(hidden = true) ProductCategoryEntity params,
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
-        IPage<ShangpinleixingEntity> result = service.queryPage(params);
+        IPage<ProductCategoryEntity> result = service.queryPage(params);
         return R.ok(result);
     }
 
     @Operation(summary = "新增商品类型")
     @PostMapping
-    public R<?> save(@RequestBody ShangpinleixingEntity entity) {
+    public R<?> save(@RequestBody ProductCategoryEntity entity) {
         service.save(entity);
         return R.ok("保存成功");
     }
 
     @Operation(summary = "修改商品类型")
     @PutMapping
-    public R<?> update(@RequestBody ShangpinleixingEntity entity) {
+    public R<?> update(@RequestBody ProductCategoryEntity entity) {
         service.update(entity);
         return R.ok("更新成功");
     }

@@ -1,11 +1,11 @@
-package com.cgb.product.service;
+﻿package com.cgb.product.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.product.entity.ShangpinleixingEntity;
+import com.cgb.product.entity.ProductCategoryEntity;
 
-public interface ShangpinleixingService {
-    void save(ShangpinleixingEntity entity);
-    void update(ShangpinleixingEntity entity);
+public interface ProductCategoryService {
+    void save(ProductCategoryEntity entity);
+    void update(ProductCategoryEntity entity);
     void delete(Long id);
-    IPage<ShangpinleixingEntity> queryPage(ShangpinleixingEntity params);
+    IPage<ProductCategoryEntity> queryPage(ProductCategoryEntity params);
 }

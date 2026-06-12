@@ -1,13 +1,13 @@
-package com.cgb.product.dao;
+﻿package com.cgb.product.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cgb.product.entity.ShangpinEntity;
+import com.cgb.product.entity.ProductEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
 @Mapper
-public interface ShangpinDao extends BaseMapper<ShangpinEntity> {
+public interface ProductDao extends BaseMapper<ProductEntity> {
 
     /** 原子扣减库存（并发安全） */
     @Update("UPDATE shangpin SET kucun = kucun - #{quantity} WHERE id = #{id} AND kucun >= #{quantity}")

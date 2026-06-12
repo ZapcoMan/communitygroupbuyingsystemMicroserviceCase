@@ -1,9 +1,9 @@
-package com.cgb.product.controller;
+﻿package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.product.entity.ShangpinCommentEntity;
-import com.cgb.product.service.ShangpinCommentService;
+import com.cgb.product.entity.ProductCommentEntity;
+import com.cgb.product.service.ProductCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/shangpin/comment")
 @RequiredArgsConstructor
-public class ShangpinCommentController {
+public class ProductCommentController {
 
-    private final ShangpinCommentService commentService;
+    private final ProductCommentService commentService;
 
     @Operation(summary = "发表评论")
     @PostMapping
-    public R<?> save(@RequestBody ShangpinCommentEntity entity, HttpServletRequest request) {
+    public R<?> save(@RequestBody ProductCommentEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserId(userId);
         commentService.save(entity);
@@ -30,10 +30,10 @@ public class ShangpinCommentController {
 
     @Operation(summary = "分页查询评论")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) ShangpinCommentEntity params,
+    public R<?> list(@Parameter(hidden = true) ProductCommentEntity params,
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
-        IPage<ShangpinCommentEntity> result = commentService.queryPage(params);
+        IPage<ProductCommentEntity> result = commentService.queryPage(params);
         return R.ok(result);
     }
 
@@ -46,7 +46,7 @@ public class ShangpinCommentController {
 
     @Operation(summary = "更新评论/回复")
     @PutMapping
-    public R<?> update(@RequestBody ShangpinCommentEntity entity) {
+    public R<?> update(@RequestBody ProductCommentEntity entity) {
         commentService.update(entity);
         return R.ok("更新成功");
     }
