@@ -1,0 +1,3 @@
+jwt:
+  secret: ${JWT_SECRET:cgb-community-group-buying-secret-key-2024-change-this-in-production}
+  expiration: ${JWT_EXPIRATION:3600}
