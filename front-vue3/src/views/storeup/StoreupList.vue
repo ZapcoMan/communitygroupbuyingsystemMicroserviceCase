@@ -47,7 +47,7 @@ import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/product/file/')
 const loading = ref(false)
 const storeupList = ref([])
 const currentPage = ref(1)

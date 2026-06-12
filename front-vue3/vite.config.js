@@ -13,10 +13,10 @@ export default defineConfig({
     port: 8084,
     host: '0.0.0.0',
     proxy: {
-      '/springboot2c1hu': {
-        target: 'http://localhost:8080',
+      '/api': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/springboot2c1hu/, '/springboot2c1hu')
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   },

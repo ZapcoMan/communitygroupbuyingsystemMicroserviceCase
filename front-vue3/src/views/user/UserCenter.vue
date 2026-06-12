@@ -84,7 +84,7 @@
         <el-form-item label="头像">
           <el-upload
             class="avatar-uploader"
-            action="/springboot2c1hu/upload"
+            action="/api/user/file/upload"
             :headers="uploadHeaders"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
@@ -146,7 +146,7 @@ import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/user/file/')
 const uploadHeaders = ref({ Token: localStorage.getItem('token') || '' })
 const defaultAvatar = ref('https://via.placeholder.com/100')
 const loading = ref(false)

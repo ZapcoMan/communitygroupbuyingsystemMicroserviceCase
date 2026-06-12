@@ -84,7 +84,7 @@ const loading = ref(false)
 const commentText = ref('')
 const commentList = ref([])
 const isFavorited = ref(false)
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/content/file/')
 
 // 获取新闻详情
 const fetchNewsDetail = async () => {

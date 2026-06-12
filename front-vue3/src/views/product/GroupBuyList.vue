@@ -67,7 +67,7 @@ import { getGroupBuyList } from '@/api/product'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/groupbuy/file/')
 const searchQuery = ref('')
 const loading = ref(false)
 const groupBuyList = ref([])

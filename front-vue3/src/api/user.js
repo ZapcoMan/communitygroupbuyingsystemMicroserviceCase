@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 用户登录
 export const login = (data) => {
   return request({
-    url: '/yonghu/login',
+    url: '/user/yonghu/login',
     method: 'post',
     data
   })
@@ -12,7 +12,7 @@ export const login = (data) => {
 // 用户注册
 export const register = (data) => {
   return request({
-    url: '/yonghu/register',
+    url: '/user/yonghu/register',
     method: 'post',
     data
   })
@@ -21,7 +21,7 @@ export const register = (data) => {
 // 获取用户信息
 export const getUserInfo = (id) => {
   return request({
-    url: `/yonghu/detail/${id}`,
+    url: `/user/yonghu/detail/${id}`,
     method: 'get'
   })
 }
@@ -29,7 +29,7 @@ export const getUserInfo = (id) => {
 // 更新用户信息
 export const updateUserInfo = (data) => {
   return request({
-    url: '/yonghu/update',
+    url: '/user/yonghu/update',
     method: 'post',
     data
   })
@@ -38,7 +38,7 @@ export const updateUserInfo = (data) => {
 // 修改密码
 export const changePassword = (data) => {
   return request({
-    url: '/yonghu/password',
+    url: '/user/yonghu/password',
     method: 'post',
     data
   })
@@ -47,7 +47,7 @@ export const changePassword = (data) => {
 // 获取轮播图
 export const getBannerList = (params) => {
   return request({
-    url: '/config/list',
+    url: '/content/config/list',
     method: 'get',
     params: { ...params, name: 'homepage' }
   })
@@ -56,7 +56,7 @@ export const getBannerList = (params) => {
 // 获取配置信息
 export const getConfig = (name) => {
   return request({
-    url: '/config/list',
+    url: '/content/config/list',
     method: 'get',
     params: { name }
   })

@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取地址列表
 export const getAddressList = (params) => {
   return request({
-    url: '/address/list',
+    url: '/order/address/list',
     method: 'get',
     params
   })
@@ -12,7 +12,7 @@ export const getAddressList = (params) => {
 // 添加地址
 export const addAddress = (data) => {
   return request({
-    url: '/address/save',
+    url: '/order/address',
     method: 'post',
     data
   })
@@ -21,8 +21,8 @@ export const addAddress = (data) => {
 // 更新地址
 export const updateAddress = (data) => {
   return request({
-    url: '/address/update',
-    method: 'post',
+    url: `/order/address/${data.id}`,
+    method: 'put',
     data
   })
 }
@@ -30,17 +30,15 @@ export const updateAddress = (data) => {
 // 删除地址
 export const deleteAddress = (id) => {
   return request({
-    url: '/address/delete',
-    method: 'post',
-    data: [id]
+    url: `/order/address/${id}`,
+    method: 'delete'
   })
 }
 
 // 设置默认地址
 export const setDefaultAddress = (id) => {
   return request({
-    url: '/address/setDefault',
-    method: 'post',
-    data: { id }
+    url: `/order/address/default/${id}`,
+    method: 'put'
   })
 }

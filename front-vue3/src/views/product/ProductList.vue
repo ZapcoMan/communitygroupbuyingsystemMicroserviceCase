@@ -90,7 +90,7 @@ import { getProductList, getProductTypes } from '@/api/product'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/product/file/')
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const sortBy = ref('addtime')

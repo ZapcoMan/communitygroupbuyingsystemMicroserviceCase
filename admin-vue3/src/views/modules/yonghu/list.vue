@@ -97,7 +97,7 @@
         <el-form-item label="头像">
           <el-upload
             class="avatar-uploader"
-            action="/springboot2c1hu/upload"
+            action="/api/user/file/upload"
             :headers="uploadHeaders"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
@@ -120,7 +120,7 @@ import { ref, reactive, onMounted } from 'vue'
 import request from '@/utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/user/file/')
 const uploadHeaders = ref({ Token: localStorage.getItem('adminToken') || '' })
 const loading = ref(false)
 const tableData = ref([])

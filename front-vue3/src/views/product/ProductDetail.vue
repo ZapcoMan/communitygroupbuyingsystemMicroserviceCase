@@ -106,7 +106,7 @@ const mainImage = ref('')
 const commentText = ref('')
 const commentList = ref([])
 const isFavorited = ref(false)
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/product/file/')
 
 // 图片列表
 const imageList = computed(() => {

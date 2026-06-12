@@ -114,7 +114,7 @@
         </el-row>
         <el-form-item label="团购图片">
           <el-upload
-            action="/springboot2c1hu/upload"
+            action="/api/groupbuy/file/upload"
             :headers="uploadHeaders"
             :show-file-list="false"
             :on-success="handleUploadSuccess"
@@ -144,7 +144,7 @@ import { ref, reactive, onMounted } from 'vue'
 import request from '@/utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/groupbuy/file/')
 const uploadHeaders = ref({ Token: localStorage.getItem('adminToken') || '' })
 const loading = ref(false)
 const tableData = ref([])

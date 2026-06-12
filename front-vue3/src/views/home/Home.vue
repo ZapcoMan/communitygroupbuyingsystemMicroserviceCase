@@ -59,7 +59,7 @@ import { getProductList } from '@/api/product'
 import { getNewsList } from '@/api/news'
 
 const router = useRouter()
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/product/file/')
 const bannerList = ref([])
 const recommendProducts = ref([])
 const newsList = ref([])

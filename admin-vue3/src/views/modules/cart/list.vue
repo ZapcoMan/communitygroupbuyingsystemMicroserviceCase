@@ -73,7 +73,7 @@ import { ref, reactive, onMounted } from 'vue'
 import request from '@/utils/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/order/file/')
 const loading = ref(false)
 const tableData = ref([])
 const multipleSelection = ref([])

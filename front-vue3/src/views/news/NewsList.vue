@@ -44,7 +44,7 @@ import { getNewsList } from '@/api/news'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const baseUrl = ref('http://localhost:8080/springboot2c1hu/file/')
+const baseUrl = ref('/api/content/file/')
 const loading = ref(false)
 const newsList = ref([])
 const currentPage = ref(1)

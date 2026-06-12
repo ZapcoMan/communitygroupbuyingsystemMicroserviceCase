@@ -65,7 +65,7 @@ import { UserFilled, HomeFilled, Link, ShoppingCart } from '@element-plus/icons-
 const router = useRouter()
 const currentPage = ref('home')
 const projectName = ref('社区团购系统')
-const adminurl = ref('http://localhost:8080/springboot2c1hu/admin/dist/index.html')
+const adminurl = ref('/admin/dist/index.html')
 const cartFlag = ref(true)
 
 // 导航菜单
