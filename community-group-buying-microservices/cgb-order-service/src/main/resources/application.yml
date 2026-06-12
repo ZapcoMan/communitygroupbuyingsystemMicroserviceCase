@@ -82,3 +82,13 @@ logging:
   level:
     com.cgb: debug
     com.alibaba.nacos: info
+
+# ==================== RocketMQ 配置 ====================
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: cgb-order-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true

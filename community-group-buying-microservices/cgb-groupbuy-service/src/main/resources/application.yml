@@ -1,8 +1,38 @@
 server:
   port: 8003
+
 spring:
   application:
     name: cgb-groupbuy-service
+  profiles:
+    active: dev
+
+  # ==================== Nacos 配置中心 ====================
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848
+      discovery:
+        namespace: cgb-dev
+        group: CGB_GROUP
+        metadata:
+          version: 1.0.0
+          env: dev
+      config:
+        namespace: cgb-dev
+        group: CGB_GROUP
+        file-extension: yml
+        shared-configs:
+          - data-id: common-redis.yml
+            group: SHARED_GROUP
+            refresh: true
+          - data-id: common-mybatis.yml
+            group: SHARED_GROUP
+            refresh: true
+        refresh-enabled: true
+  config:
+    import:
+      - optional:nacos:cgb-groupbuy-service.yml?group=CGB_GROUP&refreshEnabled=true
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/cgb_groupbuy?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
@@ -49,3 +79,14 @@ management:
 logging:
   level:
     com.cgb: debug
+    com.alibaba.nacos: info
+
+# ==================== RocketMQ 配置 ====================
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: cgb-groupbuy-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
