@@ -1,9 +1,9 @@
-package com.cgb.user.service.impl;
+﻿package com.cgb.user.service.impl;
 
 import com.cgb.common.EIException;
 import com.cgb.common.R;
-import com.cgb.user.dao.YonghuDao;
-import com.cgb.user.entity.YonghuEntity;
+import com.cgb.user.dao.MemberDao;
+import com.cgb.user.entity.MemberEntity;
 import com.cgb.user.service.RedisTokenService;
 import com.cgb.user.utils.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -20,15 +20,15 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * YonghuServiceImpl 单元测试
+ * MemberServiceImpl 单元测试
  * 覆盖用户 CRUD、登录、注册业务逻辑
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("YonghuServiceImpl - 用户服务测试")
-class YonghuServiceImplTest {
+@DisplayName("MemberServiceImpl - 用户服务测试")
+class MemberServiceImplTest {
 
     @Mock
-    private YonghuDao yonghuDao;
+    private MemberDao yonghuDao;
 
     @Mock
     private RedisTokenService redisTokenService;
@@ -37,7 +37,7 @@ class YonghuServiceImplTest {
     private JwtUtils jwtUtils;
 
     @InjectMocks
-    private YonghuServiceImpl yonghuService;
+    private MemberServiceImpl yonghuService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -51,9 +51,9 @@ class YonghuServiceImplTest {
         @DisplayName("正常保存，密码被加密，默认值被设置")
         void save_newUser_encodesPasswordAndSetsDefaults() {
             when(yonghuDao.selectOne(any())).thenReturn(null);
-            when(yonghuDao.insert(any(YonghuEntity.class))).thenReturn(1);
+            when(yonghuDao.insert(any(MemberEntity.class))).thenReturn(1);
 
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             entity.setZhanghao("testuser");
             entity.setMima("plain123");
 
@@ -70,11 +70,11 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("账号已存在，抛出 EIException")
         void save_duplicateAccount_throwsException() {
-            YonghuEntity existing = new YonghuEntity();
+            MemberEntity existing = new MemberEntity();
             existing.setZhanghao("testuser");
             when(yonghuDao.selectOne(any())).thenReturn(existing);
 
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             entity.setZhanghao("testuser");
             entity.setMima("pass");
 
@@ -86,9 +86,9 @@ class YonghuServiceImplTest {
         @DisplayName("已设置积分和余额时不覆盖默认值")
         void save_withExistingValues_keepsDefaults() {
             when(yonghuDao.selectOne(any())).thenReturn(null);
-            when(yonghuDao.insert(any(YonghuEntity.class))).thenReturn(1);
+            when(yonghuDao.insert(any(MemberEntity.class))).thenReturn(1);
 
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             entity.setZhanghao("testuser");
             entity.setMima("pass");
             entity.setJifen(100.0);
@@ -112,7 +112,7 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("ID 为空时抛出异常")
         void update_nullId_throwsException() {
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             assertThrows(EIException.class, () -> yonghuService.update(entity));
         }
 
@@ -121,7 +121,7 @@ class YonghuServiceImplTest {
         void update_userNotFound_throwsException() {
             when(yonghuDao.selectById(99L)).thenReturn(null);
 
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             entity.setId(99L);
 
             EIException ex = assertThrows(EIException.class, () -> yonghuService.update(entity));
@@ -131,13 +131,13 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("密码变更时重新加密")
         void update_passwordChanged_reEncodes() {
-            YonghuEntity old = new YonghuEntity();
+            MemberEntity old = new MemberEntity();
             old.setId(1L);
             old.setMima("oldHashedPassword");
             when(yonghuDao.selectById(1L)).thenReturn(old);
-            when(yonghuDao.updateById(any(YonghuEntity.class))).thenReturn(1);
+            when(yonghuDao.updateById(any(MemberEntity.class))).thenReturn(1);
 
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             entity.setId(1L);
             entity.setMima("newPassword123");
 
@@ -149,13 +149,13 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("密码未变更时不更新密码字段")
         void update_passwordUnchanged_setsNull() {
-            YonghuEntity old = new YonghuEntity();
+            MemberEntity old = new MemberEntity();
             old.setId(1L);
             old.setMima("samePassword");
             when(yonghuDao.selectById(1L)).thenReturn(old);
-            when(yonghuDao.updateById(any(YonghuEntity.class))).thenReturn(1);
+            when(yonghuDao.updateById(any(MemberEntity.class))).thenReturn(1);
 
-            YonghuEntity entity = new YonghuEntity();
+            MemberEntity entity = new MemberEntity();
             entity.setId(1L);
             entity.setMima("samePassword");
 
@@ -189,11 +189,11 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("正常返回用户实体")
         void getById_exists_returnsEntity() {
-            YonghuEntity expected = new YonghuEntity();
+            MemberEntity expected = new MemberEntity();
             expected.setId(1L);
             when(yonghuDao.selectById(1L)).thenReturn(expected);
 
-            YonghuEntity result = yonghuService.getById(1L);
+            MemberEntity result = yonghuService.getById(1L);
 
             assertNotNull(result);
             assertEquals(1L, result.getId());
@@ -220,7 +220,7 @@ class YonghuServiceImplTest {
         void login_accountNotFound_returnsFail() {
             when(yonghuDao.selectOne(any())).thenReturn(null);
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("nonexist");
             params.setMima("pass");
 
@@ -232,14 +232,14 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("账号被禁用，返回错误")
         void login_accountDisabled_returnsFail() {
-            YonghuEntity user = new YonghuEntity();
+            MemberEntity user = new MemberEntity();
             user.setId(1L);
             user.setZhanghao("testuser");
             user.setMima(passwordEncoder.encode("pass"));
             user.setStatus(1);
             when(yonghuDao.selectOne(any())).thenReturn(user);
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("testuser");
             params.setMima("pass");
 
@@ -251,14 +251,14 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("密码错误，返回错误")
         void login_wrongPassword_returnsFail() {
-            YonghuEntity user = new YonghuEntity();
+            MemberEntity user = new MemberEntity();
             user.setId(1L);
             user.setZhanghao("testuser");
             user.setMima(passwordEncoder.encode("correct"));
             user.setStatus(0);
             when(yonghuDao.selectOne(any())).thenReturn(user);
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("testuser");
             params.setMima("wrong");
 
@@ -270,7 +270,7 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("登录成功，返回 Token 和脱敏用户信息")
         void login_success_returnsTokenAndVO() {
-            YonghuEntity user = new YonghuEntity();
+            MemberEntity user = new MemberEntity();
             user.setId(1L);
             user.setZhanghao("testuser");
             user.setMima(passwordEncoder.encode("pass123"));
@@ -279,7 +279,7 @@ class YonghuServiceImplTest {
             when(yonghuDao.selectOne(any())).thenReturn(user);
             when(jwtUtils.generateToken(eq(1L), eq("user"), eq("10.0.0.1"))).thenReturn("jwt-abc");
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("testuser");
             params.setMima("pass123");
 
@@ -294,7 +294,7 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("登录成功后 Token 保存到 Redis")
         void login_success_savesTokenToRedis() {
-            YonghuEntity user = new YonghuEntity();
+            MemberEntity user = new MemberEntity();
             user.setId(1L);
             user.setZhanghao("testuser");
             user.setMima(passwordEncoder.encode("pass"));
@@ -302,7 +302,7 @@ class YonghuServiceImplTest {
             when(yonghuDao.selectOne(any())).thenReturn(user);
             when(jwtUtils.generateToken(anyLong(), anyString(), anyString())).thenReturn("token-xyz");
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("testuser");
             params.setMima("pass");
 
@@ -314,7 +314,7 @@ class YonghuServiceImplTest {
         @Test
         @DisplayName("status 为 null 时不影响登录")
         void login_statusNull_allowsLogin() {
-            YonghuEntity user = new YonghuEntity();
+            MemberEntity user = new MemberEntity();
             user.setId(1L);
             user.setZhanghao("testuser");
             user.setMima(passwordEncoder.encode("pass"));
@@ -322,7 +322,7 @@ class YonghuServiceImplTest {
             when(yonghuDao.selectOne(any())).thenReturn(user);
             when(jwtUtils.generateToken(anyLong(), anyString(), anyString())).thenReturn("token");
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("testuser");
             params.setMima("pass");
 
@@ -342,9 +342,9 @@ class YonghuServiceImplTest {
         @DisplayName("注册成功")
         void register_newUser_returnsSuccess() {
             when(yonghuDao.selectOne(any())).thenReturn(null);
-            when(yonghuDao.insert(any(YonghuEntity.class))).thenReturn(1);
+            when(yonghuDao.insert(any(MemberEntity.class))).thenReturn(1);
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("newuser");
             params.setMima("password123");
 
@@ -352,17 +352,17 @@ class YonghuServiceImplTest {
 
             assertEquals(0, result.getCode());
             assertEquals("注册成功", result.getMsg());
-            verify(yonghuDao).insert(any(YonghuEntity.class));
+            verify(yonghuDao).insert(any(MemberEntity.class));
         }
 
         @Test
         @DisplayName("注册账号已存在，抛出异常")
         void register_duplicateAccount_throwsException() {
-            YonghuEntity existing = new YonghuEntity();
+            MemberEntity existing = new MemberEntity();
             existing.setZhanghao("existuser");
             when(yonghuDao.selectOne(any())).thenReturn(existing);
 
-            YonghuEntity params = new YonghuEntity();
+            MemberEntity params = new MemberEntity();
             params.setZhanghao("existuser");
             params.setMima("pass");
 

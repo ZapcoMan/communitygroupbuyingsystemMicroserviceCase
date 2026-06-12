@@ -1,8 +1,8 @@
-package com.cgb.product.service.impl;
+﻿package com.cgb.product.service.impl;
 
 import com.cgb.common.EIException;
-import com.cgb.product.dao.ShangpinDao;
-import com.cgb.product.entity.ShangpinEntity;
+import com.cgb.product.dao.ProductDao;
+import com.cgb.product.entity.ProductEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,15 +18,15 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * ShangpinServiceImpl 单元测试
+ * ProductServiceImpl 单元测试
  * 覆盖商品 CRUD 和 Redis 库存管理
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ShangpinServiceImpl - 商品服务测试")
-class ShangpinServiceImplTest {
+@DisplayName("ProductServiceImpl - 商品服务测试")
+class ProductServiceImplTest {
 
     @Mock
-    private ShangpinDao shangpinDao;
+    private ProductDao shangpinDao;
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
@@ -35,7 +35,7 @@ class ShangpinServiceImplTest {
     private ValueOperations<String, Object> valueOperations;
 
     @InjectMocks
-    private ShangpinServiceImpl shangpinService;
+    private ProductServiceImpl shangpinService;
 
     @Nested
     @DisplayName("save - 新增商品")
@@ -43,8 +43,8 @@ class ShangpinServiceImplTest {
         @Test
         @DisplayName("正常保存商品")
         void save_validEntity_callsInsert() {
-            when(shangpinDao.insert(any(ShangpinEntity.class))).thenReturn(1);
-            ShangpinEntity entity = new ShangpinEntity();
+            when(shangpinDao.insert(any(ProductEntity.class))).thenReturn(1);
+            ProductEntity entity = new ProductEntity();
             entity.setMingcheng("苹果");
             shangpinService.save(entity);
             verify(shangpinDao).insert(entity);
@@ -57,15 +57,15 @@ class ShangpinServiceImplTest {
         @Test
         @DisplayName("ID 为空时抛出异常")
         void update_nullId_throwsException() {
-            ShangpinEntity entity = new ShangpinEntity();
+            ProductEntity entity = new ProductEntity();
             assertThrows(EIException.class, () -> shangpinService.update(entity));
         }
 
         @Test
         @DisplayName("正常更新商品")
         void update_validEntity_callsUpdateById() {
-            when(shangpinDao.updateById(any(ShangpinEntity.class))).thenReturn(1);
-            ShangpinEntity entity = new ShangpinEntity();
+            when(shangpinDao.updateById(any(ProductEntity.class))).thenReturn(1);
+            ProductEntity entity = new ProductEntity();
             entity.setId(1L);
             shangpinService.update(entity);
             verify(shangpinDao).updateById(entity);
@@ -90,10 +90,10 @@ class ShangpinServiceImplTest {
         @Test
         @DisplayName("商品存在时正常返回")
         void getById_exists_returnsEntity() {
-            ShangpinEntity expected = new ShangpinEntity();
+            ProductEntity expected = new ProductEntity();
             expected.setId(1L);
             when(shangpinDao.selectById(1L)).thenReturn(expected);
-            ShangpinEntity result = shangpinService.getById(1L);
+            ProductEntity result = shangpinService.getById(1L);
             assertNotNull(result);
             assertEquals(1L, result.getId());
         }

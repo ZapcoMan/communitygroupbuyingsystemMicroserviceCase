@@ -1,7 +1,7 @@
-package com.cgb.product.service.impl;
+﻿package com.cgb.product.service.impl;
 
-import com.cgb.product.dao.ShangpinLiuyanDao;
-import com.cgb.product.entity.ShangpinLiuyanEntity;
+import com.cgb.product.dao.ProductInquiryDao;
+import com.cgb.product.entity.ProductInquiryEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,14 +14,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ShangpinLiuyanServiceImpl - 商品留言服务测试")
-class ShangpinLiuyanServiceImplTest {
+@DisplayName("ProductInquiryServiceImpl - 商品留言服务测试")
+class ProductInquiryServiceImplTest {
 
     @Mock
-    private ShangpinLiuyanDao liuyanDao;
+    private ProductInquiryDao liuyanDao;
 
     @InjectMocks
-    private ShangpinLiuyanServiceImpl liuyanService;
+    private ProductInquiryServiceImpl liuyanService;
 
     @Nested
     @DisplayName("save - 新增留言")
@@ -29,8 +29,8 @@ class ShangpinLiuyanServiceImplTest {
         @Test
         @DisplayName("正常保存留言")
         void save_validEntity_callsInsert() {
-            when(liuyanDao.insert(any(ShangpinLiuyanEntity.class))).thenReturn(1);
-            ShangpinLiuyanEntity entity = new ShangpinLiuyanEntity();
+            when(liuyanDao.insert(any(ProductInquiryEntity.class))).thenReturn(1);
+            ProductInquiryEntity entity = new ProductInquiryEntity();
             entity.setShangpinid(1L);
             liuyanService.save(entity);
             verify(liuyanDao).insert(entity);

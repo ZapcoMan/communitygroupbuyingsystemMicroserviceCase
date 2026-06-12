@@ -1,7 +1,7 @@
-package com.cgb.content.service.impl;
+﻿package com.cgb.content.service.impl;
 
-import com.cgb.content.dao.ZixunDao;
-import com.cgb.content.entity.ZixunEntity;
+import com.cgb.content.dao.InformationDao;
+import com.cgb.content.entity.InformationEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,16 +16,16 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("团购资讯服务测试")
-class ZixunServiceImplTest {
+class InformationServiceImplTest {
 
     @Mock
-    private ZixunDao zixunDao;
+    private InformationDao zixunDao;
 
     @InjectMocks
-    private ZixunServiceImpl zixunService;
+    private InformationServiceImpl zixunService;
 
-    private ZixunEntity buildZixun(Long id) {
-        ZixunEntity entity = new ZixunEntity();
+    private InformationEntity buildZixun(Long id) {
+        InformationEntity entity = new InformationEntity();
         entity.setId(id);
         entity.setTitle("团购资讯");
         entity.setContent("资讯内容详情");
@@ -41,8 +41,8 @@ class ZixunServiceImplTest {
         @Test
         @DisplayName("保存资讯 - 成功")
         void save_success() {
-            ZixunEntity entity = buildZixun(null);
-            when(zixunDao.insert(any(ZixunEntity.class))).thenReturn(1);
+            InformationEntity entity = buildZixun(null);
+            when(zixunDao.insert(any(InformationEntity.class))).thenReturn(1);
 
             zixunService.save(entity);
 
@@ -56,8 +56,8 @@ class ZixunServiceImplTest {
         @Test
         @DisplayName("更新资讯 - 成功")
         void update_success() {
-            ZixunEntity entity = buildZixun(1L);
-            when(zixunDao.updateById(any(ZixunEntity.class))).thenReturn(1);
+            InformationEntity entity = buildZixun(1L);
+            when(zixunDao.updateById(any(InformationEntity.class))).thenReturn(1);
 
             zixunService.update(entity);
 
@@ -85,10 +85,10 @@ class ZixunServiceImplTest {
         @Test
         @DisplayName("根据ID查询 - 存在")
         void getById_exists() {
-            ZixunEntity expected = buildZixun(1L);
+            InformationEntity expected = buildZixun(1L);
             when(zixunDao.selectById(1L)).thenReturn(expected);
 
-            ZixunEntity result = zixunService.getById(1L);
+            InformationEntity result = zixunService.getById(1L);
 
             assertNotNull(result);
             assertEquals("团购资讯", result.getTitle());

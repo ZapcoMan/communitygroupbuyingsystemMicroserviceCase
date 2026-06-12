@@ -1,7 +1,7 @@
-package com.cgb.groupbuy.service.impl;
+﻿package com.cgb.groupbuy.service.impl;
 
-import com.cgb.groupbuy.dao.TuanxinxiDao;
-import com.cgb.groupbuy.entity.TuanxinxiEntity;
+import com.cgb.groupbuy.dao.GroupBuyDao;
+import com.cgb.groupbuy.entity.GroupBuyEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,18 +18,18 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("团购信息服务测试")
-class TuanxinxiServiceImplTest {
+class GroupBuyServiceImplTest {
 
     @Mock
-    private TuanxinxiDao tuanxinxiDao;
+    private GroupBuyDao tuanxinxiDao;
 
     @InjectMocks
-    private TuanxinxiServiceImpl tuanxinxiService;
+    private GroupBuyServiceImpl tuanxinxiService;
 
     // ========== 辅助方法 ==========
 
-    private TuanxinxiEntity buildTuanxinxi(Long id, Long tuanduiid, Long userId, Integer status) {
-        TuanxinxiEntity entity = new TuanxinxiEntity();
+    private GroupBuyEntity buildTuanxinxi(Long id, Long tuanduiid, Long userId, Integer status) {
+        GroupBuyEntity entity = new GroupBuyEntity();
         entity.setId(id);
         entity.setTuanduiid(tuanduiid);
         entity.setUserId(userId);
@@ -49,8 +49,8 @@ class TuanxinxiServiceImplTest {
         @Test
         @DisplayName("保存参团记录 - 未指定状态时默认设为0")
         void save_noDefault_setToZero() {
-            TuanxinxiEntity entity = buildTuanxinxi(null, 1L, 100L, null);
-            when(tuanxinxiDao.insert(any(TuanxinxiEntity.class))).thenReturn(1);
+            GroupBuyEntity entity = buildTuanxinxi(null, 1L, 100L, null);
+            when(tuanxinxiDao.insert(any(GroupBuyEntity.class))).thenReturn(1);
 
             tuanxinxiService.save(entity);
 
@@ -61,8 +61,8 @@ class TuanxinxiServiceImplTest {
         @Test
         @DisplayName("保存参团记录 - 已有状态时保留原值")
         void save_withStatus_keepValue() {
-            TuanxinxiEntity entity = buildTuanxinxi(null, 1L, 100L, 1);
-            when(tuanxinxiDao.insert(any(TuanxinxiEntity.class))).thenReturn(1);
+            GroupBuyEntity entity = buildTuanxinxi(null, 1L, 100L, 1);
+            when(tuanxinxiDao.insert(any(GroupBuyEntity.class))).thenReturn(1);
 
             tuanxinxiService.save(entity);
 
@@ -80,8 +80,8 @@ class TuanxinxiServiceImplTest {
         @Test
         @DisplayName("更新参团记录 - 成功")
         void update_success() {
-            TuanxinxiEntity entity = buildTuanxinxi(1L, 1L, 100L, 1);
-            when(tuanxinxiDao.updateById(any(TuanxinxiEntity.class))).thenReturn(1);
+            GroupBuyEntity entity = buildTuanxinxi(1L, 1L, 100L, 1);
+            when(tuanxinxiDao.updateById(any(GroupBuyEntity.class))).thenReturn(1);
 
             tuanxinxiService.update(entity);
 

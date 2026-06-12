@@ -1,7 +1,7 @@
-package com.cgb.product.service.impl;
+﻿package com.cgb.product.service.impl;
 
-import com.cgb.product.dao.ShangpinCollectionDao;
-import com.cgb.product.entity.ShangpinCollectionEntity;
+import com.cgb.product.dao.ProductCollectionDao;
+import com.cgb.product.entity.ProductCollectionEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,14 +15,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ShangpinCollectionServiceImpl - 商品收藏服务测试")
-class ShangpinCollectionServiceImplTest {
+@DisplayName("ProductCollectionServiceImpl - 商品收藏服务测试")
+class ProductCollectionServiceImplTest {
 
     @Mock
-    private ShangpinCollectionDao collectionDao;
+    private ProductCollectionDao collectionDao;
 
     @InjectMocks
-    private ShangpinCollectionServiceImpl collectionService;
+    private ProductCollectionServiceImpl collectionService;
 
     @Nested
     @DisplayName("save - 新增收藏")
@@ -30,8 +30,8 @@ class ShangpinCollectionServiceImplTest {
         @Test
         @DisplayName("正常保存收藏记录")
         void save_validEntity_callsInsert() {
-            when(collectionDao.insert(any(ShangpinCollectionEntity.class))).thenReturn(1);
-            ShangpinCollectionEntity entity = new ShangpinCollectionEntity();
+            when(collectionDao.insert(any(ProductCollectionEntity.class))).thenReturn(1);
+            ProductCollectionEntity entity = new ProductCollectionEntity();
             entity.setUserId(1L);
             entity.setShangpinid(10L);
             collectionService.save(entity);
@@ -57,10 +57,10 @@ class ShangpinCollectionServiceImplTest {
         @Test
         @DisplayName("收藏存在时返回实体")
         void getByUserAndProduct_exists_returnsEntity() {
-            ShangpinCollectionEntity expected = new ShangpinCollectionEntity();
+            ProductCollectionEntity expected = new ProductCollectionEntity();
             expected.setId(1L);
             when(collectionDao.selectOne(any())).thenReturn(expected);
-            ShangpinCollectionEntity result = collectionService.getByUserAndProduct(1L, 10L);
+            ProductCollectionEntity result = collectionService.getByUserAndProduct(1L, 10L);
             assertNotNull(result);
         }
 
@@ -78,7 +78,7 @@ class ShangpinCollectionServiceImplTest {
         @Test
         @DisplayName("已收藏返回 true")
         void isCollected_collected_returnsTrue() {
-            when(collectionDao.selectOne(any())).thenReturn(new ShangpinCollectionEntity());
+            when(collectionDao.selectOne(any())).thenReturn(new ProductCollectionEntity());
             assertTrue(collectionService.isCollected(1L, 10L));
         }
 

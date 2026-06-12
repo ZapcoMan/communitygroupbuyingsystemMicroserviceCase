@@ -1,8 +1,8 @@
-package com.cgb.groupbuy.service.impl;
+﻿package com.cgb.groupbuy.service.impl;
 
 import com.cgb.common.EIException;
-import com.cgb.groupbuy.dao.TuanweiDao;
-import com.cgb.groupbuy.entity.TuanweiEntity;
+import com.cgb.groupbuy.dao.GroupSlotDao;
+import com.cgb.groupbuy.entity.GroupSlotEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,18 +20,18 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("团长团购服务测试")
-class TuanweiServiceImplTest {
+class GroupSlotServiceImplTest {
 
     @Mock
-    private TuanweiDao tuanweiDao;
+    private GroupSlotDao tuanweiDao;
 
     @InjectMocks
-    private TuanweiServiceImpl tuanweiService;
+    private GroupSlotServiceImpl tuanweiService;
 
     // ========== 辅助方法 ==========
 
-    private TuanweiEntity buildTuanwei(Long id, Integer status, Integer currentPeople) {
-        TuanweiEntity entity = new TuanweiEntity();
+    private GroupSlotEntity buildTuanwei(Long id, Integer status, Integer currentPeople) {
+        GroupSlotEntity entity = new GroupSlotEntity();
         entity.setId(id);
         entity.setMingcheng("新鲜水果团购");
         entity.setTupian("/images/tuanwei/1.jpg");
@@ -56,8 +56,8 @@ class TuanweiServiceImplTest {
         @Test
         @DisplayName("创建团购 - 未指定状态和人数时设默认值")
         void save_noDefaults_setDefaults() {
-            TuanweiEntity entity = buildTuanwei(null, null, null);
-            when(tuanweiDao.insert(any(TuanweiEntity.class))).thenReturn(1);
+            GroupSlotEntity entity = buildTuanwei(null, null, null);
+            when(tuanweiDao.insert(any(GroupSlotEntity.class))).thenReturn(1);
 
             tuanweiService.save(entity);
 
@@ -69,8 +69,8 @@ class TuanweiServiceImplTest {
         @Test
         @DisplayName("创建团购 - 已有状态和人数时保留原值")
         void save_withValues_keepOriginal() {
-            TuanweiEntity entity = buildTuanwei(null, 1, 5);
-            when(tuanweiDao.insert(any(TuanweiEntity.class))).thenReturn(1);
+            GroupSlotEntity entity = buildTuanwei(null, 1, 5);
+            when(tuanweiDao.insert(any(GroupSlotEntity.class))).thenReturn(1);
 
             tuanweiService.save(entity);
 
@@ -89,8 +89,8 @@ class TuanweiServiceImplTest {
         @Test
         @DisplayName("更新团购 - 成功")
         void update_success() {
-            TuanweiEntity entity = buildTuanwei(1L, 0, 3);
-            when(tuanweiDao.updateById(any(TuanweiEntity.class))).thenReturn(1);
+            GroupSlotEntity entity = buildTuanwei(1L, 0, 3);
+            when(tuanweiDao.updateById(any(GroupSlotEntity.class))).thenReturn(1);
 
             tuanweiService.update(entity);
 
@@ -100,7 +100,7 @@ class TuanweiServiceImplTest {
         @Test
         @DisplayName("更新团购 - ID为空抛出异常")
         void update_nullId_throwsException() {
-            TuanweiEntity entity = buildTuanwei(null, 0, 3);
+            GroupSlotEntity entity = buildTuanwei(null, 0, 3);
 
             EIException ex = assertThrows(EIException.class,
                     () -> tuanweiService.update(entity));
@@ -134,10 +134,10 @@ class TuanweiServiceImplTest {
         @Test
         @DisplayName("根据ID查询 - 存在")
         void getById_exists() {
-            TuanweiEntity expected = buildTuanwei(1L, 0, 5);
+            GroupSlotEntity expected = buildTuanwei(1L, 0, 5);
             when(tuanweiDao.selectById(1L)).thenReturn(expected);
 
-            TuanweiEntity result = tuanweiService.getById(1L);
+            GroupSlotEntity result = tuanweiService.getById(1L);
 
             assertNotNull(result);
             assertEquals("新鲜水果团购", result.getMingcheng());

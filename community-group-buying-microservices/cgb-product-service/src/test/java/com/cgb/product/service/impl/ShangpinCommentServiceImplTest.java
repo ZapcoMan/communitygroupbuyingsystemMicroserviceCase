@@ -1,7 +1,7 @@
-package com.cgb.product.service.impl;
+﻿package com.cgb.product.service.impl;
 
-import com.cgb.product.dao.ShangpinCommentDao;
-import com.cgb.product.entity.ShangpinCommentEntity;
+import com.cgb.product.dao.ProductCommentDao;
+import com.cgb.product.entity.ProductCommentEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,14 +17,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ShangpinCommentServiceImpl - 商品评价服务测试")
-class ShangpinCommentServiceImplTest {
+@DisplayName("ProductCommentServiceImpl - 商品评价服务测试")
+class ProductCommentServiceImplTest {
 
     @Mock
-    private ShangpinCommentDao commentDao;
+    private ProductCommentDao commentDao;
 
     @InjectMocks
-    private ShangpinCommentServiceImpl commentService;
+    private ProductCommentServiceImpl commentService;
 
     @Nested
     @DisplayName("save - 新增评价")
@@ -32,8 +32,8 @@ class ShangpinCommentServiceImplTest {
         @Test
         @DisplayName("正常保存评价")
         void save_validEntity_callsInsert() {
-            when(commentDao.insert(any(ShangpinCommentEntity.class))).thenReturn(1);
-            ShangpinCommentEntity entity = new ShangpinCommentEntity();
+            when(commentDao.insert(any(ProductCommentEntity.class))).thenReturn(1);
+            ProductCommentEntity entity = new ProductCommentEntity();
             entity.setShangpinid(1L);
             entity.setPingfen(5);
             commentService.save(entity);
@@ -47,8 +47,8 @@ class ShangpinCommentServiceImplTest {
         @Test
         @DisplayName("正常更新评价")
         void update_validEntity_callsUpdateById() {
-            when(commentDao.updateById(any(ShangpinCommentEntity.class))).thenReturn(1);
-            ShangpinCommentEntity entity = new ShangpinCommentEntity();
+            when(commentDao.updateById(any(ProductCommentEntity.class))).thenReturn(1);
+            ProductCommentEntity entity = new ProductCommentEntity();
             entity.setId(1L);
             commentService.update(entity);
             verify(commentDao).updateById(entity);
@@ -74,9 +74,9 @@ class ShangpinCommentServiceImplTest {
         @DisplayName("有评价时返回正确平均分")
         void getAverageScore_hasComments_returnsAverage() {
             when(commentDao.selectCount(any())).thenReturn(2L);
-            ShangpinCommentEntity c1 = new ShangpinCommentEntity();
+            ProductCommentEntity c1 = new ProductCommentEntity();
             c1.setPingfen(4);
-            ShangpinCommentEntity c2 = new ShangpinCommentEntity();
+            ProductCommentEntity c2 = new ProductCommentEntity();
             c2.setPingfen(6);
             when(commentDao.selectList(any())).thenReturn(List.of(c1, c2));
 
