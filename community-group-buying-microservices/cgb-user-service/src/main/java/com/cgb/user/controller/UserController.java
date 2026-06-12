@@ -42,7 +42,7 @@ public class UserController {
     @GetMapping("/list")
     public R<?> list(@Parameter(hidden = true) UserEntity params) {
         IPage<UserEntity> result = userService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "管理员详情")

@@ -32,7 +32,7 @@ public class AddressController {
     @GetMapping("/my")
     public R<?> myList(@Parameter(hidden = true) AddressEntity params) {
         IPage<AddressEntity> result = addressService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "修改地址")
@@ -71,7 +71,7 @@ public class AddressController {
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
         IPage<AddressEntity> result = addressService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "批量删除地址")

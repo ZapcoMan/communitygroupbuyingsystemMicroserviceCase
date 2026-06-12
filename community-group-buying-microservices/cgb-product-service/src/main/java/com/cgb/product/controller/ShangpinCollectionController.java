@@ -39,7 +39,7 @@ public class ShangpinCollectionController {
                        @RequestParam(defaultValue = "1") Integer page,
                        @RequestParam(defaultValue = "10") Integer limit) {
         IPage<ShangpinCollectionEntity> result = collectionService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "管理员查询所有收藏")
@@ -48,7 +48,7 @@ public class ShangpinCollectionController {
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
         IPage<ShangpinCollectionEntity> result = collectionService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "管理员删除收藏")

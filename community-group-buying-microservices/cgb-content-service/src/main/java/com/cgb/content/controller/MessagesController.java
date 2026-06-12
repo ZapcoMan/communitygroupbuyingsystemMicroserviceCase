@@ -32,7 +32,7 @@ public class MessagesController {
     @GetMapping("/list")
     public R<?> list(@Parameter(hidden = true) MessagesEntity params) {
         IPage<MessagesEntity> result = messagesService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "回复留言")

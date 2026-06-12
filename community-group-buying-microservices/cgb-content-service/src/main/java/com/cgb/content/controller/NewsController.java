@@ -29,7 +29,7 @@ public class NewsController {
     @GetMapping("/list")
     public R<?> list(@Parameter(hidden = true) NewsEntity params) {
         IPage<NewsEntity> result = newsService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "公告详情")

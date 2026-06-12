@@ -32,7 +32,7 @@ public class ForumController {
     @GetMapping("/list")
     public R<?> list(@Parameter(hidden = true) ForumEntity params) {
         IPage<ForumEntity> result = forumService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "帖子详情")

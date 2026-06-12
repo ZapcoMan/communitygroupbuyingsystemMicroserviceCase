@@ -24,7 +24,7 @@ public class TuanCommentController {
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
         IPage<TuanCommentEntity> result = service.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "发表团购评论")

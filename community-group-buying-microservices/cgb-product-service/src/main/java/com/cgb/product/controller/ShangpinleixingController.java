@@ -24,7 +24,7 @@ public class ShangpinleixingController {
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
         IPage<ShangpinleixingEntity> result = service.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "新增商品类型")

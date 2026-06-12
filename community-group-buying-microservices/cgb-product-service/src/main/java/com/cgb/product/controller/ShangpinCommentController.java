@@ -34,7 +34,7 @@ public class ShangpinCommentController {
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
         IPage<ShangpinCommentEntity> result = commentService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "删除评论")

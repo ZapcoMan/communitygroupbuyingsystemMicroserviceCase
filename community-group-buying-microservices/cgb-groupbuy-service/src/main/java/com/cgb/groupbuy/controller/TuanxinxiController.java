@@ -33,7 +33,7 @@ public class TuanxinxiController {
     @GetMapping("/list")
     public R<?> list(@Parameter(hidden = true) TuanxinxiEntity params) {
         IPage<TuanxinxiEntity> result = tuanxinxiService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "参团详情")
