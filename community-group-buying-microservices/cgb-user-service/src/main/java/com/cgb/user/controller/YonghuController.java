@@ -3,6 +3,7 @@ package com.cgb.user.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
 import com.cgb.common.annotation.IgnoreAuth;
+import com.cgb.common.annotation.RateLimit;
 import com.cgb.common.utils.CommonUtil;
 import com.cgb.user.entity.YonghuEntity;
 import com.cgb.user.service.YonghuService;
@@ -29,6 +30,7 @@ public class YonghuController {
     @Operation(summary = "用户注册")
     @PostMapping("/register")
     @IgnoreAuth
+    @RateLimit(key = "user_register", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> register(@RequestBody YonghuEntity entity) {
         return yonghuService.register(entity);
     }
@@ -36,6 +38,7 @@ public class YonghuController {
     @Operation(summary = "用户登录")
     @PostMapping("/login")
     @IgnoreAuth
+    @RateLimit(key = "user_login", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> login(@RequestBody YonghuEntity entity, HttpServletRequest request) {
         String clientIP = CommonUtil.getClientIP(request);
         return yonghuService.login(entity, clientIP);

@@ -2,6 +2,7 @@ package com.cgb.product.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
+import com.cgb.common.annotation.RateLimit;
 import com.cgb.product.entity.ShangpinEntity;
 import com.cgb.product.service.ShangpinService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ public class ShangpinController {
 
     @Operation(summary = "新增商品")
     @PostMapping
+    @RateLimit(key = "product_create", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody ShangpinEntity entity) {
         shangpinService.save(entity);
         return R.ok("保存成功");

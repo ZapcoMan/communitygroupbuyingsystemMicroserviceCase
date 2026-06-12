@@ -10,4 +10,7 @@ public interface ForumService {
     ForumEntity getById(Long id);
     IPage<ForumEntity> queryPage(ForumEntity params);
     void thumbUp(Long id);
+
+    /** 获取热门帖子（Redis 缓存） */
+    IPage<ForumEntity> getHotPosts(int page, int limit);
 }

@@ -9,4 +9,10 @@ public interface TuanweiService {
     void delete(Long id);
     TuanweiEntity getById(Long id);
     IPage<TuanweiEntity> queryPage(TuanweiEntity params);
+
+    /** 参团（分布式事务：+1人 + 扣库存 + 发MQ） */
+    void joinGroupBuy(Long groupBuyId, Long userId, Integer quantity);
+
+    /** 检查并完成成团 */
+    void checkAndCompleteGroupBuy(Long groupBuyId);
 }

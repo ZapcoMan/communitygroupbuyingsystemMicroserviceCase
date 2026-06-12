@@ -10,4 +10,7 @@ public interface TuanxinxiService {
     TuanxinxiEntity getById(Long id);
     IPage<TuanxinxiEntity> queryPage(TuanxinxiEntity params);
     int countByTuanId(Long tuanduiid);
+
+    /** 参团（含分布式事务） */
+    void joinGroupBuy(Long groupBuyId, Long userId, Integer quantity);
 }

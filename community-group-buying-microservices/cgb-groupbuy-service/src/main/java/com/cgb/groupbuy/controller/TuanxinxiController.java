@@ -2,6 +2,7 @@ package com.cgb.groupbuy.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
+import com.cgb.common.annotation.RateLimit;
 import com.cgb.groupbuy.entity.TuanxinxiEntity;
 import com.cgb.groupbuy.service.TuanxinxiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ public class TuanxinxiController {
 
     @Operation(summary = "参与团购")
     @PostMapping
+    @RateLimit(key = "groupbuy_join", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody TuanxinxiEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserid(userId);

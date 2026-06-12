@@ -2,6 +2,7 @@ package com.cgb.order.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
+import com.cgb.common.annotation.RateLimit;
 import com.cgb.order.entity.OrdersEntity;
 import com.cgb.order.entity.dto.CreateOrderDTO;
 import com.cgb.order.entity.vo.OrderVO;
@@ -24,6 +25,7 @@ public class OrdersController {
 
     @Operation(summary = "创建订单（分布式事务：下单+扣库存）")
     @PostMapping
+    @RateLimit(key = "order_create", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> create(@Valid @RequestBody CreateOrderDTO dto, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         OrderVO vo = ordersService.createOrderFromDTO(dto, userId);
@@ -47,6 +49,7 @@ public class OrdersController {
 
     @Operation(summary = "支付订单")
     @PostMapping("/pay/{orderId}")
+    @RateLimit(key = "order_pay", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> pay(@PathVariable String orderId) {
         ordersService.pay(orderId);
         return R.ok("支付成功");

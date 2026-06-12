@@ -2,6 +2,7 @@ package com.cgb.order.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
+import com.cgb.common.annotation.RateLimit;
 import com.cgb.order.entity.CartEntity;
 import com.cgb.order.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "购物车")
 @RestController
@@ -35,6 +38,15 @@ public class CartController {
                        @RequestParam(defaultValue = "10") Integer limit) {
         IPage<CartEntity> result = cartService.queryPage(params);
         return R.ok(result);
+    }
+
+    @Operation(summary = "购物车结算（Seata分布式事务：批量下单+扣库存+清空购物车）")
+    @PostMapping("/checkout")
+    @RateLimit(key = "cart_checkout", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
+    public R<?> checkout(HttpServletRequest request) {
+        Long userId = Long.parseLong(request.getHeader("X-User-Id"));
+        var orders = cartService.checkout(userId);
+        return R.ok("结算成功，共创建" + orders.size() + "个订单", orders);
     }
 
     @Operation(summary = "清空购物车")
@@ -71,7 +83,7 @@ public class CartController {
 
     @Operation(summary = "批量删除购物车")
     @DeleteMapping("/batch")
-    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+    public R<?> batchDelete(@RequestBody List<Long> ids) {
         ids.forEach(cartService::delete);
         return R.ok("批量删除成功");
     }
