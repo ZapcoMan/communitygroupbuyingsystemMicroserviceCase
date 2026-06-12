@@ -29,8 +29,8 @@ export const getUserInfo = (id) => {
 // 更新用户信息
 export const updateUserInfo = (data) => {
   return request({
-    url: '/user/yonghu/update',
-    method: 'post',
+    url: '/user/yonghu',
+    method: 'put',
     data
   })
 }

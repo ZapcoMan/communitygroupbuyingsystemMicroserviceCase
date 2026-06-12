@@ -13,4 +13,5 @@ public interface YonghuService {
     IPage<YonghuEntity> queryPage(YonghuEntity params);
     R<?> login(YonghuEntity params, String clientIP);
     R<?> register(YonghuEntity params);
+    R<?> changePassword(String token, String oldPassword, String newPassword);
 }

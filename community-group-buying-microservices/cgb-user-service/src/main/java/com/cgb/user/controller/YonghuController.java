@@ -77,11 +77,31 @@ public class YonghuController {
         return R.ok("更新成功");
     }
 
+    @Operation(summary = "修改密码")
+    @PostMapping("/password")
+    public R<?> changePassword(@RequestBody Map<String, String> params, HttpServletRequest request) {
+        String token = request.getHeader("X-Token");
+        String oldPassword = params.get("password");
+        String newPassword = params.get("newpassword");
+        if (oldPassword == null || newPassword == null) {
+            return R.fail("参数不完整");
+        }
+        // 通过 token 获取用户ID，验证旧密码，更新新密码
+        return yonghuService.changePassword(token, oldPassword, newPassword);
+    }
+
     @Operation(summary = "删除用户")
     @DeleteMapping("/{id}")
     public R<?> delete(@PathVariable Long id) {
         yonghuService.delete(id);
         return R.ok("删除成功");
+    }
+
+    @Operation(summary = "批量删除用户")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(yonghuService::delete);
+        return R.ok("批量删除成功");
     }
 
     /**

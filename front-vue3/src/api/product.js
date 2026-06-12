@@ -55,6 +55,13 @@ export const updateCart = (data) => {
 
 // 删除购物车商品
 export const deleteCart = (id) => {
+  if (Array.isArray(id)) {
+    return request({
+      url: '/order/cart/batch',
+      method: 'delete',
+      data: id
+    })
+  }
   return request({
     url: `/order/cart/${id}`,
     method: 'delete'
@@ -76,6 +83,15 @@ export const getOrderList = (params) => {
     url: '/order/orders/my',
     method: 'get',
     params
+  })
+}
+
+// 更新订单
+export const updateOrder = (data) => {
+  return request({
+    url: '/order/orders',
+    method: 'put',
+    data
   })
 }
 
@@ -116,6 +132,13 @@ export const getStoreupList = (params) => {
 
 // 删除收藏
 export const deleteStoreup = (id) => {
+  if (Array.isArray(id)) {
+    return request({
+      url: '/product/shangpin/collection/batch',
+      method: 'delete',
+      data: id
+    })
+  }
   return request({
     url: `/product/shangpin/collection/${id}`,
     method: 'delete'

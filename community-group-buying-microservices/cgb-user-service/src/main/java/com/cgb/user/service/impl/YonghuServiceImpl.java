@@ -119,4 +119,23 @@ public class YonghuServiceImpl implements YonghuService {
         save(params);
         return R.ok("注册成功");
     }
+
+    /**
+     * 修改密码
+     */
+    @Override
+    public R<?> changePassword(String token, String oldPassword, String newPassword) {
+        if (token == null) return R.fail("未登录");
+        Long userId = jwtUtils.getUserId(token);
+        if (userId == null) return R.fail("Token无效");
+        YonghuEntity user = getById(userId);
+        if (!passwordEncoder.matches(oldPassword, user.getMima())) {
+            return R.fail("旧密码错误");
+        }
+        YonghuEntity updateEntity = new YonghuEntity();
+        updateEntity.setId(userId);
+        updateEntity.setMima(passwordEncoder.encode(newPassword));
+        yonghuDao.updateById(updateEntity);
+        return R.ok("密码修改成功");
+    }
 }
