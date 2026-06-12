@@ -1,1032 +1,690 @@
-# 社区团购微服务项目
+# 社区团购系统（微服务版）
 
-基于 **Spring Boot 3.4.1** + **Spring Cloud 2024.0.0** + **MyBatis Plus 3.5.9** 构建的社区团购微服务系统。
+<div align="center">
 
-## 📋 目录
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen)
+![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2024.0.0-blue)
+![Vue](https://img.shields.io/badge/Vue-3.5.34-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+![Redis](https://img.shields.io/badge/Redis-7-red)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-- [项目概述](#项目概述)
-- [技术栈](#技术栈)
-- [项目结构](#项目结构)
-- [核心功能](#核心功能)
-- [架构设计](#架构设计)
-- [快速开始](#快速开始)
-- [API 接口文档](#api-接口文档)
-- [认证与授权](#认证与授权)
-- [数据库设计](#数据库设计)
-- [部署指南](#部署指南)
-- [开发规范](#开发规范)
+**基于 Spring Boot 3 + Spring Cloud 2024 + Vue 3 的微服务社区团购系统 · 管理后台与用户前台双端架构**
 
----
+[快速开始](#-快速开始) • [功能特性](#-功能特性) • [项目结构](#-项目结构) • [API 接口](#-api-接口) • [更新日志](#-更新日志)
 
-## 项目概述
-
-社区团购微服务项目是一个完整的社区团购平台，包含管理后台（Vue3 + Element Plus）和用户前台（Vue3 + Element Plus）两个前端应用，后端采用微服务架构，提供用户管理、商品管理、团购管理、订单管理、内容管理等功能。
-
-**核心特性：**
-- 🔐 JWT + Redis 双重认证机制，支持 IP 绑定防多设备登录
-- 🚪 API Gateway 统一网关鉴权，白名单灵活配置
-- 💾 BCrypt 密码加密，保障数据安全
-- ⚡ Redis 缓存优化，提升查询性能
-- 📦 MyBatis Plus + 分页插件，高效数据访问
-- 🔄 Flyway 数据库版本管理，自动化迁移
-- 🔗 OpenFeign 声明式服务间调用
-- 🛡️ Druid 连接池，内置防 SQL 注入
-- 📝 SpringDoc OpenAPI 自动生成接口文档
-- 🏷️ 自定义注解：`@IgnoreAuth` / `@RateLimit` / `@LoginUser`
-- 🗑️ 逻辑删除与自动填充（创建时间/更新时间）
+</div>
 
 ---
 
-## 技术栈
+## 📋 项目简介
 
-### 后端技术
+社区团购系统是一个功能完善的**微服务电商应用**，以微信小程序式社区团购为业务蓝本，提供商品信息管理、团购活动发布（团长发起/参团记录/状态流转）、购物车、订单管理、收藏管理、社区资讯发布、论坛互动等核心业务功能。系统分为**管理后台**和**用户前台**两套独立界面，分别满足管理员运营和用户使用的需求。
 
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| **JDK** | 17 | Java 运行环境 |
-| **Spring Boot** | 3.4.1 | 核心框架 |
-| **Spring Cloud** | 2024.0.0 | 微服务框架 |
-| **Spring Cloud Gateway** | - | API 网关 |
-| **MyBatis Plus** | 3.5.9 | 增强型 ORM 框架 |
-| **MySQL** | 8.0 | 关系型数据库 |
-| **Redis** | 7 | 缓存数据库 |
-| **Druid** | 1.2.24 | 数据库连接池（防 SQL 注入） |
-| **Flyway** | - | 数据库迁移工具 |
-| **JWT (jjwt)** | 0.12.6 | JSON Web Token 认证 |
-| **BCrypt** | - | 密码加密 |
-| **SpringDoc OpenAPI** | 2.8.15 | 接口文档自动生成 |
-| **Hutool** | 5.8.25 | Java 工具类库 |
-| **Fastjson** | 1.2.83 | JSON 处理 |
-| **Lombok** | - | 简化代码 |
+后端采用 **Spring Cloud 微服务架构**，通过 API 网关统一入口，各业务服务独立部署、独立数据库，服务间通过 OpenFeign 进行通信。
 
-### 前端技术
+### ✨ 核心特性
 
-#### 管理后台 (admin-vue3)
-- Vue 3 + Vite 8
-- Element Plus 2.14
-- ECharts 6（数据可视化）
-- Pinia 3（状态管理）
-- Vue Router 4
-- Axios
+- 🏗️ **微服务架构**：Spring Boot 3.4.1 + Spring Cloud 2024.0.0，6 个微服务模块独立部署，各服务拥有独立数据库
+- 🌐 **Spring Cloud Gateway 网关**：统一入口（端口 8000），动态路由（`lb://`）、全局 CORS、请求大小限制、白名单鉴权
+- 🔐 **JWT + Redis 认证**：网关层 JWT 签名验证 + Redis Token 会话存储，Token 绑定客户端 IP，支持主动失效（退出登录）
+- 🔗 **OpenFeign 服务间调用**：cgb-common 定义 Feign 客户端接口（FeignUserService / FeignProductService / FeignOrderService），各服务间松耦合通信
+- 🗄️ **Flyway 数据库版本管理**：每个微服务独立 Flyway 迁移，`baseline-on-migrate: true`，启动即自动执行建表 + 种子数据
+- 🛡️ **Redis + Lua 接口限流**：`@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE 计数限流，按客户端 IP 隔离
+- 📡 **Swagger API 文档**：各服务集成 SpringDoc OpenAPI，自动生成接口文档，支持在线调试
+- 📊 **Actuator 监控端点**：各服务集成 Spring Boot Actuator，暴露 health / info / metrics 端点；网关额外暴露 gateway 端点
+- 🏥 **Druid 连接池**：各服务集成 Druid 数据库连接池（initial-size: 5, min-idle: 5, max-active: 20），test-while-idle 保活
+- 🌍 **MyBatis Plus 逻辑删除**：全局配置 `isdelete` 字段逻辑删除（1=已删除 / 0=未删除）
+- 👥 **双端设计**：管理后台（admin-vue3，端口 8081）+ 用户前台（front-vue3，端口 8084）独立运行
+- 📊 **ECharts 数据可视化**：后台首页集成数据图表展示
+- 🛒 **完整电商流程**：商品浏览 → 购物车 → 下单 → 订单管理
+- 🤝 **团购状态流转**：团长发起团购 → 用户参团 → 状态流转（进行中 / 已成团 / 已过期）
+- 🧪 **28 个测试类**：覆盖工具类、服务实现层、网关鉴权等核心模块
+- 🔄 **Vite 开发代理**：开发环境自动代理后端 API（网关 8000 端口），无需跨域配置
 
-#### 用户前台 (front-vue3)
-- Vue 3 + Vite 8
-- Element Plus 2.14
-- Pinia 3（状态管理）
-- Vue Router 4
-- Axios
+### 🛠️ 技术栈
+
+| 分类 | 技术 |
+|------|------|
+| **后端框架** | Spring Boot 3.4.1, Spring Cloud 2024.0.0, MyBatis Plus 3.5.9, Flyway, JSqlParser |
+| **API 网关** | Spring Cloud Gateway（动态路由、全局过滤器、鉴权过滤器） |
+| **服务间通信** | Spring Cloud OpenFeign（声明式 REST 客户端） |
+| **认证与安全** | JWT (jjwt 0.12.6), Redis (Spring Data Redis + Lettuce), MD5, Spring Security (仅 BCryptPasswordEncoder) |
+| **缓存与限流** | Redis 7 + Lettuce 连接池, Redis Lua 原子限流 |
+| **数据库** | MySQL 8.0（每服务独立库）, Druid 1.2.24 连接池 |
+| **API 文档** | SpringDoc OpenAPI (Swagger UI) |
+| **监控** | Spring Boot Actuator |
+| **前端（后台）** | Vue 3.5.34, Vite 8, Element Plus 2.14.1, Pinia 3, ECharts 6, Axios |
+| **前端（前台）** | Vue 3.5.34, Vite 8, Element Plus 2.14.1, Pinia 3, Axios |
+| **测试** | JUnit 5, Mockito, SpringBootTest (28 test classes) |
+| **工具** | Maven, Hutool 5.8.25, FastJSON 1.2.83, Lombok |
 
 ---
 
-## 项目结构
+## 🚀 快速开始
+
+### 前置要求
+
+- **JDK** >= 17
+- **Maven** >= 3.6
+- **Node.js** >= 16
+- **MySQL** >= 8.0
+- **Redis** >= 7
+- 推荐使用：**谷歌浏览器**
+
+### 💻 手动部署（开发模式）
+
+#### 1. 数据库初始化
+
+每个微服务拥有独立数据库，系统已集成 **Flyway** 数据库版本管理，首次启动时自动执行迁移脚本（建表 + 种子数据）。
+
+需要创建以下 5 个数据库：
+
+```sql
+CREATE DATABASE cgb_user DEFAULT CHARACTER SET utf8mb4;
+CREATE DATABASE cgb_product DEFAULT CHARACTER SET utf8mb4;
+CREATE DATABASE cgb_groupbuy DEFAULT CHARACTER SET utf8mb4;
+CREATE DATABASE cgb_order DEFAULT CHARACTER SET utf8mb4;
+CREATE DATABASE cgb_content DEFAULT CHARACTER SET utf8mb4;
+```
+
+> 💡 Flyway 配置了 `baseline-on-migrate: true`，若数据库已存在数据，会以 baseline 为基线，仅执行未应用的迁移脚本。
+
+#### 2. 修改数据库连接配置
+
+各服务的 `application.yml` 中默认配置为 `root/root`，如需修改请编辑对应服务的配置文件：
+
+```yaml
+# 以 cgb-user-service 为例（src/main/resources/application.yml）
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/cgb_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: root
+    password: 你的数据库密码
+```
+
+#### 3. 启动后端微服务
+
+按以下顺序依次启动各微服务：
+
+```bash
+# ① 先编译整个项目（在父 pom 目录执行）
+cd community-group-buying-microservices
+mvn clean install -DskipTests
+
+# ② 启动网关（必须首先启动）
+cd cgb-gateway
+mvn spring-boot:run        # 端口 8000
+
+# ③ 启动用户服务
+cd cgb-user-service
+mvn spring-boot:run        # 端口 8001
+
+# ④ 启动商品服务
+cd cgb-product-service
+mvn spring-boot:run        # 端口 8002
+
+# ⑤ 启动团购服务
+cd cgb-groupbuy-service
+mvn spring-boot:run        # 端口 8003
+
+# ⑥ 启动订单服务
+cd cgb-order-service
+mvn spring-boot:run        # 端口 8004
+
+# ⑦ 启动内容服务
+cd cgb-content-service
+mvn spring-boot:run        # 端口 8005
+```
+
+✅ 网关地址：http://localhost:8000
+✅ 各服务 Swagger 文档：`http://localhost:{服务端口}/swagger-ui.html`
+
+#### 4. 启动管理后台
+
+```bash
+cd admin-vue3
+npm install
+npm run dev
+```
+
+✅ 管理后台地址：http://localhost:8081
+
+#### 5. 启动用户前台
+
+```bash
+cd front-vue3
+npm install
+npm run dev
+```
+
+✅ 用户前台地址：http://localhost:8084
+
+---
+
+### 🌐 生产部署（Nginx）
+
+```bash
+# 构建管理后台
+cd admin-vue3 && npm run build
+# 将 dist 目录内容部署到 Nginx
+
+# 构建用户前台
+cd front-vue3 && npm run build
+# 将 dist 目录内容部署到 Nginx
+```
+
+**生产环境 Nginx 配置示例：**
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # 管理后台
+    location /admin/ {
+        alias /usr/share/nginx/html/admin/;
+        try_files $uri $uri/ /admin/index.html;
+    }
+
+    # 用户前台
+    location /front/ {
+        alias /usr/share/nginx/html/front/;
+        try_files $uri $uri/ /front/index.html;
+    }
+
+    # API 反向代理到网关
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+---
+
+## 📁 项目结构
 
 ```
 communitygroupbuyingsystemMicroserviceCase/
-├── community-group-buying-microservices/    # 后端微服务
-│   ├── cgb-common/                          # 公共模块（其他服务依赖）
+├── 📄 README.md                              # 项目说明（本文件）
+│
+├── 📂 community-group-buying-microservices/   # 后端微服务（Spring Cloud）
+│   ├── 📄 pom.xml                            # 父 POM（统一依赖版本管理）
+│   │
+│   ├── 📂 cgb-common/                        # 公共模块（不独立部署，被各服务引用）
 │   │   ├── src/main/java/com/cgb/common/
-│   │   │   ├── annotation/
-│   │   │   │   ├── IgnoreAuth.java          # 公开接口注解（跳过鉴权）
-│   │   │   │   ├── LoginUser.java           # 需要登录注解
-│   │   │   │   ├── NoRecord.java            # 不记录日志注解
-│   │   │   │   └── RateLimit.java           # 接口限流注解（Redis + Lua）
-│   │   │   ├── config/
-│   │   │   │   ├── CorsConfig.java          # CORS 跨域配置
-│   │   │   │   ├── GlobalExceptionHandler.java # 全局异常处理器
-│   │   │   │   └── RedisConfig.java         # Redis 序列化配置
-│   │   │   ├── feign/
-│   │   │   │   ├── FeignUserService.java    # 用户服务 Feign 客户端
-│   │   │   │   ├── FeignProductService.java # 商品服务 Feign 客户端
-│   │   │   │   └── FeignOrderService.java   # 订单服务 Feign 客户端
-│   │   │   ├── utils/
-│   │   │   │   ├── CommonUtil.java          # 通用工具（IP 获取等）
-│   │   │   │   ├── FileUtil.java            # 文件上传下载工具
-│   │   │   │   ├── JQPageInfo.java          # 分页信息封装
-│   │   │   │   ├── MD5Util.java             # MD5 加密工具
-│   │   │   │   ├── PageUtils.java           # 分页工具
-│   │   │   │   ├── Query.java               # 查询参数封装
-│   │   │   │   ├── SQLFilter.java           # SQL 注入过滤
-│   │   │   │   └── SpringContextUtils.java  # Spring 上下文工具
-│   │   │   ├── EIException.java             # 自定义业务异常
-│   │   │   ├── ErrorCode.java               # 错误码枚举
-│   │   │   └── R.java                       # 统一响应结果封装
-│   │   └── pom.xml
+│   │   │   ├── EIException.java              # 自定义异常
+│   │   │   ├── ErrorCode.java                # 错误码枚举
+│   │   │   ├── R.java                        # 统一响应封装
+│   │   │   ├── annotation/                   # 自定义注解
+│   │   │   │   ├── IgnoreAuth.java           # 免鉴权注解
+│   │   │   │   ├── LoginUser.java            # 登录用户注入注解
+│   │   │   │   ├── NoRecord.java             # 不记录日志注解
+│   │   │   │   └── RateLimit.java            # 接口限流注解
+│   │   │   ├── config/                       # 公共配置类
+│   │   │   │   ├── CorsConfig.java           # CORS 跨域配置
+│   │   │   │   ├── GlobalExceptionHandler.java # 全局异常处理
+│   │   │   │   └── RedisConfig.java          # Redis 序列化配置
+│   │   │   ├── feign/                        # Feign 客户端接口
+│   │   │   │   ├── FeignUserService.java     # 用户服务 Feign 客户端
+│   │   │   │   ├── FeignProductService.java  # 商品服务 Feign 客户端
+│   │   │   │   └── FeignOrderService.java    # 订单服务 Feign 客户端
+│   │   │   └── utils/                        # 工具类（8 个）
+│   │   │       ├── CommonUtil.java           # 通用工具
+│   │   │       ├── FileUtil.java             # 文件处理
+│   │   │       ├── JQPageInfo.java           # 分页信息
+│   │   │       ├── MD5Util.java              # MD5 加密
+│   │   │       ├── PageUtils.java            # 分页工具
+│   │   │       ├── Query.java                # 查询参数
+│   │   │       ├── SQLFilter.java            # SQL 注入过滤
+│   │   │       └── SpringContextUtils.java   # Spring 上下文
+│   │   └── src/test/                         # 公共模块测试（9 个测试类）
 │   │
-│   ├── cgb-gateway/                         # API 网关服务（端口 8000）
+│   ├── 📂 cgb-gateway/                       # API 网关（端口 8000）
 │   │   ├── src/main/java/com/cgb/gateway/
-│   │   │   ├── CgbGatewayApplication.java   # 启动类
+│   │   │   ├── CgbGatewayApplication.java    # 网关启动类
 │   │   │   ├── config/
-│   │   │   │   └── GatewayConfig.java       # 网关配置
+│   │   │   │   └── RedisConfig.java          # Redis 配置
 │   │   │   ├── filter/
-│   │   │   │   └── GatewayAuthFilter.java   # JWT 全局鉴权过滤器
+│   │   │   │   └── GatewayAuthFilter.java    # 网关鉴权过滤器
 │   │   │   ├── service/
-│   │   │   │   └── RedisTokenService.java   # Redis Token 会话管理
+│   │   │   │   └── RedisTokenService.java    # Redis Token 会话服务
 │   │   │   └── utils/
-│   │   │       └── JwtUtils.java            # JWT 工具类
+│   │   │       └── JwtUtils.java             # JWT 工具类
 │   │   ├── src/main/resources/
-│   │   │   └── application.yml              # 配置文件
-│   │   └── pom.xml
+│   │   │   └── application.yml               # 网关配置（路由、CORS、JWT、限流）
+│   │   └── src/test/                         # 网关测试（2 个测试类）
 │   │
-│   ├── cgb-user-service/                    # 用户服务（端口 8001）
+│   ├── 📂 cgb-user-service/                  # 用户服务（端口 8001，数据库 cgb_user）
 │   │   ├── src/main/java/com/cgb/user/
-│   │   │   ├── CgbUserServiceApplication.java # 启动类
-│   │   │   ├── config/                      # 配置类
-│   │   │   ├── controller/
-│   │   │   │   ├── UserController.java      # 管理员 CRUD + 登录
-│   │   │   │   └── YonghuController.java    # 用户（买家）CRUD + 注册/登录
-│   │   │   ├── dao/
-│   │   │   │   ├── UserDao.java             # 管理员 Mapper
-│   │   │   │   └── YonghuDao.java           # 用户 Mapper
-│   │   │   ├── entity/
-│   │   │   │   ├── UserEntity.java          # 管理员实体
-│   │   │   │   ├── YonghuEntity.java        # 用户实体
-│   │   │   │   └── vo/                      # 视图对象
-│   │   │   ├── service/
-│   │   │   │   ├── UserService.java         # 管理员服务接口
-│   │   │   │   ├── YonghuService.java       # 用户服务接口
-│   │   │   │   ├── RedisTokenService.java   # Redis Token 管理
-│   │   │   │   └── impl/                    # 服务实现类
-│   │   │   └── utils/
-│   │   │       └── JwtUtils.java            # JWT Token 工具类
+│   │   │   ├── CgbUserServiceApplication.java
+│   │   │   ├── config/                       # MybatisPlusConfig, SwaggerConfig
+│   │   │   ├── controller/                   # UserController, YonghuController
+│   │   │   ├── dao/                          # UserDao, YonghuDao
+│   │   │   ├── entity/                       # UserEntity, YonghuEntity + VO
+│   │   │   ├── service/                      # UserService, YonghuService, RedisTokenService + impl
+│   │   │   └── utils/                        # JwtUtils
 │   │   ├── src/main/resources/
-│   │   │   ├── application.yml
-│   │   │   ├── mapper/                      # MyBatis XML
-│   │   │   └── db/migration/                # Flyway 迁移脚本
-│   │   └── pom.xml
+│   │   │   ├── application.yml               # 服务配置
+│   │   │   └── db/migration/                 # Flyway 迁移脚本
+│   │   └── src/test/                         # 用户服务测试（4 个测试类）
 │   │
-│   ├── cgb-product-service/                 # 商品服务（端口 8002）
+│   ├── 📂 cgb-product-service/               # 商品服务（端口 8002，数据库 cgb_product）
 │   │   ├── src/main/java/com/cgb/product/
-│   │   │   ├── CgbProductServiceApplication.java # 启动类
-│   │   │   ├── config/                      # 配置类
-│   │   │   ├── controller/
-│   │   │   │   ├── ShangpinController.java          # 商品管理
-│   │   │   │   ├── ShangpinCollectionController.java # 商品收藏
-│   │   │   │   ├── ShangpinCommentController.java    # 商品评价
-│   │   │   │   └── ShangpinLiuyanController.java     # 商品留言
-│   │   │   ├── dao/                         # Mapper 接口
-│   │   │   ├── entity/                      # 实体类
-│   │   │   └── service/                     # 服务层
+│   │   │   ├── CgbProductServiceApplication.java
+│   │   │   ├── config/                       # 配置类
+│   │   │   ├── controller/                   # 4 个 Controller（商品/收藏/评论/留言）
+│   │   │   ├── dao/                          # 4 个 Mapper
+│   │   │   ├── entity/                       # 4 个 Entity + VO
+│   │   │   └── service/                      # 4 个 Service + impl
 │   │   ├── src/main/resources/
 │   │   │   ├── application.yml
-│   │   │   ├── mapper/                      # MyBatis XML
-│   │   │   └── db/migration/                # Flyway 迁移脚本
-│   │   └── pom.xml
+│   │   │   └── db/migration/
+│   │   └── src/test/                         # 商品服务测试（4 个测试类）
 │   │
-│   ├── cgb-groupbuy-service/                # 团购服务（端口 8003）
+│   ├── 📂 cgb-groupbuy-service/              # 团购服务（端口 8003，数据库 cgb_groupbuy）
 │   │   ├── src/main/java/com/cgb/groupbuy/
-│   │   │   ├── CgbGroupbuyServiceApplication.java # 启动类
-│   │   │   ├── config/                      # 配置类
-│   │   │   ├── controller/
-│   │   │   │   ├── TuanweiController.java   # 团长（团购发起）管理
-│   │   │   │   └── TuanxinxiController.java # 参团记录管理
-│   │   │   ├── dao/                         # Mapper 接口
-│   │   │   ├── entity/                      # 实体类
-│   │   │   └── service/                     # 服务层
+│   │   │   ├── CgbGroupbuyServiceApplication.java
+│   │   │   ├── config/                       # 配置类
+│   │   │   ├── controller/                   # 2 个 Controller（团购信息/团位）
+│   │   │   ├── dao/                          # 2 个 Mapper
+│   │   │   ├── entity/                       # 2 个 Entity + VO
+│   │   │   └── service/                      # 2 个 Service + impl
 │   │   ├── src/main/resources/
 │   │   │   ├── application.yml
-│   │   │   ├── mapper/                      # MyBatis XML
-│   │   │   └── db/migration/                # Flyway 迁移脚本
-│   │   └── pom.xml
+│   │   │   └── db/migration/
+│   │   └── src/test/                         # 团购服务测试（2 个测试类）
 │   │
-│   ├── cgb-order-service/                   # 订单服务（端口 8004）
+│   ├── 📂 cgb-order-service/                 # 订单服务（端口 8004，数据库 cgb_order）
 │   │   ├── src/main/java/com/cgb/order/
-│   │   │   ├── CgbOrderServiceApplication.java # 启动类
-│   │   │   ├── config/                      # 配置类
-│   │   │   ├── controller/
-│   │   │   │   ├── OrdersController.java    # 订单管理（创建/支付/取消）
-│   │   │   │   ├── CartController.java      # 购物车管理
-│   │   │   │   └── AddressController.java   # 收货地址管理
-│   │   │   ├── dao/                         # Mapper 接口
-│   │   │   ├── entity/                      # 实体类
-│   │   │   └── service/                     # 服务层
+│   │   │   ├── CgbOrderServiceApplication.java
+│   │   │   ├── config/                       # 配置类
+│   │   │   ├── controller/                   # 3 个 Controller（订单/购物车/地址）
+│   │   │   ├── dao/                          # 3 个 Mapper
+│   │   │   ├── entity/                       # 3 个 Entity + VO
+│   │   │   └── service/                      # 3 个 Service + impl
 │   │   ├── src/main/resources/
 │   │   │   ├── application.yml
-│   │   │   ├── mapper/                      # MyBatis XML
-│   │   │   └── db/migration/                # Flyway 迁移脚本
-│   │   └── pom.xml
+│   │   │   └── db/migration/
+│   │   └── src/test/                         # 订单服务测试（3 个测试类）
 │   │
-│   ├── cgb-content-service/                 # 内容服务（端口 8005）
-│   │   ├── src/main/java/com/cgb/content/
-│   │   │   ├── CgbContentServiceApplication.java # 启动类
-│   │   │   ├── config/                      # 配置类
-│   │   │   ├── controller/
-│   │   │   │   ├── NewsController.java      # 社区公告管理
-│   │   │   │   ├── ForumController.java     # 论坛帖子管理
-│   │   │   │   ├── MessagesController.java  # 留言板管理
-│   │   │   │   └── ZixunController.java     # 团购资讯管理
-│   │   │   ├── dao/                         # Mapper 接口
-│   │   │   ├── entity/                      # 实体类
-│   │   │   └── service/                     # 服务层
-│   │   ├── src/main/resources/
-│   │   │   ├── application.yml
-│   │   │   ├── mapper/                      # MyBatis XML
-│   │   │   └── db/migration/                # Flyway 迁移脚本
-│   │   └── pom.xml
-│   │
-│   └── pom.xml                              # Maven 父 POM
+│   └── 📂 cgb-content-service/               # 内容服务（端口 8005，数据库 cgb_content）
+│       ├── src/main/java/com/cgb/content/
+│       │   ├── CgbContentServiceApplication.java
+│       │   ├── config/                       # 配置类
+│       │   ├── controller/                   # 4 个 Controller（新闻/论坛/留言/资讯）
+│       │   ├── dao/                          # 4 个 Mapper
+│       │   ├── entity/                       # 4 个 Entity + VO
+│       │   └── service/                      # 4 个 Service + impl
+│       ├── src/main/resources/
+│       │   ├── application.yml
+│       │   └── db/migration/
+│       └── src/test/                         # 内容服务测试（4 个测试类）
 │
-├── admin-vue3/                              # Vue3 管理后台
+├── 📂 admin-vue3/                            # 管理后台前端（Vue 3，端口 8081）
 │   ├── src/
-│   │   ├── views/modules/                   # 功能模块页面
-│   │   │   ├── yonghu/                      # 用户管理
-│   │   │   ├── shangpinleixing/             # 商品类型管理
-│   │   │   ├── shangpinxinxi/               # 商品信息管理
-│   │   │   ├── tuangouxinxi/                # 团购信息管理
-│   │   │   ├── cart/                        # 购物车管理
-│   │   │   ├── orders/                      # 订单管理
-│   │   │   ├── storeup/                     # 收藏管理
-│   │   │   ├── address/                     # 地址管理
-│   │   │   ├── news/                        # 新闻资讯管理
-│   │   │   ├── discussshangpinxinxi/        # 商品评论管理
-│   │   │   ├── discusstuangouxinxi/         # 团购评论管理
-│   │   │   └── config/                      # 配置管理
-│   │   ├── router/                          # 路由配置
-│   │   ├── stores/                          # Pinia 状态管理
-│   │   ├── utils/                           # 工具函数
-│   │   └── api/                             # API 接口封装
-│   ├── package.json
-│   └── vite.config.js
+│   │   ├── components/common/                # 公共组件（Layout 布局）
+│   │   ├── router/                           # 路由配置（12 个模块路由）
+│   │   ├── stores/                           # Pinia 状态管理
+│   │   ├── utils/                            # Axios 拦截器封装
+│   │   └── views/                            # 页面组件
+│   │       ├── home/                         # 首页（ECharts 可视化）
+│   │       ├── login/                        # 登录页
+│   │       └── modules/                      # 12 个功能模块页面
+│   ├── vite.config.js                        # Vite 配置（代理 → 网关 8000）
+│   └── package.json
 │
-├── front-vue3/                              # Vue3 用户前台
-│   ├── src/
-│   │   ├── views/
-│   │   │   ├── home/                        # 首页
-│   │   │   ├── login/                       # 登录页
-│   │   │   ├── product/                     # 商品/团购列表与详情
-│   │   │   ├── news/                        # 社区信息列表与详情
-│   │   │   ├── cart/                        # 购物车
-│   │   │   ├── order/                       # 我的订单
-│   │   │   ├── address/                     # 我的地址
-│   │   │   ├── storeup/                     # 我的收藏
-│   │   │   └── user/                        # 个人中心
-│   │   ├── router/                          # 路由配置
-│   │   ├── stores/                          # Pinia 状态管理
-│   │   ├── utils/                           # 工具函数
-│   │   └── api/                             # API 接口封装
-│   ├── package.json
-│   └── vite.config.js
-│
-├── .gitignore                               # Git 忽略配置
-├── LICENSE                                  # 开源许可证
-└── README.md                                # 项目说明文档
+└── 📂 front-vue3/                            # 用户前台前端（Vue 3，端口 8084）
+    ├── src/
+    │   ├── api/                              # API 接口封装（4 个模块）
+    │   ├── router/                           # 路由配置（11 个页面路由）
+    │   ├── stores/                           # Pinia 状态管理
+    │   ├── utils/                            # Axios 拦截器封装
+    │   └── views/                            # 页面组件
+    │       ├── home/                         # 首页
+    │       ├── product/                      # 商品和团购（列表 + 详情）
+    │       ├── news/                         # 资讯列表和详情
+    │       ├── cart/                         # 购物车
+    │       ├── order/                        # 订单列表
+    │       ├── address/                      # 地址管理
+    │       ├── storeup/                      # 收藏列表
+    │       └── user/                         # 个人中心
+    ├── vite.config.js                        # Vite 配置（代理 → 网关 8000）
+    └── package.json
 ```
 
 ---
 
-## 核心功能
+## 📊 功能特性
 
-### 1. 用户认证模块 (cgb-user-service)
-- **管理员登录**：管理员账号密码验证，BCrypt 加密存储
-- **用户注册**：买家端自助注册，账号唯一性校验
-- **用户登录**：买家端登录认证，支持 IP 绑定防多设备登录
-- **Token 管理**：JWT + Redis 双重验证，Token 过期自动刷新
-- **用户管理**：管理员和用户信息的 CRUD 操作
-- **内部接口**：供其他微服务通过 Feign 调用的用户信息查询接口
+### 🏠 管理后台（admin-vue3）
 
-### 2. 商品服务模块 (cgb-product-service)
-- **商品管理**：商品信息的增删改查
-  - 字段：名称、类型、图片、介绍、提货方式、库存、价格、原价、状态
-  - 支持分页查询和条件搜索
-- **商品收藏**：用户收藏/取消收藏商品
-- **商品评价**：用户对商品进行评分（1-5 分）和文字评价，支持回复
-- **商品留言**：商品页面的留言互动，支持嵌套回复
-- **内部接口**：供其他微服务查询商品详情和名称
+| 模块 | 页面 | 说明 |
+|------|------|------|
+| 📊 首页 | `Home.vue` | 数据概览看板，ECharts 图表可视化 |
+| 👤 用户管理 | `yonghu/list.vue` | 用户信息增删改查、账号状态管理 |
+| 🏷️ 商品类型 | `shangpinleixing/list.vue` | 商品分类管理 |
+| 🛍️ 商品信息 | `shangpinxinxi/list.vue` | 商品信息 CRUD、图片上传、分类筛选 |
+| 🤝 团购信息 | `tuangouxinxi/list.vue` | 团购活动发布、价格设置、时间管理 |
+| 🛒 购物车管理 | `cart/list.vue` | 查看全部用户购物车记录 |
+| 📦 订单管理 | `orders/list.vue` | 订单列表、状态流转、发货管理 |
+| ❤️ 收藏管理 | `storeup/list.vue` | 商品/团购收藏记录查看 |
+| 📍 地址管理 | `address/list.vue` | 用户收货地址管理 |
+| 📰 新闻资讯 | `news/list.vue` | 社区资讯发布与管理 |
+| 💬 商品评论 | `discussshangpinxinxi/list.vue` | 商品评论审核与回复 |
+| 💬 团购评论 | `discusstuangouxinxi/list.vue` | 团购评论审核与回复 |
+| ⚙️ 系统配置 | `config/list.vue` | 系统参数配置管理 |
 
-### 3. 团购服务模块 (cgb-groupbuy-service)
-- **团长管理**：发起团购活动
-  - 字段：团购名称、图片、介绍、关联商品、成团人数、原价/团购价、截止时间
-  - 状态流转：进行中 → 已成团 / 已过期
-- **参团记录**：用户参与团购的记录管理
-  - 字段：团购 ID、参团用户、商品、数量、价格、状态
-  - 状态流转：待支付 → 已支付 / 已取消
+### 🛒 用户前台（front-vue3）
 
-### 4. 订单服务模块 (cgb-order-service)
-- **购物车**：添加商品到购物车、修改数量、删除商品
-- **订单管理**：完整的订单生命周期
-  - 创建订单（自动生成订单编号）
-  - 订单支付
-  - 订单取消
-  - 订单状态流转：待支付 → 已支付 → 已发货 → 已完成 / 已取消
-  - 支持关联团购 ID
-- **收货地址**：收货地址的增删改查，支持设置默认地址
-- **内部接口**：供其他微服务查询订单详情和取消订单
-
-### 5. 内容服务模块 (cgb-content-service)
-- **社区公告**：社区公告信息的发布和管理
-- **论坛帖子**：社区论坛发帖互动，支持点赞/踩
-- **留言板**：用户留言和回复功能
-- **团购资讯**：团购相关新闻资讯管理
-
-### 6. API 网关 (cgb-gateway)
-- **统一入口**：所有请求通过网关路由到对应微服务
-- **全局鉴权**：JWT Token 验证，支持白名单配置
-- **IP 绑定验证**：防止 Token 被其他设备复用
-- **用户信息透传**：将解析后的用户 ID、角色、客户端 IP 传递给下游服务
-- **Token 刷新**：每次鉴权通过后自动刷新 Redis Token 有效期
-- **动态路由**：基于服务名的负载均衡路由（`lb://`）
-- **全局 CORS**：统一跨域配置
-- **请求体大小限制**：默认 10MB
+| 模块 | 页面 | 说明 |
+|------|------|------|
+| 🏠 首页 | `Home.vue` | 商品推荐、团购活动、资讯轮播 |
+| 🛍️ 商品列表 | `ProductList.vue` | 分类浏览、关键词搜索、商品卡片展示 |
+| 📋 商品详情 | `ProductDetail.vue` | 商品图片、规格参数、评论区 |
+| 🤝 团购列表 | `GroupBuyList.vue` | 团购活动列表、价格对比 |
+| 📋 团购详情 | `GroupBuyDetail.vue` | 团购详情、参团操作 |
+| 📰 资讯列表 | `NewsList.vue` | 社区资讯列表 |
+| 📋 资讯详情 | `NewsDetail.vue` | 资讯正文阅读 |
+| 🛒 购物车 | `Cart.vue` | 商品选购、数量调整、结算 |
+| 📦 我的订单 | `OrderList.vue` | 订单列表、状态跟踪 |
+| 📍 我的地址 | `AddressList.vue` | 收货地址增删改、默认地址设置 |
+| ❤️ 我的收藏 | `StoreupList.vue` | 收藏商品/团购列表 |
+| 👤 个人中心 | `UserCenter.vue` | 个人信息修改、密码修改 |
 
 ---
 
-## 架构设计
+## 🏛️ 微服务架构
 
-### 系统架构图
+### 服务注册与端口分配
 
-```
-┌──────────────────┐      ┌──────────────────┐
-│   admin-vue3     │      │   front-vue3     │
-│  （管理后台）      │      │  （用户前台）      │
-└────────┬─────────┘      └────────┬─────────┘
-         │                         │
-         └────────────┬────────────┘
-                      ▼
-             ┌──────────────────┐
-             │   cgb-gateway    │
-             │   (Port 8000)    │
-             └────────┬─────────┘
-                      │
-     ┌────────────────┼────────────────┬──────────────────┐
-     ▼                ▼                ▼                  ▼
-┌──────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│ User Svc │  │ Product Svc  │  │ Groupbuy Svc │  │  Order Svc   │
-│  (8001)  │  │   (8002)     │  │   (8003)     │  │   (8004)     │
-└──────────┘  └──────────────┘  └──────────────┘  └──────────────┘
-                                                              │
-                                                     ┌──────────────┐
-                                                     │ Content Svc  │
-                                                     │   (8005)     │
-                                                     └──────────────┘
-                                                              │
-                    ┌─────────────────────────────────────────┘
-                    ▼                ▼                ▼
-              ┌──────────┐    ┌──────────┐    ┌──────────────────────┐
-              │  MySQL   │    │  Redis   │    │ Spring Cloud Gateway │
-              │  (5 DBs) │    │          │    │    (LoadBalancer)    │
-              └──────────┘    └──────────┘    └──────────────────────┘
-```
+| 服务 | 端口 | 数据库 | 说明 |
+|------|------|--------|------|
+| `cgb-gateway` | 8000 | — | API 网关，统一入口、鉴权、路由 |
+| `cgb-user-service` | 8001 | `cgb_user` | 用户注册、登录、管理员管理 |
+| `cgb-product-service` | 8002 | `cgb_product` | 商品信息、收藏、评论、留言 |
+| `cgb-groupbuy-service` | 8003 | `cgb_groupbuy` | 团购信息、团位管理 |
+| `cgb-order-service` | 8004 | `cgb_order` | 订单、购物车、收货地址 |
+| `cgb-content-service` | 8005 | `cgb_content` | 新闻、论坛、留言板、资讯 |
 
 ### 网关路由规则
 
-| 路径前缀 | 目标服务 | 说明 |
-|---------|---------|------|
-| `/user/**` | cgb-user-service | 用户相关接口 |
-| `/product/**` | cgb-product-service | 商品相关接口 |
-| `/groupbuy/**` | cgb-groupbuy-service | 团购相关接口 |
-| `/order/**` | cgb-order-service | 订单相关接口 |
-| `/content/**` | cgb-content-service | 内容相关接口 |
+所有前端请求统一发送到网关（端口 8000），由网关按路径前缀路由到对应微服务：
 
-### 认证流程
+| 路径前缀 | 路由目标 | StripPrefix |
+|----------|---------|-------------|
+| `/user/**` | `lb://cgb-user-service` | 1 |
+| `/product/**` | `lb://cgb-product-service` | 1 |
+| `/groupbuy/**` | `lb://cgb-groupbuy-service` | 1 |
+| `/order/**` | `lb://cgb-order-service` | 1 |
+| `/content/**` | `lb://cgb-content-service` | 1 |
 
-```
-1. 用户登录 / 管理员登录
-   ↓
-2. cgb-user-service 验证账号密码（BCrypt）
-   ↓
-3. 生成 JWT Token（包含 userId、role、clientIP）
-   ↓
-4. 存储到 Redis：token → 会话信息
-   ↓
-5. 返回 Token 给客户端
-   ↓
-6. 后续请求在请求头携带 Token
-   ↓
-7. cgb-gateway 拦截验证：
-   - 检查白名单（登录/注册等路径放行）
-   - 检查 OPTIONS 预检请求（直接放行）
-   - 解析并验证 JWT 签名 + IP 匹配
-   - 验证 Redis Token 会话是否存在
-   ↓
-8. 刷新 Redis Token 有效期
-   ↓
-9. 透传 X-User-Id、X-User-Role、X-Client-IP、X-Token 到下游服务
-```
+> 💡 `StripPrefix=1` 表示转发时去掉第一级路径前缀，例如 `/user/yonghu/list` 转发为 `/yonghu/list`
 
-### 服务间调用（OpenFeign）
+### 服务间通信
 
-```
-cgb-order-service ──FeignUserService──▶ cgb-user-service（获取用户信息）
-cgb-order-service ──FeignProductService──▶ cgb-product-service（获取商品信息）
-cgb-groupbuy-service ──FeignUserService──▶ cgb-user-service（获取用户信息）
-cgb-groupbuy-service ──FeignProductService──▶ cgb-product-service（获取商品信息）
-其他服务 ──FeignOrderService──▶ cgb-order-service（查询/取消订单）
-```
+通过 **OpenFeign** 声明式 REST 客户端进行服务间调用，Feign 接口定义在 `cgb-common` 模块中：
 
-### 关键设计模式
-
-1. **统一响应封装**：`R<T>` 类封装所有 API 返回结果（code/msg/data/token）
-2. **全局异常处理**：`GlobalExceptionHandler` 使用 `@ControllerAdvice` 统一捕获异常
-3. **自定义业务异常**：`EIException` 区分业务逻辑异常
-4. **自定义注解**：
-   - `@IgnoreAuth`：标注公开接口，跳过登录鉴权
-   - `@LoginUser`：标注需要登录才能访问的接口
-   - `@RateLimit`：接口限流注解，配合 Redis + Lua 实现
-   - `@NoRecord`：标注不记录操作日志的接口
-5. **逻辑删除**：所有实体使用 `@TableLogic` 实现逻辑删除
-6. **自动填充**：`addtime` / `updatetime` 字段自动填充
-7. **SQL 防注入**：`SQLFilter` 工具类过滤危险 SQL 关键字
-8. **静态初始化**：工具类使用 `@PostConstruct` 注入静态依赖
+| Feign 客户端 | 目标服务 | 用途 |
+|-------------|---------|------|
+| `FeignUserService` | cgb-user-service | 查询用户信息、验证用户身份 |
+| `FeignProductService` | cgb-product-service | 查询商品信息、库存校验 |
+| `FeignOrderService` | cgb-order-service | 订单创建、订单状态查询 |
 
 ---
 
-## 快速开始
+## 🔌 API 接口
 
-### 环境准备
+后端提供 RESTful API，前端请求统一经过网关（端口 8000）路由到各微服务：
 
-1. **JDK 17+**
-2. **Maven 3.8+**
-3. **MySQL 8.0**
-4. **Redis 7**
+### 用户服务（cgb-user-service:8001）
 
-### 本地开发部署
+| 接口路径 | 说明 |
+|---------|------|
+| `/user/*` | 管理员登录、用户注册、信息管理 |
+| `/yonghu/*` | 用户注册、登录、信息管理 |
 
-1. **启动基础设施**
-   ```bash
-   # 启动 MySQL
-   docker run --name mysql -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql:8.0
-   
-   # 启动 Redis
-   docker run --name redis -d -p 6379:6379 redis:7
-   ```
+### 商品服务（cgb-product-service:8002）
 
-2. **创建数据库**
-   ```sql
-   CREATE DATABASE cgb_user DEFAULT CHARACTER SET utf8mb4;
-   CREATE DATABASE cgb_product DEFAULT CHARACTER SET utf8mb4;
-   CREATE DATABASE cgb_groupbuy DEFAULT CHARACTER SET utf8mb4;
-   CREATE DATABASE cgb_order DEFAULT CHARACTER SET utf8mb4;
-   CREATE DATABASE cgb_content DEFAULT CHARACTER SET utf8mb4;
-   ```
-   > 注：表结构由 Flyway 自动迁移创建，无需手动执行建表 SQL
+| 接口路径 | 说明 |
+|---------|------|
+| `/shangpin/*` | 商品信息 CRUD、点赞、详情 |
+| `/shangpincollection/*` | 商品收藏管理 |
+| `/shangpincomment/*` | 商品评论管理 |
+| `/shangpinliuyan/*` | 商品留言管理 |
 
-3. **修改配置文件**
-   - 更新各服务 `src/main/resources/application.yml` 中的数据库、Redis 连接信息
-   - 确保各服务能够连接到对应的外部服务
+### 团购服务（cgb-groupbuy-service:8003）
 
-4. **启动微服务**
-   ```bash
-   # 1. 安装公共模块到本地 Maven 仓库
-   cd community-group-buying-microservices/cgb-common
-   mvn clean install
-   
-   # 2. 按顺序启动各服务
-   cd ../cgb-gateway && mvn spring-boot:run      # 端口 8000
-   cd ../cgb-user-service && mvn spring-boot:run  # 端口 8001
-   cd ../cgb-product-service && mvn spring-boot:run # 端口 8002
-   cd ../cgb-groupbuy-service && mvn spring-boot:run # 端口 8003
-   cd ../cgb-order-service && mvn spring-boot:run    # 端口 8004
-   cd ../cgb-content-service && mvn spring-boot:run  # 端口 8005
-   ```
+| 接口路径 | 说明 |
+|---------|------|
+| `/tuanxinxi/*` | 团购活动管理、点赞、详情 |
+| `/tuanwei/*` | 团位管理、参团记录 |
 
-5. **启动前端应用**
-   ```bash
-   # 管理后台
-   cd admin-vue3
-   npm install
-   npm run dev
-   
-   # 用户前台
-   cd front-vue3
-   npm install
-   npm run dev
-   ```
+### 订单服务（cgb-order-service:8004）
 
-### 默认账号
+| 接口路径 | 说明 |
+|---------|------|
+| `/cart/*` | 购物车增删改查 |
+| `/orders/*` | 订单创建、状态管理 |
+| `/address/*` | 收货地址管理 |
 
-| 角色 | 用户名 | 密码 | 说明 |
-|------|--------|------|------|
-| 管理员 | abo | abo | 管理后台登录 |
+### 内容服务（cgb-content-service:8005）
 
----
+| 接口路径 | 说明 |
+|---------|------|
+| `/news/*` | 新闻资讯发布与管理 |
+| `/forum/*` | 论坛帖子管理 |
+| `/messages/*` | 留言板管理 |
+| `/zixun/*` | 社区资讯管理 |
 
-## API 接口文档
+> 💡 **Swagger 在线文档**：各服务可访问 `http://localhost:{服务端口}/swagger-ui.html` 查看完整 API 文档并在线调试
 
-> 启动服务后访问 SpringDoc Swagger UI：`http://localhost:{port}/swagger-ui.html`
+### 响应格式
 
-### 1. 用户认证接口 (cgb-user-service)
-
-#### 管理员接口
-- **POST** `/users/login` - 管理员登录 `@IgnoreAuth`
-- **POST** `/users/logout` - 管理员登出
-- **GET** `/users/list` - 分页查询管理员
-- **GET** `/users/{id}` - 管理员详情
-- **POST** `/users` - 新增管理员
-- **PUT** `/users` - 修改管理员
-- **DELETE** `/users/{id}` - 删除管理员
-
-#### 用户（买家）接口
-- **POST** `/yonghu/register` - 用户注册 `@IgnoreAuth`
-- **POST** `/yonghu/login` - 用户登录 `@IgnoreAuth`
-- **POST** `/yonghu/logout` - 用户登出
-- **GET** `/yonghu/list` - 分页查询用户
-- **GET** `/yonghu/{id}` - 用户详情
-- **POST** `/yonghu` - 新增用户
-- **PUT** `/yonghu` - 修改用户
-- **DELETE** `/yonghu/{id}` - 删除用户
-
-#### 内部接口（服务间调用）
-- **GET** `/yonghu/internal/userInfo` - 获取用户信息 `@IgnoreAuth`
-- **GET** `/yonghu/internal/getUsername` - 获取用户名 `@IgnoreAuth`
-
-### 2. 商品服务接口 (cgb-product-service)
-
-#### 商品管理
-- **GET** `/shangpin/list` - 分页查询商品
-- **GET** `/shangpin/{id}` - 商品详情
-- **POST** `/shangpin` - 新增商品
-- **PUT** `/shangpin` - 修改商品
-- **DELETE** `/shangpin/{id}` - 删除商品
-
-#### 商品收藏
-- **GET** `/shangpinCollection/list` - 收藏列表
-- **POST** `/shangpinCollection` - 添加收藏
-- **DELETE** `/shangpinCollection/{id}` - 取消收藏
-
-#### 商品评价
-- **GET** `/shangpinComment/list` - 评价列表
-- **POST** `/shangpinComment` - 发表评价
-- **PUT** `/shangpinComment` - 修改评价
-- **DELETE** `/shangpinComment/{id}` - 删除评价
-
-#### 商品留言
-- **GET** `/shangpinLiuyan/list` - 留言列表
-- **POST** `/shangpinLiuyan` - 发表留言
-- **DELETE** `/shangpinLiuyan/{id}` - 删除留言
-
-#### 内部接口（服务间调用）
-- **GET** `/shangpin/internal/productDetail` - 获取商品详情
-- **GET** `/shangpin/internal/productName` - 获取商品名称
-
-### 3. 团购服务接口 (cgb-groupbuy-service)
-
-#### 团长（团购发起）管理
-- **GET** `/tuanwei/list` - 团购列表
-- **GET** `/tuanwei/{id}` - 团购详情
-- **POST** `/tuanwei` - 发起团购
-- **PUT** `/tuanwei` - 修改团购
-- **DELETE** `/tuanwei/{id}` - 删除团购
-
-#### 参团记录
-- **GET** `/tuanxinxi/list` - 参团记录列表
-- **POST** `/tuanxinxi` - 参加团购
-- **PUT** `/tuanxinxi` - 修改参团记录
-- **DELETE** `/tuanxinxi/{id}` - 取消参团
-
-### 4. 订单服务接口 (cgb-order-service)
-
-#### 订单管理
-- **POST** `/orders` - 创建订单
-- **GET** `/orders/my` - 我的订单列表（分页）
-- **GET** `/orders/{id}` - 订单详情
-- **POST** `/orders/pay/{orderId}` - 支付订单
-- **POST** `/orders/cancel/{orderId}` - 取消订单
-- **DELETE** `/orders/{id}` - 删除订单
-
-#### 购物车
-- **GET** `/cart/list` - 购物车列表
-- **POST** `/cart` - 加入购物车
-- **PUT** `/cart` - 修改数量
-- **DELETE** `/cart/{id}` - 删除购物车项
-
-#### 收货地址
-- **GET** `/address/list` - 地址列表
-- **GET** `/address/{id}` - 地址详情
-- **POST** `/address` - 新增地址
-- **PUT** `/address` - 修改地址
-- **DELETE** `/address/{id}` - 删除地址
-
-### 5. 内容服务接口 (cgb-content-service)
-
-#### 社区公告
-- **GET** `/news/list` - 公告列表
-- **GET** `/news/{id}` - 公告详情
-- **POST** `/news` - 新增公告
-- **PUT** `/news` - 修改公告
-- **DELETE** `/news/{id}` - 删除公告
-
-#### 论坛帖子
-- **GET** `/forum/list` - 帖子列表
-- **GET** `/forum/{id}` - 帖子详情
-- **POST** `/forum` - 发帖
-- **PUT** `/forum` - 修改帖子
-- **DELETE** `/forum/{id}` - 删除帖子
-
-#### 留言板
-- **GET** `/messages/list` - 留言列表
-- **POST** `/messages` - 发表留言
-- **PUT** `/messages` - 修改留言
-- **DELETE** `/messages/{id}` - 删除留言
-
-#### 团购资讯
-- **GET** `/zixun/list` - 资讯列表
-- **GET** `/zixun/{id}` - 资讯详情
-- **POST** `/zixun` - 新增资讯
-- **PUT** `/zixun` - 修改资讯
-- **DELETE** `/zixun/{id}` - 删除资讯
-
----
-
-## 认证与授权
-
-### JWT Token 结构
-
-Token Payload 包含以下字段：
-- `userId`：用户 ID
-- `role`：用户角色（admin / user）
-- `clientIP`：登录时的客户端 IP
-
-### 网关认证流程
-
-1. **白名单路径**：以下路径无需认证
-   - `/user/users/login` - 管理员登录
-   - `/user/users/register` - 管理员注册
-   - `/user/yonghu/login` - 用户登录
-   - `/user/yonghu/register` - 用户注册
-   - `/user/users/forgot` - 忘记密码
-   - `/doc.html`、`/swagger-ui`、`/v3/api-docs` - 接口文档
-   - `/actuator` - 健康检查
-
-2. **Token 验证**：
-   - 放行所有 OPTIONS 预检请求
-   - 从请求头 `Token` 或 `Authorization: Bearer xxx` 获取 Token
-   - 验证 JWT 签名有效性及 IP 匹配
-   - 验证 Redis 中 Token 会话是否存在
-
-3. **信息透传**：
-   - 验证通过后，在请求头添加以下字段传递给下游微服务：
-     - `X-User-Id`：用户 ID
-     - `X-User-Role`：用户角色
-     - `X-Client-IP`：客户端真实 IP
-     - `X-Token`：原始 Token
-   - 自动刷新 Redis Token 有效期
-
-### 角色权限
-
-- **admin**: 管理员角色，通过管理后台访问所有管理功能
-- **user**: 普通用户（买家），通过用户前台浏览商品、参与团购、下单购买
-
----
-
-## 数据库设计
-
-### 数据库结构
-
-系统包含五个独立数据库，每个微服务独占一个数据库：
-
-1. **cgb_user** - 用户相关数据（cgb-user-service）
-2. **cgb_product** - 商品相关数据（cgb-product-service）
-3. **cgb_groupbuy** - 团购相关数据（cgb-groupbuy-service）
-4. **cgb_order** - 订单相关数据（cgb-order-service）
-5. **cgb_content** - 内容相关数据（cgb-content-service）
-
-### 表结构详情
-
-#### cgb_user 数据库
-
-**users 表（管理员）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键（自增） |
-| `username` | VARCHAR(50) | 用户名（唯一） |
-| `password` | VARCHAR(200) | 密码（BCrypt 加密） |
-| `role` | VARCHAR(20) | 角色（默认 admin） |
-| `avatar` | VARCHAR(200) | 头像 |
-| `addtime` | DATETIME | 创建时间 |
-| `updatetime` | DATETIME | 更新时间 |
-| `isdelete` | TINYINT | 逻辑删除（0正常/1删除） |
-
-**yonghu 表（用户/买家）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键（自增） |
-| `zhanghao` | VARCHAR(50) | 账号（唯一） |
-| `mima` | VARCHAR(200) | 密码（BCrypt 加密） |
-| `xingming` | VARCHAR(50) | 姓名 |
-| `xingbie` | VARCHAR(10) | 性别 |
-| `shouji` | VARCHAR(20) | 手机 |
-| `youxiang` | VARCHAR(50) | 邮箱 |
-| `touxiang` | VARCHAR(200) | 头像 |
-| `jifen` | DOUBLE | 积分 |
-| `yue` | DOUBLE | 余额 |
-| `status` | TINYINT | 账号状态（0正常/1禁用） |
-| `addtime` | DATETIME | 创建时间 |
-| `updatetime` | DATETIME | 更新时间 |
-| `isdelete` | TINYINT | 逻辑删除 |
-
-#### cgb_product 数据库
-
-**shangpin 表（商品）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键（自增） |
-| `mingcheng` | VARCHAR(200) | 商品名称 |
-| `leixing` | VARCHAR(50) | 商品类型 |
-| `tupian` | VARCHAR(200) | 商品图片 |
-| `jieshao` | TEXT | 商品介绍 |
-| `tihuofangshi` | VARCHAR(100) | 提货方式 |
-| `kucun` | INT | 库存 |
-| `jiage` | DECIMAL(10,2) | 价格 |
-| `yuanjia` | DECIMAL(10,2) | 原价 |
-| `status` | TINYINT | 状态（0上架/1下架） |
-| `userid` | BIGINT | 所属商家用户 ID |
-| `addtime` | DATETIME | 创建时间 |
-| `updatetime` | DATETIME | 更新时间 |
-| `isdelete` | TINYINT | 逻辑删除 |
-
-**shangpin_collection 表（商品收藏）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `userid` | BIGINT | 用户 ID |
-| `shangpinid` | BIGINT | 商品 ID |
-| `addtime` | DATETIME | 收藏时间 |
-
-**shangpin_comment 表（商品评价）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `shangpinid` | BIGINT | 商品 ID |
-| `userid` | BIGINT | 用户 ID |
-| `pingfen` | TINYINT | 评分（1-5） |
-| `pingjianeirong` | TEXT | 评价内容 |
-| `parentid` | BIGINT | 父评价 ID（回复） |
-
-**shangpin_liuyan 表（商品留言）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `shangpinid` | BIGINT | 商品 ID |
-| `userid` | BIGINT | 用户 ID |
-| `liuyanneirong` | TEXT | 留言内容 |
-| `parentid` | BIGINT | 父留言 ID |
-
-#### cgb_groupbuy 数据库
-
-**tuanwei 表（团长/团购活动）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `mingcheng` | VARCHAR(200) | 团购名称 |
-| `tupian` | VARCHAR(200) | 团购图片 |
-| `jieshao` | TEXT | 团购介绍 |
-| `shangpinid` | BIGINT | 关联商品 ID |
-| `zhuangtai` | TINYINT | 状态（0进行中/1已成团/2已过期） |
-| `lirenjia` | INT | 成团人数 |
-| `xianxiarenshu` | INT | 当前参团人数 |
-| `yuanjia` | DECIMAL(10,2) | 原价 |
-| `tejia` | DECIMAL(10,2) | 团购价 |
-| `jieshushijian` | DATETIME | 截止时间 |
-| `userid` | BIGINT | 团长用户 ID |
-
-**tuanxinxi 表（参团记录）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `tuanduiid` | BIGINT | 团购 ID |
-| `userid` | BIGINT | 参团用户 |
-| `shangpinid` | BIGINT | 商品 ID |
-| `shuliang` | INT | 购买数量 |
-| `jiage` | DECIMAL(10,2) | 购买价格 |
-| `zhuangtai` | TINYINT | 状态（0待支付/1已支付/2已取消） |
-
-#### cgb_order 数据库
-
-**cart 表（购物车）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `userid` | BIGINT | 用户 ID |
-| `shangpinid` | BIGINT | 商品 ID |
-| `shuliang` | INT | 数量（默认 1） |
-
-**orders 表（订单）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `orderid` | VARCHAR(64) | 订单编号（唯一） |
-| `userid` | BIGINT | 用户 ID |
-| `shangpinid` | BIGINT | 商品 ID |
-| `shangpinming` | VARCHAR(200) | 商品名称 |
-| `shangpintupian` | VARCHAR(200) | 商品图片 |
-| `shuliang` | INT | 数量 |
-| `jiage` | DECIMAL(10,2) | 单价 |
-| `zongjia` | DECIMAL(10,2) | 总价 |
-| `lianxidianhua` | VARCHAR(20) | 联系电话 |
-| `shouhuodizhi` | VARCHAR(200) | 收货地址 |
-| `zhuangtai` | TINYINT | 状态（0待支付/1已支付/2已取消/3已发货/4已完成） |
-| `fukuanfangshi` | INT | 付款方式 |
-| `beizhu` | VARCHAR(500) | 备注 |
-| `tuanduiid` | BIGINT | 团购 ID（可选） |
-
-**address 表（收货地址）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `userid` | BIGINT | 用户 ID |
-| `dizhimingchen` | VARCHAR(100) | 地址名称 |
-| `lianxidianhua` | VARCHAR(20) | 联系电话 |
-| `shouhuoren` | VARCHAR(50) | 收货人 |
-| `provinces` | VARCHAR(50) | 省 |
-| `citys` | VARCHAR(50) | 市 |
-| `areas` | VARCHAR(50) | 区/县 |
-| `detailedaddress` | VARCHAR(200) | 详细地址 |
-| `isdefault` | TINYINT | 是否默认（0否/1是） |
-
-#### cgb_content 数据库
-
-**news 表（社区公告）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `title` | VARCHAR(200) | 标题 |
-| `content` | TEXT | 内容 |
-| `picture` | VARCHAR(200) | 封面图 |
-| `type` | VARCHAR(50) | 类型 |
-| `publishtime` | VARCHAR(50) | 发布时间 |
-
-**forum 表（论坛帖子）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `title` | VARCHAR(200) | 标题 |
-| `content` | TEXT | 内容 |
-| `picture` | VARCHAR(200) | 封面图 |
-| `parentid` | VARCHAR(50) | 父帖子 ID |
-| `userid` | BIGINT | 发帖用户 |
-| `username` | VARCHAR(100) | 用户名 |
-| `avatar` | VARCHAR(200) | 头像 |
-| `thumbsupnum` | INT | 点赞数 |
-| `cainixihao` | INT | 踩 |
-
-**messages 表（留言板）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `userid` | BIGINT | 留言用户 |
-| `username` | VARCHAR(100) | 用户名 |
-| `content` | TEXT | 留言内容 |
-| `parentid` | BIGINT | 父留言 ID（回复） |
-| `replycontent` | TEXT | 回复内容 |
-
-**zixun 表（团购资讯）**：
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT | 主键 |
-| `title` | VARCHAR(200) | 标题 |
-| `content` | TEXT | 内容 |
-| `picture` | VARCHAR(200) | 封面图 |
-| `source` | VARCHAR(100) | 来源 |
-| `publishtime` | VARCHAR(50) | 发布时间 |
-
----
-
-## 部署指南
-
-### 生产环境部署
-
-1. **环境要求**:
-   - JDK 17+
-   - Maven 3.8+
-   - MySQL 8.0
-   - Redis 7+
-
-2. **配置调整**:
-   - 修改各服务的 `application.yml`
-   - 配置生产环境数据库、Redis 连接信息
-   - 修改 JWT 密钥（`jwt.secret`）为安全的随机字符串
-   - 调整日志级别（建议生产使用 `INFO` 或 `WARN`）
-
-3. **构建与启动**:
-   ```bash
-   # 1. 安装公共模块
-   cd cgb-common && mvn clean install
-   
-   # 2. 打包所有服务
-   mvn clean package -DskipTests
-   
-   # 3. 启动各服务
-   java -jar cgb-gateway/target/cgb-gateway-1.0.0-SNAPSHOT.jar
-   java -jar cgb-user-service/target/cgb-user-service-1.0.0-SNAPSHOT.jar
-   java -jar cgb-product-service/target/cgb-product-service-1.0.0-SNAPSHOT.jar
-   java -jar cgb-groupbuy-service/target/cgb-groupbuy-service-1.0.0-SNAPSHOT.jar
-   java -jar cgb-order-service/target/cgb-order-service-1.0.0-SNAPSHOT.jar
-   java -jar cgb-content-service/target/cgb-content-service-1.0.0-SNAPSHOT.jar
-   ```
-
-4. **前端构建**:
-   ```bash
-   # 管理后台
-   cd admin-vue3
-   npm install && npm run build
-   # 产物在 dist/ 目录，部署到 Nginx
-   
-   # 用户前台
-   cd front-vue3
-   npm install && npm run build
-   # 产物在 dist/ 目录，部署到 Nginx
-   ```
-
-5. **监控与运维**:
-   - 集成 Spring Boot Actuator 监控
-   - 网关暴露端点：`health`、`info`、`metrics`、`gateway`
-   - 业务服务暴露端点：`health`、`info`、`metrics`
-   - 日志级别：`com.cgb: debug`（开发）/ `com.cgb: info`（生产）
-
----
-
-## 开发规范
-
-### 代码规范
-
-1. **命名规范**:
-   - 类名：大驼峰命名法（PascalCase），如 `ShangpinEntity`
-   - 方法名/变量名：小驼峰命名法（camelCase），如 `queryPage`
-   - 常量名：全大写下划线分隔（UPPER_SNAKE_CASE），如 `WHITE_LIST`
-   - 数据库字段：使用拼音或英文，下划线分隔（如 `mingcheng`、`userid`）
-   - Controller 以 `Controller` 结尾，Service 以 `Service` 结尾
-
-2. **分层结构**:
-   - `controller`：接收请求，参数校验，调用 Service
-   - `service`：业务逻辑，事务管理
-   - `dao`：数据访问，MyBatis Plus BaseMapper
-   - `entity`：数据库实体映射
-   - `vo`：视图对象，接口返回数据封装
-
-3. **注释规范**:
-   - 类和公共方法使用 Javadoc 注释
-   - 实体字段使用行内注释说明含义
-   - 复杂业务逻辑添加说明注释
-
-4. **异常处理**:
-   - 使用自定义异常类 `EIException` 抛出业务异常
-   - `GlobalExceptionHandler` 统一捕获并返回规范格式
-   - 使用 `ErrorCode` 枚举定义标准错误码
-
-### 统一响应格式
+后端接口统一响应格式：
 
 ```json
 {
   "code": 0,
   "msg": "操作成功",
-  "data": { ... },
-  "token": "xxx"
+  "data": {}
 }
 ```
 
-- `code = 0`：操作成功
-- `code = -1`：操作失败
-- `code = 401`：未授权
+> ⚠️ 成功响应码为 `0`，非 0 表示失败
 
-### Git 规范
+### 开发环境代理
 
-1. **分支策略**:
-   - `main`：生产环境主分支
-   - `develop`：开发主分支
-   - `feature/*`：功能开发分支
-   - `hotfix/*`：紧急修复分支
+前端开发服务器已配置 API 代理，开发时无需处理跨域问题：
 
-2. **提交规范**:
-   - feat: 新功能
-   - fix: 修复缺陷
-   - docs: 文档更新
-   - style: 代码格式调整
-   - refactor: 重构
-   - test: 测试
-   - chore: 构建过程或辅助工具的变动
+```javascript
+// admin-vue3/vite.config.js（端口 8081）
+proxy: {
+  '/springboot2c1hu': {
+    target: 'http://localhost:8000',   // 代理到网关
+    changeOrigin: true
+  }
+}
 
-### 安全规范
-
-1. **敏感信息保护**:
-   - 密码必须使用 BCrypt 加密存储
-   - JWT 密钥需替换为安全的随机字符串（生产环境）
-   - Token 绑定 IP 防止多设备登录
-   - 数据库密码等敏感信息建议使用环境变量
-
-2. **输入验证**:
-   - `SQLFilter` 工具类过滤 SQL 注入关键字
-   - Druid 连接池内置防 SQL 注入 WallFilter
-   - 前端参数校验 + 后端业务验证双重保障
-
-3. **访问控制**:
-   - 网关统一鉴权，白名单灵活配置
-   - `@IgnoreAuth` 标注公开接口
-   - `@RateLimit` 接口限流防护（Redis + Lua）
-   - 逻辑删除保护数据安全
+// front-vue3/vite.config.js（端口 8084）
+proxy: {
+  '/springboot2c1hu': {
+    target: 'http://localhost:8000',   // 代理到网关
+    changeOrigin: true
+  }
+}
+```
 
 ---
 
-## 致谢
+## 🔐 安全机制
 
-感谢以下开源项目的支持：
+### 网关层鉴权
 
-- Spring Framework & Spring Boot
-- Spring Cloud & Spring Cloud Gateway
-- MyBatis Plus
-- Redis & MySQL & Druid
-- JWT (jjwt)
-- Vue.js & Element Plus & Vite
-- Hutool & Lombok
+| 机制 | 说明 |
+|------|------|
+| **GatewayAuthFilter** | Spring Cloud Gateway 全局过滤器，统一校验 JWT Token |
+| **JWT 签名验证** | `JwtUtils` 验证 Token 签名、过期时间、IP 绑定 |
+| **Redis Token 会话** | `RedisTokenService` 管理 Token 在 Redis 中的存储/查询/删除，支持主动失效 |
+| **IP 绑定验证** | JWT Token 绑定客户端 IP，防止 Token 被盗用后在其他设备使用 |
+| **白名单机制** | `@IgnoreAuth` 注解标记的接口跳过鉴权（如登录、注册） |
+| **全局 CORS** | 网关配置全局跨域策略，允许所有来源、方法、请求头 |
+| **请求大小限制** | 网关 `RequestSize` 过滤器限制请求体最大 10MB |
+
+### 服务层安全
+
+| 机制 | 说明 |
+|------|------|
+| **MD5 密码加密** | 用户密码 MD5 加密存储 |
+| **Redis + Lua 限流** | `@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE，按 IP 隔离 |
+| **注解控制** | `@LoginUser` 标记需登录接口，`@IgnoreAuth` 标记公开接口 |
+| **SQL 注入过滤** | `SQLFilter` 工具类过滤用户输入中的 SQL 关键字 |
+| **逻辑删除** | MyBatis Plus 全局逻辑删除配置，数据不物理删除 |
+
+### 前端安全
+
+| 机制 | 说明 |
+|------|------|
+| **Axios 请求拦截** | 自动注入 `Token` / `Userid` / `Username` 到请求头 |
+| **Axios 响应拦截** | 401 状态码自动清除本地存储并跳转登录页 |
+| **路由守卫（后台）** | 检查 `localStorage.adminToken`，未登录跳转 `/login` |
+| **路由守卫（前台）** | 检查 `localStorage.userTable`，`meta.requireAuth` 页面需登录 |
 
 ---
 
-**项目持续更新中，欢迎 Star ⭐ 和贡献代码！**
+## 🗄️ 数据库设计
+
+系统采用**每服务独立数据库**设计，共 5 个数据库，约 **19 张数据表**：
+
+### cgb_user（用户服务）
+
+| 表名 | 说明 | 核心字段 |
+|------|------|---------|
+| `yonghu` | 用户表 | 账号、密码、姓名、性别、手机、邮箱、积分、余额 |
+| `users` | 管理员表 | 用户名、密码、角色 |
+
+### cgb_product（商品服务）
+
+| 表名 | 说明 | 核心字段 |
+|------|------|---------|
+| `shangpin` | 商品信息 | 编号、名称、类型、数量、供货地址、价格、图片、积分 |
+| `shangpincollection` | 商品收藏 | 用户ID、商品ID、收藏时间 |
+| `shangpincomment` | 商品评论 | 关联ID、用户ID、评论内容、回复 |
+| `shangpinliuyan` | 商品留言 | 关联ID、用户ID、留言内容 |
+
+### cgb_groupbuy（团购服务）
+
+| 表名 | 说明 | 核心字段 |
+|------|------|---------|
+| `tuanxinxi` | 团购信息 | 编号、名称、类型、数量、团购价、活动时间、图片 |
+| `tuanwei` | 团位（参团记录） | 团购ID、用户ID、参团时间、状态 |
+
+### cgb_order（订单服务）
+
+| 表名 | 说明 | 核心字段 |
+|------|------|---------|
+| `orders` | 订单表 | 订单编号、商品ID、数量、价格、状态、地址、收货人 |
+| `cart` | 购物车 | 用户ID、商品ID、购买数量、单价、会员价 |
+| `address` | 收货地址 | 用户ID、地址、收货人、电话、是否默认 |
+
+### cgb_content（内容服务）
+
+| 表名 | 说明 | 核心字段 |
+|------|------|---------|
+| `news` | 新闻资讯 | 标题、简介、图片、内容 |
+| `forum` | 论坛帖子 | 标题、内容、用户ID |
+| `messages` | 留言板 | 用户ID、留言内容 |
+| `zixun` | 社区资讯 | 标题、内容、图片 |
+
+---
+
+## ❓ 常见问题
+
+### 1. 网关启动失败
+- 确认 Redis 服务已启动（默认 `127.0.0.1:6379`）
+- 检查 `cgb-gateway/src/main/resources/application.yml` 中的 Redis 配置
+
+### 2. 微服务间调用失败（Feign）
+- 确认所有相关微服务已启动
+- 检查 `cgb-common` 中的 Feign 客户端接口 `@FeignClient` 注解的 `name` 属性是否与目标服务名一致
+- 查看调用方日志是否有 `Load balancer does not have available server` 错误
+
+### 3. 数据库连接失败
+- 确认 MySQL 服务已启动
+- 确认对应的数据库已创建（`cgb_user` / `cgb_product` / `cgb_groupbuy` / `cgb_order` / `cgb_content`）
+- 检查各服务 `application.yml` 中的数据库用户名和密码
+
+### 4. Flyway 迁移报错
+- 若数据库已存在旧数据，Flyway 以 `baseline-version: 0` 为基线
+- 检查 `db/migration/` 目录下的迁移脚本文件名是否符合 `V{版本号}__{描述}.sql` 格式
+
+### 5. 前端页面空白
+- 确认网关服务已启动（端口 8000）
+- 确认 Vite 开发代理配置正确（target 指向 `http://localhost:8000`）
+- 检查浏览器控制台是否有报错信息
+
+### 6. el-upload 上传报 401 错误
+el-upload 组件不经过 Axios 拦截器，需显式配置 headers：
+```javascript
+const uploadHeaders = ref({
+  Token: localStorage.getItem('adminToken') || localStorage.getItem('token') || ''
+})
+```
+
+---
+
+## 🤝 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支：`git checkout -b feature/AmazingFeature`
+3. 提交更改：`git commit -m 'Add some AmazingFeature'`
+4. 推送分支：`git push origin feature/AmazingFeature`
+5. 提交 Pull Request
+
+---
+
+## 📄 许可证
+
+本项目仅供学习交流使用。
+
+---
+
+## 📞 联系方式
+
+如有问题或建议，欢迎提 Issue。
+
+---
+
+## 📋 更新日志
+
+#### 2026-06-12 - 微服务架构搭建
+
+- 🏗️ **Spring Cloud 微服务拆分**：将系统拆分为 6 个独立微服务（cgb-gateway / cgb-user-service / cgb-product-service / cgb-groupbuy-service / cgb-order-service / cgb-content-service），每服务独立数据库、独立部署
+- 🌐 **Spring Cloud Gateway 网关**：统一 API 入口（端口 8000），配置动态路由（`lb://`）、全局 CORS、请求大小限制（10MB）、`GatewayAuthFilter` 鉴权过滤器
+- 🔐 **网关层 JWT + Redis 认证**：`JwtUtils` JWT 签名验证 + `RedisTokenService` Redis 会话管理，Token 绑定客户端 IP，支持主动失效
+- 🔗 **OpenFeign 服务间通信**：`cgb-common` 定义 `FeignUserService` / `FeignProductService` / `FeignOrderService` 声明式 REST 客户端，各服务间松耦合调用
+- 🗄️ **每服务独立 Flyway 迁移**：各业务服务配置独立 Flyway（`baseline-on-migrate: true`），启动时自动执行建表 + 种子数据
+- 🛡️ **Redis + Lua 接口限流**：`@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE 计数限流，按客户端 IP 隔离
+- 📡 **SpringDoc OpenAPI**：各微服务集成 Swagger UI，支持独立 API 文档查看和在线调试
+- 📊 **Spring Boot Actuator**：各服务集成 Actuator 监控端点（health / info / metrics），网关额外暴露 gateway 端点
+- 🏥 **Druid 连接池**：各服务集成 Druid 连接池（initial-size: 5, min-idle: 5, max-active: 20），test-while-idle 保活策略
+- 🌍 **MyBatis Plus 增强**：全局逻辑删除配置（`isdelete` 字段，1=已删除 / 0=未删除），驼峰命名自动映射
+- 🧪 **28 个单元测试类**：覆盖公共工具类（9）、网关鉴权（2）、用户服务（4）、商品服务（4）、团购服务（2）、订单服务（3）、内容服务（4）
+
+#### 2026-06-12 - 前端双端
+
+- 👥 **管理后台（admin-vue3）**：Vue 3 + Vite 8 + Element Plus + Pinia + ECharts，12 个功能模块页面，端口 8081，代理到网关 8000
+- 🛒 **用户前台（front-vue3）**：Vue 3 + Vite 8 + Element Plus + Pinia，11 个页面路由，端口 8084，代理到网关 8000
+- 🔒 **前端路由守卫**：后台检查 `adminToken`，前台检查 `userTable` + `meta.requireAuth`
+- 📡 **Axios 拦截器**：请求自动注入 Token / Userid / Username，401 响应自动跳转登录
+
+---
+
+<div align="center">
+
+*最后更新时间：2026-06-12*
+
+</div>
