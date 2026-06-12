@@ -33,8 +33,7 @@ public class ContentGroupBuyConsumer implements RocketMQListener<GroupBuyMessage
             // 团购成团 → 自动生成社区公告
             NewsEntity news = new NewsEntity();
             news.setTitle("🎉 团购成团通知");
-            news.setContent(String.format(
-                    "团购成团啦！团购ID=%d，共%d人参团成功，成团人数目标%d人。快来参与更多优惠团购吧！",
+            news.setContent(String.format("团购成团啦！团购ID=%d，共%d人参团成功，成团人数目标%d人。快来参与更多优惠团购吧！",
                     message.getGroupBuyId(), message.getCurrentMemberCount(), message.getTargetMemberCount()));
             news.setType("groupbuy");
             newsService.save(news);

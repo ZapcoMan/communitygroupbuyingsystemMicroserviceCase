@@ -29,4 +29,7 @@ public class GroupBuyMessage implements Serializable {
     private Integer currentCount;
     /** 状态：0参团 1成团 2过期 */
     private Integer status;
+
+    private Integer currentMemberCount;
+    private Integer targetMemberCount;
 }

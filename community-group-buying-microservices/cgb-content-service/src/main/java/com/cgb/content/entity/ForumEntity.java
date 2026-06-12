@@ -19,19 +19,20 @@ public class ForumEntity implements Serializable {
     private String content;             // 内容
 
     @TableField("picture")
-    private String coverImage;          // 封面�?
+    private String coverImage;          // 封面�?
     @TableField("parentid")
     private String parentId;            // 父帖子ID
 
     @TableField("userid")
     private Long userId;                // 发帖用户
 
-    private String username;            // 用户�?    private String avatar;              // 头像
+    private String username;            // 用户?
+     private String avatar;              // 头像
 
     @TableField("thumbsupnum")
-    private Integer likeCount;          // 点赞�?
+    private Integer likeCount;          // 点赞�?
     @TableField("cainixihao")
-    private Integer dislikeCount;       // �?
+    private Integer dislikeCount;       // �?
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addTime;
 

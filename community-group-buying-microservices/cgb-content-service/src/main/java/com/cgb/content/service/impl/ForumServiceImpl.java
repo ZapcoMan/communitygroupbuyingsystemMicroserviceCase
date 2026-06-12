@@ -48,7 +48,9 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
-    public ForumEntity getById(Long id) { return forumDao.selectById(id); }
+    public ForumEntity getById(Long id) {
+        return forumDao.selectById(id);
+    }
 
     @Override
     public IPage<ForumEntity> queryPage(ForumEntity params) {
@@ -67,7 +69,7 @@ public class ForumServiceImpl implements ForumService {
     @Override
     public void thumbUp(Long id) {
         ForumEntity entity = forumDao.selectById(id);
-        if (entity == null) throw new EIException("帖子不存�?);
+        if (entity == null) throw new EIException("帖子不存在");
 
         // 使用 Redis SETNX 防重复（简化版：用帖子ID作为key，每个帖子每人只能赞一次）
         String dedupeKey = THUMB_UP_KEY + ":" + id;
@@ -76,7 +78,7 @@ public class ForumServiceImpl implements ForumService {
             // 首次点赞，更新数据库
             entity.setLikeCount(entity.getLikeCount() + 1);
             forumDao.updateById(entity);
-            log.info("帖子点赞成功: id={}, 当前点赞�?{}", id, entity.getLikeCount());
+            log.info("帖子点赞成功: id={}, 当前点赞�?{}", id, entity.getLikeCount());
         } else {
             log.info("帖子已点赞，跳过: id={}", id);
         }
@@ -97,12 +99,13 @@ public class ForumServiceImpl implements ForumService {
                 .gt(ForumEntity::getLikeCount, 0);
         IPage<ForumEntity> result = forumDao.selectPage(pageResult, wrapper);
 
-        // 标记缓存（简化：仅做标记，实际可缓存完整分页结果�?        try {
+        // 标记缓存（简化：仅做标记，实际可缓存完整分页结果�?
+        try {
             redisTemplate.opsForValue().set(HOT_POSTS_KEY, "cached", HOT_CACHE_TTL_MINUTES, TimeUnit.MINUTES);
         } catch (Exception e) {
             log.warn("热门帖子缓存写入失败", e);
         }
-
         return result;
+
     }
 }
