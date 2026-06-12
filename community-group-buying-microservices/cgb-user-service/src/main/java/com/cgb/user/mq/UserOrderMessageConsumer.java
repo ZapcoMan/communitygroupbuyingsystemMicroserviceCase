@@ -1,9 +1,9 @@
-package com.cgb.user.mq;
+﻿package com.cgb.user.mq;
 
 import com.cgb.common.mq.MQTopics;
 import com.cgb.common.mq.OrderStatusMessage;
-import com.cgb.user.dao.YonghuDao;
-import com.cgb.user.service.YonghuService;
+import com.cgb.user.dao.MemberDao;
+import com.cgb.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserOrderMessageConsumer implements RocketMQListener<OrderStatusMessage> {
 
-    private final YonghuService yonghuService;
+    private final MemberService yonghuService;
 
     @Override
     public void onMessage(OrderStatusMessage message) {

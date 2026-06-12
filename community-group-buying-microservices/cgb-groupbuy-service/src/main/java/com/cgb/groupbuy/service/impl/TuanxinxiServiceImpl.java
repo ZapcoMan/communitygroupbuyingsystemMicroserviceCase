@@ -1,14 +1,14 @@
-package com.cgb.groupbuy.service.impl;
+﻿package com.cgb.groupbuy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.EIException;
 import com.cgb.common.utils.*;
-import com.cgb.groupbuy.dao.TuanxinxiDao;
-import com.cgb.groupbuy.entity.TuanweiEntity;
-import com.cgb.groupbuy.entity.TuanxinxiEntity;
-import com.cgb.groupbuy.service.TuanweiService;
-import com.cgb.groupbuy.service.TuanxinxiService;
+import com.cgb.groupbuy.dao.GroupBuyDao;
+import com.cgb.groupbuy.entity.GroupSlotEntity;
+import com.cgb.groupbuy.entity.GroupBuyEntity;
+import com.cgb.groupbuy.service.GroupSlotService;
+import com.cgb.groupbuy.service.GroupBuyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,47 +18,47 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TuanxinxiServiceImpl implements TuanxinxiService {
+public class GroupBuyServiceImpl implements GroupBuyService {
 
-    private final TuanxinxiDao tuanxinxiDao;
-    private final TuanweiService tuanweiService;
+    private final GroupBuyDao tuanxinxiDao;
+    private final GroupSlotService tuanweiService;
 
     @Override
-    public void save(TuanxinxiEntity entity) {
+    public void save(GroupBuyEntity entity) {
         if (entity.getStatus() == null) entity.setStatus(0);
         tuanxinxiDao.insert(entity);
     }
 
     @Override
-    public void update(TuanxinxiEntity entity) { tuanxinxiDao.updateById(entity); }
+    public void update(GroupBuyEntity entity) { tuanxinxiDao.updateById(entity); }
 
     @Override
     public void delete(Long id) { tuanxinxiDao.deleteById(id); }
 
     @Override
-    public TuanxinxiEntity getById(Long id) { return tuanxinxiDao.selectById(id); }
+    public GroupBuyEntity getById(Long id) { return tuanxinxiDao.selectById(id); }
 
     @Override
-    public IPage<TuanxinxiEntity> queryPage(TuanxinxiEntity params) {
-        IPage<TuanxinxiEntity> page = new Query<TuanxinxiEntity>().getPage(
+    public IPage<GroupBuyEntity> queryPage(GroupBuyEntity params) {
+        IPage<GroupBuyEntity> page = new Query<GroupBuyEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
-        return tuanxinxiDao.selectPage(page, new LambdaQueryWrapper<TuanxinxiEntity>()
-                .eq(params.getGroupBuyId() != null, TuanxinxiEntity::getGroupBuyId, params.getGroupBuyId())
-                .eq(params.getUserId() != null, TuanxinxiEntity::getUserId, params.getUserId())
-                .orderByDesc(TuanxinxiEntity::getId));
+        return tuanxinxiDao.selectPage(page, new LambdaQueryWrapper<GroupBuyEntity>()
+                .eq(params.getGroupBuyId() != null, GroupBuyEntity::getGroupBuyId, params.getGroupBuyId())
+                .eq(params.getUserId() != null, GroupBuyEntity::getUserId, params.getUserId())
+                .orderByDesc(GroupBuyEntity::getId));
     }
 
     @Override
     public int countByTuanId(Long groupBuyId) {
-        return tuanxinxiDao.selectCount(new LambdaQueryWrapper<TuanxinxiEntity>()
-                .eq(TuanxinxiEntity::getGroupBuyId, groupBuyId)
-                .eq(TuanxinxiEntity::getStatus, 1)).intValue();
+        return tuanxinxiDao.selectCount(new LambdaQueryWrapper<GroupBuyEntity>()
+                .eq(GroupBuyEntity::getGroupBuyId, groupBuyId)
+                .eq(GroupBuyEntity::getStatus, 1)).intValue();
     }
 
     /**
-     * 参团（委托给 TuanweiService.joinGroupBuy 的分布式事务方法）
+     * 参团（委托给 GroupSlotService.joinGroupBuy 的分布式事务方法）
      * 注意：不再在此方法声明 @GlobalTransactional，避免嵌套事务
-     * 事务边界在 TuanweiService.joinGroupBuy 中统一管理
+     * 事务边界在 GroupSlotService.joinGroupBuy 中统一管理
      */
     @Override
     public void joinGroupBuy(Long groupBuyId, Long userId, Integer quantity) {
@@ -66,8 +66,8 @@ public class TuanxinxiServiceImpl implements TuanxinxiService {
         tuanweiService.joinGroupBuy(groupBuyId, userId, quantity);
 
         // 2. 写入参团记录
-        TuanweiEntity groupBuy = tuanweiService.getById(groupBuyId);
-        TuanxinxiEntity record = new TuanxinxiEntity();
+        GroupSlotEntity groupBuy = tuanweiService.getById(groupBuyId);
+        GroupBuyEntity record = new GroupBuyEntity();
         record.setGroupBuyId(groupBuyId);
         record.setUserId(userId);
         record.setProductId(groupBuy.getProductId());

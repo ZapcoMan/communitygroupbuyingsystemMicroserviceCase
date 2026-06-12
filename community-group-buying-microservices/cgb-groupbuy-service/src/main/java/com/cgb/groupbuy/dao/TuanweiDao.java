@@ -1,13 +1,13 @@
-package com.cgb.groupbuy.dao;
+﻿package com.cgb.groupbuy.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cgb.groupbuy.entity.TuanweiEntity;
+import com.cgb.groupbuy.entity.GroupSlotEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
 @Mapper
-public interface TuanweiDao extends BaseMapper<TuanweiEntity> {
+public interface GroupSlotDao extends BaseMapper<GroupSlotEntity> {
 
     /** 原子增加参团人数（并发安全） */
     @Update("UPDATE tuanwei SET xianxiarenshu = xianxiarenshu + #{count} WHERE id = #{id} AND xianxiarenshu < lirenjia AND zhuangtai = 0")

@@ -1,9 +1,9 @@
-package com.cgb.content.dao;
+﻿package com.cgb.content.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cgb.content.entity.ZixunEntity;
+import com.cgb.content.entity.InformationEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ZixunDao extends BaseMapper<ZixunEntity> {
+public interface InformationDao extends BaseMapper<InformationEntity> {
 }

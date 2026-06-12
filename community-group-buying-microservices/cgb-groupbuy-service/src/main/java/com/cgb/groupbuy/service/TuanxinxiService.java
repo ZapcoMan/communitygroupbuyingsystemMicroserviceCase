@@ -1,14 +1,14 @@
-package com.cgb.groupbuy.service;
+﻿package com.cgb.groupbuy.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.groupbuy.entity.TuanxinxiEntity;
+import com.cgb.groupbuy.entity.GroupBuyEntity;
 
-public interface TuanxinxiService {
-    void save(TuanxinxiEntity entity);
-    void update(TuanxinxiEntity entity);
+public interface GroupBuyService {
+    void save(GroupBuyEntity entity);
+    void update(GroupBuyEntity entity);
     void delete(Long id);
-    TuanxinxiEntity getById(Long id);
-    IPage<TuanxinxiEntity> queryPage(TuanxinxiEntity params);
+    GroupBuyEntity getById(Long id);
+    IPage<GroupBuyEntity> queryPage(GroupBuyEntity params);
     int countByTuanId(Long tuanduiid);
 
     /** 参团（含分布式事务） */

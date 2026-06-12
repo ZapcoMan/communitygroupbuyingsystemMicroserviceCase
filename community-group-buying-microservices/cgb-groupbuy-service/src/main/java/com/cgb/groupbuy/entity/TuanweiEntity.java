@@ -1,4 +1,4 @@
-package com.cgb.groupbuy.entity;
+﻿package com.cgb.groupbuy.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("tuanwei")
-public class TuanweiEntity implements Serializable {
+public class GroupSlotEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)

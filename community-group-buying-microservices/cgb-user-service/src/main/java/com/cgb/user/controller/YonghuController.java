@@ -1,9 +1,9 @@
-package com.cgb.user.controller;
+﻿package com.cgb.user.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.user.entity.YonghuEntity;
-import com.cgb.user.service.YonghuService;
+import com.cgb.user.entity.MemberEntity;
+import com.cgb.user.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,21 +15,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/yonghu")
 @RequiredArgsConstructor
-public class YonghuController {
+public class MemberController {
 
-    private final YonghuService yonghuService;
+    private final MemberService yonghuService;
 
     @Operation(summary = "用户列表")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) YonghuEntity params) {
-        IPage<YonghuEntity> result = yonghuService.queryPage(params);
+    public R<?> list(@Parameter(hidden = true) MemberEntity params) {
+        IPage<MemberEntity> result = yonghuService.queryPage(params);
         return R.ok(result);
     }
 
     @Operation(summary = "注册")
     @PostMapping("/register")
     @RateLimit(key = "user_register", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
-    public R<?> register(@RequestBody YonghuEntity entity) {
+    public R<?> register(@RequestBody MemberEntity entity) {
         yonghuService.register(entity);
         return R.ok("注册成功");
     }
@@ -37,7 +37,7 @@ public class YonghuController {
     @Operation(summary = "登录")
     @PostMapping("/login")
     @RateLimit(key = "user_login", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
-    public R<?> login(@RequestBody YonghuEntity entity) {
+    public R<?> login(@RequestBody MemberEntity entity) {
         return yonghuService.login(entity.getAccount(), entity.getPassword());
     }
 
@@ -49,7 +49,7 @@ public class YonghuController {
 
     @Operation(summary = "修改用户")
     @PutMapping
-    public R<?> update(@RequestBody YonghuEntity entity) {
+    public R<?> update(@RequestBody MemberEntity entity) {
         yonghuService.update(entity);
         return R.ok("更新成功");
     }
@@ -85,7 +85,7 @@ public class YonghuController {
     @Operation(summary = "内部-获取用户名")
     @GetMapping("/internal/getUsername")
     public R<?> internalGetUsername(@RequestParam Long userId) {
-        YonghuEntity entity = yonghuService.getById(userId);
+        MemberEntity entity = yonghuService.getById(userId);
         return R.ok(entity != null ? entity.getRealName() : null);
     }
 

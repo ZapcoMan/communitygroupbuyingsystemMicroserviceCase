@@ -1,13 +1,13 @@
-package com.cgb.user.dao;
+﻿package com.cgb.user.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cgb.user.entity.YonghuEntity;
+import com.cgb.user.entity.MemberEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
 @Mapper
-public interface YonghuDao extends BaseMapper<YonghuEntity> {
+public interface MemberDao extends BaseMapper<MemberEntity> {
 
     /**
      * 原子增加积分（并发安全）

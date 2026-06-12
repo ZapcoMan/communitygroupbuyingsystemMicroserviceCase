@@ -1,18 +1,18 @@
-package com.cgb.user.service;
+﻿package com.cgb.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.user.entity.YonghuEntity;
+import com.cgb.user.entity.MemberEntity;
 
-public interface YonghuService {
-    void save(YonghuEntity entity);
-    void update(YonghuEntity entity);
+public interface MemberService {
+    void save(MemberEntity entity);
+    void update(MemberEntity entity);
     void delete(Long id);
-    YonghuEntity getById(Long id);
-    YonghuEntity getByAccount(String account);
-    IPage<YonghuEntity> queryPage(YonghuEntity params);
+    MemberEntity getById(Long id);
+    MemberEntity getByAccount(String account);
+    IPage<MemberEntity> queryPage(MemberEntity params);
     R<?> login(String account, String password);
-    R<?> register(YonghuEntity params);
+    R<?> register(MemberEntity params);
     R<?> changePassword(String token, String oldPassword, String newPassword);
     void addPoints(Long userId, Double points);
 }

@@ -1,4 +1,4 @@
-package com.cgb.groupbuy.service.impl;
+﻿package com.cgb.groupbuy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -8,9 +8,9 @@ import com.cgb.common.feign.FeignProductService;
 import com.cgb.common.mq.GroupBuyMessage;
 import com.cgb.common.mq.MQTopics;
 import com.cgb.common.utils.*;
-import com.cgb.groupbuy.dao.TuanweiDao;
-import com.cgb.groupbuy.entity.TuanweiEntity;
-import com.cgb.groupbuy.service.TuanweiService;
+import com.cgb.groupbuy.dao.GroupSlotDao;
+import com.cgb.groupbuy.entity.GroupSlotEntity;
+import com.cgb.groupbuy.service.GroupSlotService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TuanweiServiceImpl implements TuanweiService {
+public class GroupSlotServiceImpl implements GroupSlotService {
 
-    private final TuanweiDao tuanweiDao;
+    private final GroupSlotDao tuanweiDao;
     private final FeignProductService feignProductService;
     private final RocketMQTemplate rocketMQTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -36,29 +36,29 @@ public class TuanweiServiceImpl implements TuanweiService {
     private static final String GROUP_BUY_CACHE_PREFIX = "cgb:groupbuy:";
 
     @Override
-    public void save(TuanweiEntity entity) {
+    public void save(GroupSlotEntity entity) {
         if (entity.getStatus() == null) entity.setStatus(0);
         if (entity.getCurrentMemberCount() == null) entity.setCurrentMemberCount(1);
         if (entity.getEndTime() == null) {
-            entity.setEndTime(LocalDateTime.now().plusDays(7)); // 默认7�?        }
+            entity.setEndTime(LocalDateTime.now().plusDays(7)); // 默认7�?        }
         // 发起团购时扣减团长购买的库存
         if (entity.getProductId() != null) {
             try {
                 feignProductService.decreaseStock(entity.getProductId(), 1);
-                log.info("发起团购，团长库存扣减成�? productId={}", entity.getProductId());
+                log.info("发起团购，团长库存扣减成�? productId={}", entity.getProductId());
             } catch (Exception e) {
-                log.error("发起团购，库存扣减失�? productId={}", entity.getProductId(), e);
-                throw new EIException("库存不足，无法发起团�?);
+                log.error("发起团购，库存扣减失�? productId={}", entity.getProductId(), e);
+                throw new EIException("库存不足，无法发起团�?);
             }
         }
         tuanweiDao.insert(entity);
         // 缓存团购信息
         cacheGroupBuy(entity);
-        // 发送团购创建消�?        sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_JOINED);
+        // 发送团购创建消�?        sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_JOINED);
     }
 
     @Override
-    public void update(TuanweiEntity entity) {
+    public void update(GroupSlotEntity entity) {
         if (entity.getId() == null) throw new EIException("团购ID不能为空");
         tuanweiDao.updateById(entity);
         // 更新缓存
@@ -72,50 +72,50 @@ public class TuanweiServiceImpl implements TuanweiService {
     }
 
     @Override
-    public TuanweiEntity getById(Long id) {
+    public GroupSlotEntity getById(Long id) {
         // 先查缓存
         String key = GROUP_BUY_CACHE_PREFIX + id;
         try {
             Object cached = redisTemplate.opsForValue().get(key);
-            if (cached instanceof TuanweiEntity) {
-                return (TuanweiEntity) cached;
+            if (cached instanceof GroupSlotEntity) {
+                return (GroupSlotEntity) cached;
             }
         } catch (Exception e) {
             log.warn("团购缓存读取失败: id={}", id, e);
         }
-        TuanweiEntity entity = tuanweiDao.selectById(id);
+        GroupSlotEntity entity = tuanweiDao.selectById(id);
         if (entity == null) throw new EIException(ErrorCode.RESOURCE_NOT_FOUND);
         cacheGroupBuy(entity);
         return entity;
     }
 
     @Override
-    public IPage<TuanweiEntity> queryPage(TuanweiEntity params) {
-        IPage<TuanweiEntity> page = new Query<TuanweiEntity>().getPage(
+    public IPage<GroupSlotEntity> queryPage(GroupSlotEntity params) {
+        IPage<GroupSlotEntity> page = new Query<GroupSlotEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
-        LambdaQueryWrapper<TuanweiEntity> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<GroupSlotEntity> wrapper = new LambdaQueryWrapper<>();
         if (CommonUtil.isNotEmpty(params.getGroupName())) {
-            wrapper.like(TuanweiEntity::getGroupName, params.getGroupName());
+            wrapper.like(GroupSlotEntity::getGroupName, params.getGroupName());
         }
         if (params.getStatus() != null) {
-            wrapper.eq(TuanweiEntity::getStatus, params.getStatus());
+            wrapper.eq(GroupSlotEntity::getStatus, params.getStatus());
         }
-        wrapper.orderByDesc(TuanweiEntity::getId);
+        wrapper.orderByDesc(GroupSlotEntity::getId);
         return tuanweiDao.selectPage(page, wrapper);
     }
 
     /**
-     * 参团（Seata分布式事务：人数+1 + 扣库�?+ 发MQ�?     * 注意：仅在此方法声明 @GlobalTransactional，内部调用的方法不再声明
+     * 参团（Seata分布式事务：人数+1 + 扣库�?+ 发MQ�?     * 注意：仅在此方法声明 @GlobalTransactional，内部调用的方法不再声明
      */
     @Override
     @GlobalTransactional(name = "cgb-join-groupbuy", rollbackFor = Exception.class)
     public void joinGroupBuy(Long groupBuyId, Long userId, Integer quantity) {
         // 1. 查询团购信息
-        TuanweiEntity groupBuy = tuanweiDao.selectById(groupBuyId);
-        if (groupBuy == null) throw new EIException("团购不存�?);
-        if (groupBuy.getStatus() != 0) throw new EIException("团购已结�?);
+        GroupSlotEntity groupBuy = tuanweiDao.selectById(groupBuyId);
+        if (groupBuy == null) throw new EIException("团购不存�?);
+        if (groupBuy.getStatus() != 0) throw new EIException("团购已结�?);
         if (groupBuy.getEndTime() != null && groupBuy.getEndTime().isBefore(LocalDateTime.now())) {
-            throw new EIException("团购已过�?);
+            throw new EIException("团购已过�?);
         }
         if (groupBuy.getCurrentMemberCount() >= groupBuy.getTargetMemberCount()) {
             throw new EIException("团购人数已满");
@@ -123,18 +123,18 @@ public class TuanweiServiceImpl implements TuanweiService {
 
         // 2. 原子增加参团人数
         int rows = tuanweiDao.increaseMember(groupBuyId, 1);
-        if (rows == 0) throw new EIException("参团失败，团购已满或已结�?);
+        if (rows == 0) throw new EIException("参团失败，团购已满或已结�?);
 
         // 3. 远程调用商品服务扣减库存
-        log.info("参团分布式事�?�?扣减库存: productId={}, quantity={}", groupBuy.getProductId(), quantity);
+        log.info("参团分布式事�?�?扣减库存: productId={}, quantity={}", groupBuy.getProductId(), quantity);
         var stockResult = feignProductService.decreaseStock(groupBuy.getProductId(), quantity);
         if (stockResult.getCode() != 0) {
             throw new EIException("库存扣减失败: " + stockResult.getMsg());
         }
 
-        // 4. 发送参团消息（RocketMQ�?        sendGroupBuyMessage(groupBuy, MQTopics.TAG_GROUPBUY_JOINED);
+        // 4. 发送参团消息（RocketMQ�?        sendGroupBuyMessage(groupBuy, MQTopics.TAG_GROUPBUY_JOINED);
 
-        // 5. 检查是否成�?        checkAndCompleteGroupBuy(groupBuyId);
+        // 5. 检查是否成�?        checkAndCompleteGroupBuy(groupBuyId);
 
         // 6. 清除缓存
         evictGroupBuyCache(groupBuyId);
@@ -150,7 +150,7 @@ public class TuanweiServiceImpl implements TuanweiService {
         int rows = tuanweiDao.completeGroupBuy(groupBuyId);
         if (rows > 0) {
             log.info("团购成团成功: groupBuyId={}", groupBuyId);
-            TuanweiEntity entity = tuanweiDao.selectById(groupBuyId);
+            GroupSlotEntity entity = tuanweiDao.selectById(groupBuyId);
             sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_COMPLETED);
             evictGroupBuyCache(groupBuyId);
         }
@@ -162,18 +162,18 @@ public class TuanweiServiceImpl implements TuanweiService {
     @Override
     public int expireGroupBuys() {
         // 批量扫描过期团购
-        LambdaQueryWrapper<TuanweiEntity> wrapper = new LambdaQueryWrapper<TuanweiEntity>()
-                .eq(TuanweiEntity::getStatus, 0)
-                .lt(TuanweiEntity::getEndTime, LocalDateTime.now());
+        LambdaQueryWrapper<GroupSlotEntity> wrapper = new LambdaQueryWrapper<GroupSlotEntity>()
+                .eq(GroupSlotEntity::getStatus, 0)
+                .lt(GroupSlotEntity::getEndTime, LocalDateTime.now());
         var expiredList = tuanweiDao.selectList(wrapper);
         int count = 0;
-        for (TuanweiEntity entity : expiredList) {
+        for (GroupSlotEntity entity : expiredList) {
             int rows = tuanweiDao.expireGroupBuy(entity.getId());
             if (rows > 0) {
                 count++;
                 sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_EXPIRED);
                 evictGroupBuyCache(entity.getId());
-                log.info("团购已过�? groupBuyId={}", entity.getId());
+                log.info("团购已过�? groupBuyId={}", entity.getId());
             }
         }
         return count;
@@ -182,7 +182,7 @@ public class TuanweiServiceImpl implements TuanweiService {
     /**
      * 发送团购状态变更消息到 RocketMQ
      */
-    private void sendGroupBuyMessage(TuanweiEntity entity, String tag) {
+    private void sendGroupBuyMessage(GroupSlotEntity entity, String tag) {
         try {
             GroupBuyMessage msg = new GroupBuyMessage();
             msg.setGroupBuyId(entity.getId());
@@ -197,13 +197,13 @@ public class TuanweiServiceImpl implements TuanweiService {
 
             String destination = MQTopics.GROUPBUY_STATUS_CHANGE + ":" + tag;
             rocketMQTemplate.syncSend(destination, MessageBuilder.withPayload(msg).build());
-            log.info("团购状态消息发送成�? groupBuyId={}, tag={}", entity.getId(), tag);
+            log.info("团购状态消息发送成�? groupBuyId={}, tag={}", entity.getId(), tag);
         } catch (Exception e) {
-            log.error("团购状态消息发送失�? groupBuyId={}, tag={}", entity.getId(), tag, e);
+            log.error("团购状态消息发送失�? groupBuyId={}, tag={}", entity.getId(), tag, e);
         }
     }
 
-    private void cacheGroupBuy(TuanweiEntity entity) {
+    private void cacheGroupBuy(GroupSlotEntity entity) {
         try {
             redisTemplate.opsForValue().set(GROUP_BUY_CACHE_PREFIX + entity.getId(), entity, 30, TimeUnit.MINUTES);
         } catch (Exception e) {

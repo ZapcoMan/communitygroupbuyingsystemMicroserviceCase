@@ -1,9 +1,9 @@
-package com.cgb.content.controller;
+﻿package com.cgb.content.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.content.entity.ZixunEntity;
-import com.cgb.content.service.ZixunService;
+import com.cgb.content.entity.InformationEntity;
+import com.cgb.content.service.InformationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,21 +14,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/zixun")
 @RequiredArgsConstructor
-public class ZixunController {
+public class InformationController {
 
-    private final ZixunService zixunService;
+    private final InformationService zixunService;
 
     @Operation(summary = "新增资讯")
     @PostMapping
-    public R<?> save(@RequestBody ZixunEntity entity) {
+    public R<?> save(@RequestBody InformationEntity entity) {
         zixunService.save(entity);
         return R.ok("发布成功");
     }
 
     @Operation(summary = "资讯列表")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) ZixunEntity params) {
-        IPage<ZixunEntity> result = zixunService.queryPage(params);
+    public R<?> list(@Parameter(hidden = true) InformationEntity params) {
+        IPage<InformationEntity> result = zixunService.queryPage(params);
         return R.ok(result);
     }
 
@@ -40,7 +40,7 @@ public class ZixunController {
 
     @Operation(summary = "修改资讯")
     @PutMapping
-    public R<?> update(@RequestBody ZixunEntity entity) {
+    public R<?> update(@RequestBody InformationEntity entity) {
         zixunService.update(entity);
         return R.ok("更新成功");
     }
