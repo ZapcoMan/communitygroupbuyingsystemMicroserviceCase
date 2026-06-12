@@ -1,4 +1,4 @@
-﻿package com.cgb.content.controller;
+package com.cgb.content.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;

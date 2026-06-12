@@ -1,4 +1,4 @@
-﻿package com.cgb.groupbuy.dao;
+package com.cgb.groupbuy.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cgb.groupbuy.entity.GroupBuyCommentEntity;

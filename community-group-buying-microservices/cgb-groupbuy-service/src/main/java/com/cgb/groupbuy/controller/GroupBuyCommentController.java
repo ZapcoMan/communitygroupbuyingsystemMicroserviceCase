@@ -1,4 +1,4 @@
-﻿package com.cgb.groupbuy.controller;
+package com.cgb.groupbuy.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;

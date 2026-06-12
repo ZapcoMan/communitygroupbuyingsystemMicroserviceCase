@@ -1,4 +1,4 @@
-﻿package com.cgb.groupbuy.mq;
+package com.cgb.groupbuy.mq;
 
 import com.cgb.common.feign.FeignProductService;
 import com.cgb.common.mq.GroupBuyMessage;
