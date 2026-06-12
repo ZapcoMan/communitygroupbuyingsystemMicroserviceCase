@@ -1,8 +1,39 @@
 server:
   port: 8004
+
 spring:
   application:
     name: cgb-order-service
+  profiles:
+    active: dev
+
+  # ==================== Nacos 配置中心 ====================
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848
+      discovery:
+        namespace: cgb-dev
+        group: CGB_GROUP
+        metadata:
+          version: 1.0.0
+          env: dev
+      config:
+        namespace: cgb-dev
+        group: CGB_GROUP
+        file-extension: yml
+        shared-configs:
+          - data-id: common-redis.yml
+            group: SHARED_GROUP
+            refresh: true
+          - data-id: common-mybatis.yml
+            group: SHARED_GROUP
+            refresh: true
+        refresh-enabled: true
+  # 从 Nacos 导入配置
+  config:
+    import:
+      - optional:nacos:cgb-order-service.yml?group=CGB_GROUP&refreshEnabled=true
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/cgb_order?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
@@ -12,6 +43,7 @@ spring:
       initial-size: 5
       min-idle: 5
       max-active: 20
+      test-while-idle: true
   data:
     redis:
       host: 127.0.0.1
@@ -49,3 +81,4 @@ management:
 logging:
   level:
     com.cgb: debug
+    com.alibaba.nacos: info
