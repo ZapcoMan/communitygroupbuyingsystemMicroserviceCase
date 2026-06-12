@@ -1,4 +1,4 @@
-﻿package com.cgb.product.mq;
+package com.cgb.product.mq;
 
 import com.cgb.common.mq.MQTopics;
 import com.cgb.common.mq.OrderStatusMessage;
