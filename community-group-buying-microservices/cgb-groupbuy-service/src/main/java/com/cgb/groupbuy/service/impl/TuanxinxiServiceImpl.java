@@ -32,6 +32,9 @@ public class TuanxinxiServiceImpl implements TuanxinxiService {
     public void delete(Long id) { tuanxinxiDao.deleteById(id); }
 
     @Override
+    public TuanxinxiEntity getById(Long id) { return tuanxinxiDao.selectById(id); }
+
+    @Override
     public IPage<TuanxinxiEntity> queryPage(TuanxinxiEntity params) {
         IPage<TuanxinxiEntity> page = new Query<TuanxinxiEntity>().getPage(
                 CommonUtil.convert(params, Map.class));

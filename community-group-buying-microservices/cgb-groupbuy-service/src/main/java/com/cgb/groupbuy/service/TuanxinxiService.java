@@ -7,6 +7,7 @@ public interface TuanxinxiService {
     void save(TuanxinxiEntity entity);
     void update(TuanxinxiEntity entity);
     void delete(Long id);
+    TuanxinxiEntity getById(Long id);
     IPage<TuanxinxiEntity> queryPage(TuanxinxiEntity params);
     int countByTuanId(Long tuanduiid);
 }

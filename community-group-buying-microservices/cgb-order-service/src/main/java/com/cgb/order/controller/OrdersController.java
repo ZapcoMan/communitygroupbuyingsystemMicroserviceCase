@@ -65,6 +65,29 @@ public class OrdersController {
         return R.ok("删除成功");
     }
 
+    @Operation(summary = "管理员查询所有订单")
+    @GetMapping("/list")
+    public R<?> list(@Parameter(hidden = true) OrdersEntity params,
+                     @RequestParam(defaultValue = "1") Integer page,
+                     @RequestParam(defaultValue = "10") Integer limit) {
+        IPage<OrdersEntity> result = ordersService.queryPage(params);
+        return R.ok(result.getRecords());
+    }
+
+    @Operation(summary = "更新订单")
+    @PutMapping
+    public R<?> update(@RequestBody OrdersEntity entity) {
+        ordersService.update(entity);
+        return R.ok("更新成功");
+    }
+
+    @Operation(summary = "批量删除订单")
+    @DeleteMapping("/batch")
+    public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
+        ids.forEach(ordersService::delete);
+        return R.ok("批量删除成功");
+    }
+
     /** 内部接口 */
     @GetMapping("/internal/orderDetail")
     public R<?> internalOrderDetail(@RequestParam String orderId) {
