@@ -37,7 +37,7 @@ public class GroupBuyCommentServiceImpl implements GroupBuyCommentService {
         IPage<GroupBuyCommentEntity> page = new Query<GroupBuyCommentEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         return dao.selectPage(page, new LambdaQueryWrapper<GroupBuyCommentEntity>()
-                .eq(params.getTuanweiid() != null, GroupBuyCommentEntity::getTuanweiid, params.getTuanweiid())
+                .eq(params.getGroupBuyId() != null, GroupBuyCommentEntity::getGroupBuyId, params.getGroupBuyId())
                 .like(params.getContent() != null, GroupBuyCommentEntity::getContent, params.getContent())
                 .orderByDesc(GroupBuyCommentEntity::getId));
     }

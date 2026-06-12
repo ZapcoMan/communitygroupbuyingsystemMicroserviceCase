@@ -26,7 +26,7 @@ public class GroupBuyController {
     public R<?> save(@RequestBody GroupBuyEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserId(userId);
-        if (entity.getZhuangtai() == null) entity.setZhuangtai(0);
+        if (entity.getStatus() == null) entity.setStatus(0);
         tuanxinxiService.save(entity);
         return R.ok("参与成功");
     }

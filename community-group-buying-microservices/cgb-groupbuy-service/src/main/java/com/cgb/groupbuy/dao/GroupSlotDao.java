@@ -10,14 +10,14 @@ import org.apache.ibatis.annotations.Update;
 public interface GroupSlotDao extends BaseMapper<GroupSlotEntity> {
 
     /** 原子增加参团人数（并发安全） */
-    @Update("UPDATE tuanwei SET xianxiarenshu = xianxiarenshu + #{count} WHERE id = #{id} AND xianxiarenshu < lirenjia AND zhuangtai = 0")
+    @Update("UPDATE group_slot SET current_member_count = current_member_count + #{count} WHERE id = #{id} AND current_member_count < target_member_count AND status = 0")
     int increaseMember(@Param("id") Long id, @Param("count") Integer count);
 
     /** 原子更新团购状态为已成团 */
-    @Update("UPDATE tuanwei SET zhuangtai = 1 WHERE id = #{id} AND xianxiarenshu >= lirenjia AND zhuangtai = 0")
+    @Update("UPDATE group_slot SET status = 1 WHERE id = #{id} AND current_member_count >= target_member_count AND status = 0")
     int completeGroupBuy(@Param("id") Long id);
 
     /** 原子更新过期团购状态 */
-    @Update("UPDATE tuanwei SET zhuangtai = 2 WHERE id = #{id} AND jieshushijian < NOW() AND zhuangtai = 0")
+    @Update("UPDATE group_slot SET status = 2 WHERE id = #{id} AND end_time < NOW() AND status = 0")
     int expireGroupBuy(@Param("id") Long id);
 }

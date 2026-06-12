@@ -31,11 +31,11 @@ public class GroupBuyStatusConsumer implements RocketMQListener<GroupBuyMessage>
     public void onMessage(GroupBuyMessage message) {
         log.info("团购服务收到团购状态消�? groupBuyId={}, status={}, currentCount={}/{}",
                 message.getGroupBuyId(), message.getStatus(),
-                message.getCurrentMemberCount(), message.getTargetMemberCount());
+                message.getCurrentCount(), message.getTargetCount());
 
         switch (message.getStatus()) {
             case 1: // 成团
-                log.info("团购成团! groupBuyId={}, 共{}人参团", message.getGroupBuyId(), message.getCurrentMemberCount());
+                log.info("团购成团! groupBuyId={}, 共{}人参团", message.getGroupBuyId(), message.getCurrentCount());
                 break;
             case 2: // 过期
                 log.info("团购过期: groupBuyId={}", message.getGroupBuyId());
@@ -51,7 +51,7 @@ public class GroupBuyStatusConsumer implements RocketMQListener<GroupBuyMessage>
                 }
                 break;
             case 0: // 参团
-                log.info("新用户参团 groupBuyId={}, 当前{}/{}", message.getGroupBuyId(), message.getCurrentMemberCount(), message.getTargetMemberCount());
+                log.info("新用户参团 groupBuyId={}, 当前{}/{}", message.getGroupBuyId(), message.getCurrentCount(), message.getTargetCount());
                 break;
             default:
                 log.warn("未知团购状态 {}", message.getStatus());

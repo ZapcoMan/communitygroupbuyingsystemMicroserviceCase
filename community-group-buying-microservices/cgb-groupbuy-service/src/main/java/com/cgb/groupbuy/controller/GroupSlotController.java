@@ -30,7 +30,7 @@ public class GroupSlotController {
     @RateLimit(key = "groupbuy_create", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody GroupSlotEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserId(userId);
+        entity.setLeaderUserId(userId);
         tuanweiService.save(entity);
         return R.ok("发起成功");
     }
