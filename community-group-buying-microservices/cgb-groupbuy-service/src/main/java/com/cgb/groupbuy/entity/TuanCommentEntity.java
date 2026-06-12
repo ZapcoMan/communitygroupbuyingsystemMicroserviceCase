@@ -13,12 +13,16 @@ public class TuanCommentEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long tuanweiid;    // 团购ID
-    private Long userid;       // 评论用户
-    private String nickname;   // 评论用户昵称
-    private String content;    // 评论内容
-    private String reply;      // 回复内容
-    private String tablename;  // 类型标识
+    @TableField("tuanweiid")
+    private Long groupBuyId;            // 团购ID
+
+    @TableField("userid")
+    private Long userId;                // 评论用户
+
+    private String nickname;            // 评论用户昵称
+    private String content;             // 评论内容
+    private String reply;               // 回复内容
+    private String tablename;           // 类型标识
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

@@ -7,7 +7,6 @@ import com.cgb.common.feign.FeignProductService;
 import com.cgb.common.utils.*;
 import com.cgb.order.dao.CartDao;
 import com.cgb.order.entity.CartEntity;
-import com.cgb.order.entity.OrdersEntity;
 import com.cgb.order.entity.dto.CreateOrderDTO;
 import com.cgb.order.entity.vo.OrderVO;
 import com.cgb.order.service.CartService;
@@ -32,12 +31,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void save(CartEntity entity) {
-        // 检查是否已存在同一用户同一商品
         CartEntity exist = cartDao.selectOne(new LambdaQueryWrapper<CartEntity>()
-                .eq(CartEntity::getUserid, entity.getUserid())
-                .eq(CartEntity::getShangpinid, entity.getShangpinid()));
+                .eq(CartEntity::getUserId, entity.getUserId())
+                .eq(CartEntity::getProductId, entity.getProductId()));
         if (exist != null) {
-            exist.setShuliang(exist.getShuliang() + entity.getShuliang());
+            exist.setQuantity(exist.getQuantity() + entity.getQuantity());
             cartDao.updateById(exist);
         } else {
             cartDao.insert(entity);
@@ -55,42 +53,33 @@ public class CartServiceImpl implements CartService {
         IPage<CartEntity> page = new Query<CartEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         return cartDao.selectPage(page, new LambdaQueryWrapper<CartEntity>()
-                .eq(params.getUserid() != null, CartEntity::getUserid, params.getUserid())
+                .eq(params.getUserId() != null, CartEntity::getUserId, params.getUserId())
                 .orderByDesc(CartEntity::getId));
     }
 
     @Override
     public void clear(Long userId) {
-        cartDao.delete(new LambdaQueryWrapper<CartEntity>().eq(CartEntity::getUserid, userId));
+        cartDao.delete(new LambdaQueryWrapper<CartEntity>().eq(CartEntity::getUserId, userId));
     }
 
-    /**
-     * 购物车结算（Seata分布式事务：批量创建订单 + 扣库存 + 清空购物车）
-     */
     @Override
     @GlobalTransactional(name = "cgb-cart-checkout", rollbackFor = Exception.class)
     public List<OrderVO> checkout(Long userId) {
-        // 1. 查询用户购物车所有商品
         List<CartEntity> cartItems = cartDao.selectList(
-                new LambdaQueryWrapper<CartEntity>().eq(CartEntity::getUserid, userId));
+                new LambdaQueryWrapper<CartEntity>().eq(CartEntity::getUserId, userId));
         if (cartItems.isEmpty()) throw new EIException("购物车为空");
 
         List<OrderVO> orders = new ArrayList<>();
-
-        // 2. 逐个商品创建订单（每个商品一个订单）
         for (CartEntity item : cartItems) {
             CreateOrderDTO dto = new CreateOrderDTO();
-            dto.setProductId(item.getShangpinid());
-            dto.setQuantity(item.getShuliang());
+            dto.setProductId(item.getProductId());
+            dto.setQuantity(item.getQuantity());
             OrderVO vo = ordersService.createOrderFromDTO(dto, userId);
             orders.add(vo);
             log.info("购物车结算 - 订单创建成功: userId={}, productId={}, quantity={}",
-                    userId, item.getShangpinid(), item.getShuliang());
+                    userId, item.getProductId(), item.getQuantity());
         }
-
-        // 3. 清空购物车
         clear(userId);
-
         log.info("购物车结算完成: userId={}, 共创建{}个订单", userId, orders.size());
         return orders;
     }

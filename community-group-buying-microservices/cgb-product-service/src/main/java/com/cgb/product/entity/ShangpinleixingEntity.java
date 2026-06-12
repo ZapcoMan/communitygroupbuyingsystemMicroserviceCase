@@ -13,7 +13,8 @@ public class ShangpinleixingEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String shangpinleixing; // 商品类型名称
+    @TableField("shangpinleixing")
+    private String categoryName;        // 商品类型名称
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

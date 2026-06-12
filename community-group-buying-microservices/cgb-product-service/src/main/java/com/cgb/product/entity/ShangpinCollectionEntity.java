@@ -16,8 +16,12 @@ public class ShangpinCollectionEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long userid;     // 收藏用户
-    private Long shangpinid; // 商品ID
+    @TableField("userid")
+    private Long userId;                // 收藏用户
+
+    @TableField("shangpinid")
+    private Long productId;             // 商品ID
+
     private LocalDateTime addtime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)

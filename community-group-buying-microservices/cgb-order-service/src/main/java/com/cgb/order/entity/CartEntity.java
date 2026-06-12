@@ -15,9 +15,15 @@ public class CartEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long userid;     // 用户ID
-    private Long shangpinid; // 商品ID
-    private Integer shuliang; // 数量
+
+    @TableField("userid")
+    private Long userId;                // 用户ID
+
+    @TableField("shangpinid")
+    private Long productId;             // 商品ID
+
+    @TableField("shuliang")
+    private Integer quantity;           // 数量
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

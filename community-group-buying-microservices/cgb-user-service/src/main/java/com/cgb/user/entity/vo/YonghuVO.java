@@ -4,19 +4,19 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 用户视图对象（脱敏）
+ * 用户视图对象（脱敏，英文字段对外暴露）
  */
 @Data
 public class YonghuVO {
     private Long id;
-    private String zhanghao;
-    private String xingming;
-    private String xingbie;
-    private String shouji;
-    private String youxiang;
-    private String touxiang;
-    private Double jifen;
-    private Double yue;
-    private Integer status;
+    private String account;       // 账号
+    private String realName;      // 姓名
+    private String gender;        // 性别
+    private String phone;         // 手机
+    private String email;         // 邮箱
+    private String avatar;        // 头像
+    private Double points;        // 积分
+    private Double balance;       // 余额
+    private Integer status;       // 状态
     private LocalDateTime addtime;
 }

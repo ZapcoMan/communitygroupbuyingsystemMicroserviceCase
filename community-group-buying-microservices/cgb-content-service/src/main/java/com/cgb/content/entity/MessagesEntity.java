@@ -15,11 +15,17 @@ public class MessagesEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long userid;         // 留言用户
-    private String username;     // 用户名
-    private String content;      // 留言内容
-    private Long parentid;      // 父留言ID（回复）
-    private String replycontent; // 回复内容
+
+    @TableField("userid")
+    private Long userId;              // 留言用户
+    private String username;          // 用户名
+    private String content;           // 留言内容
+
+    @TableField("parentid")
+    private Long parentId;            // 父留言ID（回复）
+
+    @TableField("replycontent")
+    private String replyContent;      // 回复内容
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

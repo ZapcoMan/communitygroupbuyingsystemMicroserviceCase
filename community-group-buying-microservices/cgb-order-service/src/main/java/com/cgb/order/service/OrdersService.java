@@ -14,6 +14,8 @@ public interface OrdersService {
     IPage<OrdersEntity> queryPage(OrdersEntity params);
     void cancel(String orderId, Long userId);
     void pay(String orderId);
+    void ship(String orderId);
+    void confirmReceive(String orderId, Long userId);
 
     /**
      * 创建订单（Seata 分布式事务：下单 + 扣库存）

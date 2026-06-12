@@ -16,12 +16,24 @@ public class TuanxinxiEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long tuanduiid;      // 团购ID（关联tuanwei）
-    private Long userid;         // 参团用户
-    private Long shangpinid;     // 商品ID
-    private Integer shuliang;    // 购买数量
-    private BigDecimal jiage;    // 购买价格
-    private Integer zhuangtai;   // 状态 0待支付 1已支付 2已取消
+
+    @TableField("tuanduiid")
+    private Long groupBuyId;            // 团购ID（关联tuanwei）
+
+    @TableField("userid")
+    private Long userId;                // 参团用户
+
+    @TableField("shangpinid")
+    private Long productId;             // 商品ID
+
+    @TableField("shuliang")
+    private Integer quantity;           // 购买数量
+
+    @TableField("jiage")
+    private BigDecimal price;           // 购买价格
+
+    @TableField("zhuangtai")
+    private Integer status;             // 状态 0待支付 1已支付 2已取消
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

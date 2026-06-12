@@ -8,15 +8,11 @@ import com.cgb.product.service.ShangpinService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 商品管理 Controller
- */
 @Tag(name = "商品管理")
-@Slf4j
 @RestController
 @RequestMapping("/shangpin")
 @RequiredArgsConstructor
@@ -24,11 +20,19 @@ public class ShangpinController {
 
     private final ShangpinService shangpinService;
 
-    @Operation(summary = "分页查询商品")
+    @Operation(summary = "发布商品")
+    @PostMapping
+    @RateLimit(key = "product_create", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
+    public R<?> save(@RequestBody ShangpinEntity entity, HttpServletRequest request) {
+        Long userId = Long.parseLong(request.getHeader("X-User-Id"));
+        entity.setMerchantId(userId);
+        shangpinService.save(entity);
+        return R.ok("发布成功");
+    }
+
+    @Operation(summary = "商品列表")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) ShangpinEntity params,
-                     @RequestParam(defaultValue = "1") Integer page,
-                     @RequestParam(defaultValue = "10") Integer limit) {
+    public R<?> list(@Parameter(hidden = true) ShangpinEntity params) {
         IPage<ShangpinEntity> result = shangpinService.queryPage(params);
         return R.ok(result);
     }
@@ -37,14 +41,6 @@ public class ShangpinController {
     @GetMapping("/{id}")
     public R<?> detail(@PathVariable Long id) {
         return R.ok(shangpinService.getById(id));
-    }
-
-    @Operation(summary = "新增商品")
-    @PostMapping
-    @RateLimit(key = "product_create", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
-    public R<?> save(@RequestBody ShangpinEntity entity) {
-        shangpinService.save(entity);
-        return R.ok("保存成功");
     }
 
     @Operation(summary = "修改商品")
@@ -68,43 +64,30 @@ public class ShangpinController {
         return R.ok("批量删除成功");
     }
 
-    /** 内部接口 - 获取商品详情 */
+    // ========== 内部接口（Feign / Seata RM端调用） ==========
+
+    @Operation(summary = "内部-商品详情")
     @GetMapping("/internal/productDetail")
     public R<?> internalProductDetail(@RequestParam Long id) {
         return R.ok(shangpinService.getById(id));
     }
 
-    /** 内部接口 - 获取商品名称 */
+    @Operation(summary = "内部-商品名称")
     @GetMapping("/internal/productName")
     public R<?> internalProductName(@RequestParam Long id) {
-        return R.ok(shangpinService.getById(id).getMingcheng());
+        ShangpinEntity entity = shangpinService.getById(id);
+        return R.ok(entity != null ? entity.getProductName() : null);
     }
 
-    /** 内部接口 - 扣减库存（Seata RM 端，分布式事务分支） */
-    @Operation(summary = "扣减库存（内部）")
+    @Operation(summary = "内部-扣减库存（Seata RM端）")
     @PostMapping("/internal/decreaseStock")
-    public R<?> internalDecreaseStock(@RequestParam Long id, @RequestParam Integer quantity) {
-        try {
-            shangpinService.decreaseStock(id, quantity);
-            log.info("库存扣减成功: productId={}, quantity={}", id, quantity);
-            return R.ok("库存扣减成功");
-        } catch (Exception e) {
-            log.error("库存扣减失败: productId={}, quantity={}", id, quantity, e);
-            return R.fail(e.getMessage());
-        }
+    public R<?> decreaseStock(@RequestParam Long id, @RequestParam Integer quantity) {
+        return shangpinService.decreaseStock(id, quantity);
     }
 
-    /** 内部接口 - 回补库存（订单取消时回滚） */
-    @Operation(summary = "回补库存（内部）")
+    @Operation(summary = "内部-回补库存（取消订单回滚）")
     @PostMapping("/internal/increaseStock")
-    public R<?> internalIncreaseStock(@RequestParam Long id, @RequestParam Integer quantity) {
-        try {
-            shangpinService.increaseStock(id, quantity);
-            log.info("库存回补成功: productId={}, quantity={}", id, quantity);
-            return R.ok("库存回补成功");
-        } catch (Exception e) {
-            log.error("库存回补失败: productId={}, quantity={}", id, quantity, e);
-            return R.fail(e.getMessage());
-        }
+    public R<?> increaseStock(@RequestParam Long id, @RequestParam Integer quantity) {
+        return shangpinService.increaseStock(id, quantity);
     }
 }

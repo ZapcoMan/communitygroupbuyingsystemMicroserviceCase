@@ -15,15 +15,27 @@ public class AddressEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long userid;         // 用户ID
-    private String dizhimingchen; // 地址名称
-    private String lianxidianhua; // 联系电话
-    private String shouhuoren;  // 收货人
-    private String provinces;     // 省
-    private String citys;        // 市
-    private String areas;        // 区/县
-    private String detailedaddress; // 详细地址
-    private Integer isdefault;   // 是否默认 0否 1是
+
+    @TableField("userid")
+    private Long userId;                // 用户ID
+
+    @TableField("dizhimingchen")
+    private String addressName;         // 地址名称
+
+    @TableField("lianxidianhua")
+    private String contactPhone;        // 联系电话
+
+    @TableField("shouhuoren")
+    private String consignee;           // 收货人
+
+    private String provinces;           // 省
+    private String citys;               // 市
+    private String areas;               // 区/县
+
+    private String detailedaddress;     // 详细地址
+
+    @TableField("isdefault")
+    private Integer isDefault;          // 是否默认 0否 1是
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

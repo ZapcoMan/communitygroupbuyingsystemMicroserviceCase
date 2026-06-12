@@ -1,6 +1,7 @@
 package com.cgb.product.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cgb.common.R;
 import com.cgb.product.entity.ShangpinEntity;
 
 public interface ShangpinService {
@@ -9,6 +10,6 @@ public interface ShangpinService {
     void delete(Long id);
     ShangpinEntity getById(Long id);
     IPage<ShangpinEntity> queryPage(ShangpinEntity params);
-    void decreaseStock(Long id, Integer quantity);
-    void increaseStock(Long id, Integer quantity);
+    R<?> decreaseStock(Long id, Integer quantity);
+    R<?> increaseStock(Long id, Integer quantity);
 }

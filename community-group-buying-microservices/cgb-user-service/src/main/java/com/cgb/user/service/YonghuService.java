@@ -9,14 +9,10 @@ public interface YonghuService {
     void update(YonghuEntity entity);
     void delete(Long id);
     YonghuEntity getById(Long id);
-    YonghuEntity getByZhanghao(String zhanghao);
+    YonghuEntity getByAccount(String account);
     IPage<YonghuEntity> queryPage(YonghuEntity params);
-    R<?> login(YonghuEntity params, String clientIP);
+    R<?> login(String account, String password);
     R<?> register(YonghuEntity params);
     R<?> changePassword(String token, String oldPassword, String newPassword);
-
-    /**
-     * 增加用户积分
-     */
     void addPoints(Long userId, Double points);
 }

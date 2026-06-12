@@ -15,4 +15,7 @@ public interface TuanweiService {
 
     /** 检查并完成成团 */
     void checkAndCompleteGroupBuy(Long groupBuyId);
+
+    /** 批量过期团购扫描 */
+    int expireGroupBuys();
 }

@@ -23,7 +23,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public void save(AddressEntity entity) {
-        if (entity.getIsdefault() == null) entity.setIsdefault(0);
+        if (entity.getIsDefault() == null) entity.setIsDefault(0);
         addressDao.insert(entity);
     }
 
@@ -41,20 +41,18 @@ public class AddressServiceImpl implements AddressService {
         IPage<AddressEntity> page = new Query<AddressEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         return addressDao.selectPage(page, new LambdaQueryWrapper<AddressEntity>()
-                .eq(params.getUserid() != null, AddressEntity::getUserid, params.getUserid())
+                .eq(params.getUserId() != null, AddressEntity::getUserId, params.getUserId())
                 .orderByDesc(AddressEntity::getId));
     }
 
     @Override
     @Transactional
     public void setDefault(Long id, Long userId) {
-        // 取消该用户所有默认地址
         addressDao.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AddressEntity>()
-                .eq(AddressEntity::getUserid, userId)
-                .set(AddressEntity::getIsdefault, 0));
-        // 设置新默认地址
+                .eq(AddressEntity::getUserId, userId)
+                .set(AddressEntity::getIsDefault, 0));
         addressDao.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AddressEntity>()
                 .eq(AddressEntity::getId, id)
-                .set(AddressEntity::getIsdefault, 1));
+                .set(AddressEntity::getIsDefault, 1));
     }
 }

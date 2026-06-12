@@ -4,13 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.EIException;
 import com.cgb.common.utils.*;
-import com.cgb.groupbuy.dao.TuanweiDao;
 import com.cgb.groupbuy.dao.TuanxinxiDao;
 import com.cgb.groupbuy.entity.TuanweiEntity;
 import com.cgb.groupbuy.entity.TuanxinxiEntity;
 import com.cgb.groupbuy.service.TuanweiService;
 import com.cgb.groupbuy.service.TuanxinxiService;
-import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,7 @@ public class TuanxinxiServiceImpl implements TuanxinxiService {
 
     @Override
     public void save(TuanxinxiEntity entity) {
-        if (entity.getZhuangtai() == null) entity.setZhuangtai(0);
+        if (entity.getStatus() == null) entity.setStatus(0);
         tuanxinxiDao.insert(entity);
     }
 
@@ -45,23 +43,24 @@ public class TuanxinxiServiceImpl implements TuanxinxiService {
         IPage<TuanxinxiEntity> page = new Query<TuanxinxiEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         return tuanxinxiDao.selectPage(page, new LambdaQueryWrapper<TuanxinxiEntity>()
-                .eq(params.getTuanduiid() != null, TuanxinxiEntity::getTuanduiid, params.getTuanduiid())
-                .eq(params.getUserid() != null, TuanxinxiEntity::getUserid, params.getUserid())
+                .eq(params.getGroupBuyId() != null, TuanxinxiEntity::getGroupBuyId, params.getGroupBuyId())
+                .eq(params.getUserId() != null, TuanxinxiEntity::getUserId, params.getUserId())
                 .orderByDesc(TuanxinxiEntity::getId));
     }
 
     @Override
-    public int countByTuanId(Long tuanduiid) {
+    public int countByTuanId(Long groupBuyId) {
         return tuanxinxiDao.selectCount(new LambdaQueryWrapper<TuanxinxiEntity>()
-                .eq(TuanxinxiEntity::getTuanduiid, tuanduiid)
-                .eq(TuanxinxiEntity::getZhuangtai, 1)).intValue();
+                .eq(TuanxinxiEntity::getGroupBuyId, groupBuyId)
+                .eq(TuanxinxiEntity::getStatus, 1)).intValue();
     }
 
     /**
-     * 参团（委托给 TuanweiService 的分布式事务方法）
+     * 参团（委托给 TuanweiService.joinGroupBuy 的分布式事务方法）
+     * 注意：不再在此方法声明 @GlobalTransactional，避免嵌套事务
+     * 事务边界在 TuanweiService.joinGroupBuy 中统一管理
      */
     @Override
-    @GlobalTransactional(name = "cgb-join-groupbuy-record", rollbackFor = Exception.class)
     public void joinGroupBuy(Long groupBuyId, Long userId, Integer quantity) {
         // 1. 调用团购服务执行核心参团逻辑（+1人 + 扣库存 + 发MQ + 成团判定）
         tuanweiService.joinGroupBuy(groupBuyId, userId, quantity);
@@ -69,12 +68,12 @@ public class TuanxinxiServiceImpl implements TuanxinxiService {
         // 2. 写入参团记录
         TuanweiEntity groupBuy = tuanweiService.getById(groupBuyId);
         TuanxinxiEntity record = new TuanxinxiEntity();
-        record.setTuanduiid(groupBuyId);
-        record.setUserid(userId);
-        record.setShangpinid(groupBuy.getShangpinid());
-        record.setShuliang(quantity);
-        record.setJiage(groupBuy.getTejia());
-        record.setZhuangtai(0); // 待支付
+        record.setGroupBuyId(groupBuyId);
+        record.setUserId(userId);
+        record.setProductId(groupBuy.getProductId());
+        record.setQuantity(quantity);
+        record.setPrice(groupBuy.getGroupPrice());
+        record.setStatus(0); // 待支付
         tuanxinxiDao.insert(record);
 
         log.info("参团记录写入成功: groupBuyId={}, userId={}", groupBuyId, userId);

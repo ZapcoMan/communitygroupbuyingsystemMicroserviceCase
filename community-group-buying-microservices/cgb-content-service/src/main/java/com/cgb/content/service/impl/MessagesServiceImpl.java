@@ -31,8 +31,8 @@ public class MessagesServiceImpl implements MessagesService {
         IPage<MessagesEntity> page = new Query<MessagesEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         LambdaQueryWrapper<MessagesEntity> wrapper = new LambdaQueryWrapper<>();
-        if (params.getUserid() != null) wrapper.eq(MessagesEntity::getUserid, params.getUserid());
-        wrapper.isNull(MessagesEntity::getParentid);
+        if (params.getUserId() != null) wrapper.eq(MessagesEntity::getUserId, params.getUserId());
+        wrapper.isNull(MessagesEntity::getParentId);
         wrapper.orderByDesc(MessagesEntity::getId);
         return messagesDao.selectPage(page, wrapper);
     }
@@ -41,7 +41,7 @@ public class MessagesServiceImpl implements MessagesService {
     public void reply(Long id, String replyContent) {
         MessagesEntity entity = messagesDao.selectById(id);
         if (entity == null) throw new EIException("留言不存在");
-        entity.setReplycontent(replyContent);
+        entity.setReplyContent(replyContent);
         messagesDao.updateById(entity);
     }
 }

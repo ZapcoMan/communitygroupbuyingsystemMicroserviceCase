@@ -15,15 +15,24 @@ public class ForumEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private String title;          // 标题
-    private String content;        // 内容
-    private String picture;        // 封面图
-    private String parentid;       // 父帖子ID
-    private Long userid;           // 发帖用户
-    private String username;      // 用户名
-    private String avatar;        // 头像
-    private Integer thumbsupnum;   // 点赞数
-    private Integer cainixihao;    // 踩
+    private String title;               // 标题
+    private String content;             // 内容
+    private String picture;             // 封面图
+
+    @TableField("parentid")
+    private String parentId;            // 父帖子ID
+
+    @TableField("userid")
+    private Long userId;                // 发帖用户
+
+    private String username;            // 用户名
+    private String avatar;              // 头像
+
+    @TableField("thumbsupnum")
+    private Integer thumbUpCount;       // 点赞数
+
+    @TableField("cainixihao")
+    private Integer dislikeCount;       // 踩
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

@@ -17,16 +17,34 @@ public class YonghuEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String zhanghao;    // 账号
-    private String mima;         // 密码（BCrypt 加密存储）
-    private String xingming;    // 姓名
-    private String xingbie;     // 性别
-    private String shouji;      // 手机
-    private String youxiang;    // 邮箱
-    private String touxiang;    // 头像
-    private Double jifen;       // 积分
-    private Double yue;         // 余额
-    private Integer status;     // 账号状态 0-正常 1-禁用
+    @TableField("zhanghao")
+    private String account;             // 账号
+
+    @TableField("mima")
+    private String password;            // 密码（BCrypt 加密存储）
+
+    @TableField("xingming")
+    private String realName;            // 姓名
+
+    @TableField("xingbie")
+    private String gender;              // 性别
+
+    @TableField("shouji")
+    private String phone;               // 手机
+
+    @TableField("youxiang")
+    private String email;               // 邮箱
+
+    @TableField("touxiang")
+    private String avatar;              // 头像
+
+    @TableField("jifen")
+    private Double points;              // 积分
+
+    @TableField("yue")
+    private Double balance;             // 余额
+
+    private Integer status;             // 账号状态 0-正常 1-禁用
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;
@@ -35,5 +53,5 @@ public class YonghuEntity implements Serializable {
     private LocalDateTime updatetime;
 
     @TableLogic
-    private Integer isdelete;   // 逻辑删除
+    private Integer isdelete;           // 逻辑删除
 }

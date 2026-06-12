@@ -16,17 +16,39 @@ public class TuanweiEntity implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private String mingcheng;      // 团购名称
-    private String tupian;         // 团购图片
-    private String jieshao;        // 团购介绍
-    private Long shangpinid;       // 关联商品ID
-    private Integer zhuangtai;     // 状态 0进行中 1已成团 2已过期
-    private Integer lirenjia;     // 成团人数
-    private Integer xianxiarenshu; // 当前人数
-    private BigDecimal yuanjia;   // 原价
-    private BigDecimal tejia;     // 团购价
-    private LocalDateTime jieshushijian; // 截止时间
-    private Long userid;          // 团长用户ID
+
+    @TableField("mingcheng")
+    private String groupName;           // 团购名称
+
+    @TableField("tupian")
+    private String picture;             // 团购图片
+
+    @TableField("jieshao")
+    private String description;         // 团购介绍
+
+    @TableField("shangpinid")
+    private Long productId;             // 关联商品ID
+
+    @TableField("zhuangtai")
+    private Integer status;             // 状态 0进行中 1已成团 2已过期
+
+    @TableField("lirenjia")
+    private Integer targetCount;        // 成团人数
+
+    @TableField("xianxiarenshu")
+    private Integer currentCount;       // 当前人数
+
+    @TableField("yuanjia")
+    private BigDecimal originalPrice;   // 原价
+
+    @TableField("tejia")
+    private BigDecimal groupPrice;      // 团购价
+
+    @TableField("jieshushijian")
+    private LocalDateTime endTime;      // 截止时间
+
+    @TableField("userid")
+    private Long userId;                // 团长用户ID
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime addtime;

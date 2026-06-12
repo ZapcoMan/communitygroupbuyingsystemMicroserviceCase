@@ -20,20 +20,16 @@ public class ShangpinCollectionServiceImpl implements ShangpinCollectionService 
     private final ShangpinCollectionDao collectionDao;
 
     @Override
-    public void save(ShangpinCollectionEntity entity) {
-        collectionDao.insert(entity);
-    }
+    public void save(ShangpinCollectionEntity entity) { collectionDao.insert(entity); }
 
     @Override
-    public void delete(Long id) {
-        collectionDao.deleteById(id);
-    }
+    public void delete(Long id) { collectionDao.deleteById(id); }
 
     @Override
     public ShangpinCollectionEntity getByUserAndProduct(Long userId, Long productId) {
         return collectionDao.selectOne(new LambdaQueryWrapper<ShangpinCollectionEntity>()
-                .eq(ShangpinCollectionEntity::getUserid, userId)
-                .eq(ShangpinCollectionEntity::getShangpinid, productId));
+                .eq(ShangpinCollectionEntity::getUserId, userId)
+                .eq(ShangpinCollectionEntity::getProductId, productId));
     }
 
     @Override
@@ -41,8 +37,8 @@ public class ShangpinCollectionServiceImpl implements ShangpinCollectionService 
         IPage<ShangpinCollectionEntity> page = new Query<ShangpinCollectionEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         return collectionDao.selectPage(page, new LambdaQueryWrapper<ShangpinCollectionEntity>()
-                .eq(params.getUserid() != null, ShangpinCollectionEntity::getUserid, params.getUserid())
-                .eq(params.getShangpinid() != null, ShangpinCollectionEntity::getShangpinid, params.getShangpinid())
+                .eq(params.getUserId() != null, ShangpinCollectionEntity::getUserId, params.getUserId())
+                .eq(params.getProductId() != null, ShangpinCollectionEntity::getProductId, params.getProductId())
                 .orderByDesc(ShangpinCollectionEntity::getId));
     }
 

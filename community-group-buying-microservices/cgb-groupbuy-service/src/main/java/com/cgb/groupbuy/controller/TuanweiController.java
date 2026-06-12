@@ -30,7 +30,7 @@ public class TuanweiController {
     @RateLimit(key = "groupbuy_create", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody TuanweiEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         tuanweiService.save(entity);
         return R.ok("发起成功");
     }
@@ -78,6 +78,13 @@ public class TuanweiController {
     public R<?> batchDelete(@RequestBody java.util.List<Long> ids) {
         ids.forEach(tuanweiService::delete);
         return R.ok("批量删除成功");
+    }
+
+    @Operation(summary = "扫描过期团购（管理端）")
+    @PostMapping("/expireScan")
+    public R<?> expireScan() {
+        int count = tuanweiService.expireGroupBuys();
+        return R.ok("扫描完成，共处理" + count + "个过期团购");
     }
 
     /** 内部接口 - 获取团购详情 */

@@ -16,11 +16,21 @@ public class ShangpinCommentEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long shangpinid; // 商品ID
-    private Long userid;     // 评论用户
-    private Integer pingfen; // 评分 1-5
-    private String pingjianeirong; // 评价内容
-    private Long parentid;  // 父评价ID（回复）
+    @TableField("shangpinid")
+    private Long productId;             // 商品ID
+
+    @TableField("userid")
+    private Long userId;                // 评论用户
+
+    @TableField("pingfen")
+    private Integer rating;             // 评分 1-5
+
+    @TableField("pingjianeirong")
+    private String reviewContent;       // 评价内容
+
+    @TableField("parentid")
+    private Long parentId;              // 父评价ID（回复）
+
     private LocalDateTime addtime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)

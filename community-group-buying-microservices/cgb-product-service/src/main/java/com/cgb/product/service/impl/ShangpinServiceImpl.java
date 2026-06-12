@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.EIException;
 import com.cgb.common.ErrorCode;
+import com.cgb.common.R;
 import com.cgb.common.utils.*;
 import com.cgb.product.dao.ShangpinDao;
 import com.cgb.product.entity.ShangpinEntity;
@@ -29,6 +30,10 @@ public class ShangpinServiceImpl implements ShangpinService {
     @Override
     public void save(ShangpinEntity entity) {
         shangpinDao.insert(entity);
+        // 初始化库存缓存
+        if (entity.getStock() != null) {
+            initStockCache(entity.getId(), entity.getStock());
+        }
     }
 
     @Override
@@ -40,6 +45,7 @@ public class ShangpinServiceImpl implements ShangpinService {
     @Override
     public void delete(Long id) {
         shangpinDao.deleteById(id);
+        redisTemplate.delete(STOCK_KEY_PREFIX + id);
     }
 
     @Override
@@ -54,39 +60,50 @@ public class ShangpinServiceImpl implements ShangpinService {
         IPage<ShangpinEntity> page = new Query<ShangpinEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
         LambdaQueryWrapper<ShangpinEntity> wrapper = new LambdaQueryWrapper<>();
-        if (CommonUtil.isNotEmpty(params.getMingcheng())) {
-            wrapper.like(ShangpinEntity::getMingcheng, params.getMingcheng());
+        if (CommonUtil.isNotEmpty(params.getProductName())) {
+            wrapper.like(ShangpinEntity::getProductName, params.getProductName());
         }
-        if (CommonUtil.isNotEmpty(params.getLeixing())) {
-            wrapper.eq(ShangpinEntity::getLeixing, params.getLeixing());
+        if (CommonUtil.isNotEmpty(params.getCategory())) {
+            wrapper.eq(ShangpinEntity::getCategory, params.getCategory());
+        }
+        if (params.getStatus() != null) {
+            wrapper.eq(ShangpinEntity::getStatus, params.getStatus());
         }
         wrapper.orderByDesc(ShangpinEntity::getId);
         return shangpinDao.selectPage(page, wrapper);
     }
 
     @Override
-    public void decreaseStock(Long id, Integer quantity) {
+    public R<?> decreaseStock(Long id, Integer quantity) {
         String key = STOCK_KEY_PREFIX + id;
         Long remain = redisTemplate.opsForValue().decrement(key, quantity);
         if (remain != null && remain < 0) {
-            // 库存不足，回补 Redis
             redisTemplate.opsForValue().increment(key, quantity);
-            throw new EIException("库存不足");
+            return R.fail("库存不足");
         }
-        // 原子更新数据库（含库存校验）
         int rows = shangpinDao.decreaseStock(id, quantity);
         if (rows == 0) {
-            // 数据库库存不足，回补 Redis
             redisTemplate.opsForValue().increment(key, quantity);
-            throw new EIException("库存不足");
+            return R.fail("库存不足");
         }
+        log.info("库存扣减成功: productId={}, quantity={}, remain={}", id, quantity, remain);
+        return R.ok();
     }
 
     @Override
-    public void increaseStock(Long id, Integer quantity) {
+    public R<?> increaseStock(Long id, Integer quantity) {
         String key = STOCK_KEY_PREFIX + id;
         redisTemplate.opsForValue().increment(key, quantity);
-        // 原子更新数据库
         shangpinDao.increaseStock(id, quantity);
+        log.info("库存回补成功: productId={}, quantity={}", id, quantity);
+        return R.ok();
+    }
+
+    private void initStockCache(Long productId, Integer stock) {
+        try {
+            redisTemplate.opsForValue().set(STOCK_KEY_PREFIX + productId, stock, 24, TimeUnit.HOURS);
+        } catch (Exception e) {
+            log.warn("库存缓存初始化失败: productId={}", productId, e);
+        }
     }
 }
