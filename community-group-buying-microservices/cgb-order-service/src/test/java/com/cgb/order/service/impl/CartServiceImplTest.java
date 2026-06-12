@@ -30,7 +30,7 @@ class CartServiceImplTest {
     private CartEntity buildCart(Long id, Long userId, Long productId, Integer quantity) {
         CartEntity entity = new CartEntity();
         entity.setId(id);
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         entity.setShangpinid(productId);
         entity.setShuliang(quantity);
         return entity;

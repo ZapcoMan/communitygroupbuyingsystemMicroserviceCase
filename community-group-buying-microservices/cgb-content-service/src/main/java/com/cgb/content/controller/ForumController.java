@@ -25,7 +25,7 @@ public class ForumController {
     @RateLimit(key = "forum_post", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody ForumEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         forumService.save(entity);
         return R.ok("发布成功");
     }

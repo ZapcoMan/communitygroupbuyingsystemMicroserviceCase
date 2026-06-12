@@ -23,7 +23,7 @@ public class ShangpinCommentController {
     @PostMapping
     public R<?> save(@RequestBody ShangpinCommentEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         commentService.save(entity);
         return R.ok("评论成功");
     }

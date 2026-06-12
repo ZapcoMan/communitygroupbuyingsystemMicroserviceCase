@@ -31,7 +31,7 @@ class ForumServiceImplTest {
         entity.setId(id);
         entity.setTitle("测试帖子");
         entity.setContent("帖子内容");
-        entity.setUserid(100L);
+        entity.setUserId(100L);
         entity.setUsername("testuser");
         entity.setThumbsupnum(thumbsup);
         entity.setCainixihao(caixihao);

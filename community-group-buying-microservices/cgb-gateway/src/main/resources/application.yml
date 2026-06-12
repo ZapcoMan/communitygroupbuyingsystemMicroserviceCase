@@ -10,13 +10,10 @@ spring:
   # ==================== Nacos 配置中心 ====================
   cloud:
     nacos:
-      # Nacos 服务器地址
-      server-addr: 127.0.0.1:8848
-      # 统一命名空间（开发环境）
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
       discovery:
         namespace: cgb-dev
         group: CGB_GROUP
-        # 服务元数据
         metadata:
           version: 1.0.0
           env: dev
@@ -24,30 +21,16 @@ spring:
         namespace: cgb-dev
         group: CGB_GROUP
         file-extension: yml
-        # 共享配置
         shared-configs:
           - data-id: common-redis.yml
             group: SHARED_GROUP
             refresh: true
-  # 从 Nacos 导入配置
+  # 从 Nacos 导入配置（Redis、JWT、限流等敏感配置均在 Nacos 管理）
   config:
     import:
       - optional:nacos:cgb-gateway.yml?group=CGB_GROUP&refreshEnabled=true
 
-  # Redis 配置
-  data:
-    redis:
-      host: ${REDIS_HOST:127.0.0.1}
-      port: ${REDIS_PORT:6379}
-      database: 0
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
-
-  # 云网关配置（生产环境使用）
+  # 云网关配置
   cloud:
     gateway:
       # 全局 CORS
@@ -103,16 +86,6 @@ spring:
           filters:
             - StripPrefix=1
 
-# JWT 密钥（需替换为实际密钥）
-jwt:
-  secret: cgb-community-group-buying-secret-key-2024-change-this-in-production
-  expiration: 3600
-
-# 限流配置
-rate-limit:
-  default-count: 100
-  default-period: 60
-
 # Actuator
 management:
   endpoints:
@@ -126,31 +99,3 @@ management:
 logging:
   level:
     org.springframework.cloud.gateway: debug
-
-# ==================== RocketMQ 配置 ====================
-rocketmq:
-  name-server: 127.0.0.1:9876
-  producer:
-    group: cgb-gateway-producer-group
-    send-message-timeout: 3000
-    max-message-size: 4194304
-    retry-times-when-send-failed: 2
-    retry-next-server: true
-
-# ==================== Seata 分布式事务配置 ====================
-seata:
-  application-id: cgb-gateway
-  tx-service-group: cgb-gateway-tx-group
-  config:
-    type: nacos
-    nacos:
-      namespace: cgb-dev
-      server-addr: 127.0.0.1:8848
-      group: SEATA_GROUP
-      data-id: seataServer.properties
-  registry:
-    type: nacos
-    nacos:
-      namespace: cgb-dev
-      server-addr: 127.0.0.1:8848
-      group: SEATA_GROUP

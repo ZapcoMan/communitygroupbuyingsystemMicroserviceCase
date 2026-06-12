@@ -23,7 +23,7 @@ public class ShangpinLiuyanController {
     @PostMapping
     public R<?> save(@RequestBody ShangpinLiuyanEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         liuyanService.save(entity);
         return R.ok("留言成功");
     }

@@ -7,6 +7,7 @@ import com.cgb.user.service.YonghuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.cgb.common.annotation.RateLimit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class YonghuController {
 
     @Operation(summary = "注册")
     @PostMapping("/register")
+    @RateLimit(key = "user_register", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> register(@RequestBody YonghuEntity entity) {
         yonghuService.register(entity);
         return R.ok("注册成功");
@@ -34,6 +36,7 @@ public class YonghuController {
 
     @Operation(summary = "登录")
     @PostMapping("/login")
+    @RateLimit(key = "user_login", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> login(@RequestBody YonghuEntity entity) {
         return yonghuService.login(entity.getAccount(), entity.getPassword());
     }

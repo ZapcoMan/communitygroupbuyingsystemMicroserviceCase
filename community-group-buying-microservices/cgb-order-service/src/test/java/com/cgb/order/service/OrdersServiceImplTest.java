@@ -43,7 +43,7 @@ class OrdersServiceImplTest {
         testOrder = new OrdersEntity();
         testOrder.setId(1L);
         testOrder.setOrderid("ORD20240612001");
-        testOrder.setUserid(100L);
+        testOrder.setUserId(100L);
         testOrder.setShangpinid(200L);
         testOrder.setShuliang(2);
         testOrder.setZhuangtai(0);
@@ -84,7 +84,7 @@ class OrdersServiceImplTest {
         assertNotNull(vo);
         assertEquals(testOrder.getId(), vo.getId());
         assertEquals(testOrder.getOrderid(), vo.getOrderId());
-        assertEquals(testOrder.getUserid(), vo.getUserId());
+        assertEquals(testOrder.getUserId(), vo.getUserId());
         assertEquals(testOrder.getShangpinid(), vo.getProductId());
         assertEquals(testOrder.getShangpinming(), vo.getProductName());
         assertEquals(testOrder.getShuliang(), vo.getQuantity());

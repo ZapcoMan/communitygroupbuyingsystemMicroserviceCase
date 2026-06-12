@@ -43,7 +43,7 @@ class TuanweiServiceImplTest {
         entity.setYuanjia(new BigDecimal("99.00"));
         entity.setTejia(new BigDecimal("59.90"));
         entity.setJieshushijian(LocalDateTime.now().plusDays(7));
-        entity.setUserid(100L);
+        entity.setUserId(100L);
         return entity;
     }
 

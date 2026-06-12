@@ -23,7 +23,7 @@ public class AddressController {
     @PostMapping
     public R<?> save(@RequestBody AddressEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         addressService.save(entity);
         return R.ok("保存成功");
     }

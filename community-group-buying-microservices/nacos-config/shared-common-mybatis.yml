@@ -1,0 +1,11 @@
+# Nacos配置中心 — 共享MyBatis-Plus配置
+# data-id: common-mybatis.yml | group: SHARED_GROUP
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0

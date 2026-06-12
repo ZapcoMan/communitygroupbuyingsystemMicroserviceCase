@@ -23,7 +23,7 @@ public class ShangpinCollectionController {
     @PostMapping
     public R<?> toggle(@RequestBody ShangpinCollectionEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         ShangpinCollectionEntity exist = collectionService.getByUserAndProduct(userId, entity.getShangpinid());
         if (exist != null) {
             collectionService.delete(exist.getId());

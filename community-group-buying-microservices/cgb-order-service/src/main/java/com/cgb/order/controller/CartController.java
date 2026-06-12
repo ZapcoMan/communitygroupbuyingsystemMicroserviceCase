@@ -24,9 +24,10 @@ public class CartController {
 
     @Operation(summary = "加入购物车")
     @PostMapping
+    @RateLimit(key = "cart_add", count = 20, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> add(@RequestBody CartEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         cartService.save(entity);
         return R.ok("添加成功");
     }

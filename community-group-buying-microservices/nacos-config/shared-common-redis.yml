@@ -1,0 +1,15 @@
+# Nacos配置中心 — 共享Redis配置
+# data-id: common-redis.yml | group: SHARED_GROUP
+
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0

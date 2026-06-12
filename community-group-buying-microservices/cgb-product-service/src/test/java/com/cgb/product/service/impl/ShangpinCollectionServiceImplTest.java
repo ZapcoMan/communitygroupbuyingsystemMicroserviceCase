@@ -32,7 +32,7 @@ class ShangpinCollectionServiceImplTest {
         void save_validEntity_callsInsert() {
             when(collectionDao.insert(any(ShangpinCollectionEntity.class))).thenReturn(1);
             ShangpinCollectionEntity entity = new ShangpinCollectionEntity();
-            entity.setUserid(1L);
+            entity.setUserId(1L);
             entity.setShangpinid(10L);
             collectionService.save(entity);
             verify(collectionDao).insert(entity);

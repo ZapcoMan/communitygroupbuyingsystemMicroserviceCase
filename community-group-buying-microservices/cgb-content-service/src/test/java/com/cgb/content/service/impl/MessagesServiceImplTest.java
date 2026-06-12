@@ -29,7 +29,7 @@ class MessagesServiceImplTest {
     private MessagesEntity buildMessage(Long id, Long userId) {
         MessagesEntity entity = new MessagesEntity();
         entity.setId(id);
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         entity.setUsername("testuser");
         entity.setContent("这是一条留言");
         return entity;

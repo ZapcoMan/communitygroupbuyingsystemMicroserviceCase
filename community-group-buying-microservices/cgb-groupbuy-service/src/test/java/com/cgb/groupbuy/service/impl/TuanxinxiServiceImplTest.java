@@ -32,7 +32,7 @@ class TuanxinxiServiceImplTest {
         TuanxinxiEntity entity = new TuanxinxiEntity();
         entity.setId(id);
         entity.setTuanduiid(tuanduiid);
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         entity.setShangpinid(1L);
         entity.setShuliang(2);
         entity.setJiage(new BigDecimal("59.90"));

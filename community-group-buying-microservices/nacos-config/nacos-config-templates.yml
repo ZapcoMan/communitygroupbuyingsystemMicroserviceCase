@@ -1,0 +1,280 @@
+# Nacos配置中心 — 各服务敏感配置模板
+# 使用方式：在Nacos控制台创建对应data-id的配置，group=CGB_GROUP，格式=yml
+# 共享配置group=SHARED_GROUP
+
+# ============================================================
+# 共享配置: common-redis.yml (group: SHARED_GROUP)
+# ============================================================
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+# ============================================================
+# 共享配置: common-mybatis.yml (group: SHARED_GROUP)
+# ============================================================
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      test-while-idle: true
+
+# ============================================================
+# cgb-user-service.yml (group: CGB_GROUP)
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/cgb_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+jwt:
+  secret: cgb-community-group-buying-secret-key-2024-change-this-in-production
+  expiration: 3600
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:127.0.0.1:9876}
+  producer:
+    group: cgb-user-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
+
+seata:
+  application-id: cgb-user-service
+  tx-service-group: cgb-user-service-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+
+# ============================================================
+# cgb-product-service.yml (group: CGB_GROUP)
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/cgb_product?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:127.0.0.1:9876}
+  producer:
+    group: cgb-product-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
+
+seata:
+  application-id: cgb-product-service
+  tx-service-group: cgb-product-service-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+
+# ============================================================
+# cgb-groupbuy-service.yml (group: CGB_GROUP)
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/cgb_groupbuy?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:127.0.0.1:9876}
+  producer:
+    group: cgb-groupbuy-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
+
+seata:
+  application-id: cgb-groupbuy-service
+  tx-service-group: cgb-groupbuy-service-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+
+# ============================================================
+# cgb-order-service.yml (group: CGB_GROUP)
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/cgb_order?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:127.0.0.1:9876}
+  producer:
+    group: cgb-order-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
+
+seata:
+  application-id: cgb-order-service
+  tx-service-group: cgb-order-service-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+
+# ============================================================
+# cgb-content-service.yml (group: CGB_GROUP)
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/cgb_content?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:127.0.0.1:9876}
+  producer:
+    group: cgb-content-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
+
+seata:
+  application-id: cgb-content-service
+  tx-service-group: cgb-content-service-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+
+# ============================================================
+# cgb-gateway.yml (group: CGB_GROUP)
+# ============================================================
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+jwt:
+  secret: cgb-community-group-buying-secret-key-2024-change-this-in-production
+  expiration: 3600
+
+rate-limit:
+  default-count: 100
+  default-period: 60
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:127.0.0.1:9876}
+  producer:
+    group: cgb-gateway-producer-group
+    send-message-timeout: 3000
+    max-message-size: 4194304
+    retry-times-when-send-failed: 2
+    retry-next-server: true
+
+seata:
+  application-id: cgb-gateway
+  tx-service-group: cgb-gateway-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      group: SEATA_GROUP

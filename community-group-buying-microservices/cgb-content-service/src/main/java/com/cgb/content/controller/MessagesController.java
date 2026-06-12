@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import com.cgb.common.annotation.RateLimit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +22,10 @@ public class MessagesController {
 
     @Operation(summary = "留言")
     @PostMapping
+    @RateLimit(key = "message_post", count = 20, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody MessagesEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         messagesService.save(entity);
         return R.ok("留言成功");
     }
@@ -37,6 +39,7 @@ public class MessagesController {
 
     @Operation(summary = "回复留言")
     @PostMapping("/reply/{id}")
+    @RateLimit(key = "message_reply", count = 20, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> reply(@PathVariable Long id, @RequestParam String replyContent) {
         messagesService.reply(id, replyContent);
         return R.ok("回复成功");

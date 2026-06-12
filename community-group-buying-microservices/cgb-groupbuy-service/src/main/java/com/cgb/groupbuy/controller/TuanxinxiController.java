@@ -25,7 +25,7 @@ public class TuanxinxiController {
     @RateLimit(key = "groupbuy_join", count = 10, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> save(@RequestBody TuanxinxiEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         if (entity.getZhuangtai() == null) entity.setZhuangtai(0);
         tuanxinxiService.save(entity);
         return R.ok("参与成功");

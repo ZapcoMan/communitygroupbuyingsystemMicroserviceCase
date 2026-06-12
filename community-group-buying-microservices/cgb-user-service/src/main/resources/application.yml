@@ -10,13 +10,10 @@ spring:
   # ==================== Nacos 配置中心 ====================
   cloud:
     nacos:
-      # Nacos 服务器地址
-      server-addr: 127.0.0.1:8848
-      # 统一命名空间（开发环境）
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
       discovery:
         namespace: cgb-dev
         group: CGB_GROUP
-        # 服务元数据
         metadata:
           version: 1.0.0
           env: dev
@@ -24,7 +21,6 @@ spring:
         namespace: cgb-dev
         group: CGB_GROUP
         file-extension: yml
-        # 共享配置（公共数据源、Redis、MyBatis-Plus 配置）
         shared-configs:
           - data-id: common-redis.yml
             group: SHARED_GROUP
@@ -32,36 +28,11 @@ spring:
           - data-id: common-mybatis.yml
             group: SHARED_GROUP
             refresh: true
-        # 开启配置自动刷新
         refresh-enabled: true
-  # 从 Nacos 导入配置
+  # 从 Nacos 导入配置（数据源、Redis、RocketMQ、Seata、JWT 等敏感配置均在 Nacos 管理）
   config:
     import:
       - optional:nacos:cgb-user-service.yml?group=CGB_GROUP&refreshEnabled=true
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    # 以下配置可被 Nacos 配置中心覆盖（cgb-user-service.yml）
-    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/cgb_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
-    username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:root}
-    druid:
-      initial-size: 5
-      min-idle: 5
-      max-active: 20
-      test-while-idle: true
-
-  data:
-    redis:
-      host: ${REDIS_HOST:127.0.0.1}
-      port: ${REDIS_PORT:6379}
-      database: 0
-      timeout: 10s
-
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
@@ -69,11 +40,6 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      logic-delete-field: isdelete
-      logic-delete-value: 1
-      logic-not-delete-value: 0
 
 springdoc:
   api-docs:
@@ -90,40 +56,7 @@ management:
     health:
       show-details: when_authorized
 
-jwt:
-  secret: cgb-community-group-buying-secret-key-2024-change-this-in-production
-  expiration: 3600
-
 logging:
   level:
     com.cgb: debug
     com.alibaba.nacos: info
-    org.springframework.cloud: info
-
-# ==================== RocketMQ 配置 ====================
-rocketmq:
-  name-server: 127.0.0.1:9876
-  producer:
-    group: cgb-user-producer-group
-    send-message-timeout: 3000
-    max-message-size: 4194304
-    retry-times-when-send-failed: 2
-    retry-next-server: true
-
-# ==================== Seata 分布式事务配置 ====================
-seata:
-  application-id: cgb-user-service
-  tx-service-group: cgb-user-service-tx-group
-  config:
-    type: nacos
-    nacos:
-      namespace: cgb-dev
-      server-addr: 127.0.0.1:8848
-      group: SEATA_GROUP
-      data-id: seataServer.properties
-  registry:
-    type: nacos
-    nacos:
-      namespace: cgb-dev
-      server-addr: 127.0.0.1:8848
-      group: SEATA_GROUP

@@ -33,7 +33,7 @@ class OrdersServiceImplTest {
         OrdersEntity entity = new OrdersEntity();
         entity.setId(id);
         entity.setOrderid(orderId);
-        entity.setUserid(100L);
+        entity.setUserId(100L);
         entity.setShangpinid(1L);
         entity.setShangpinming("测试商品");
         entity.setShuliang(2);

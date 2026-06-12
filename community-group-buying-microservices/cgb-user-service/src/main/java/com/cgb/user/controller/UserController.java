@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import com.cgb.common.annotation.RateLimit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class UserController {
     @Operation(summary = "管理员登录")
     @PostMapping("/login")
     @IgnoreAuth
+    @RateLimit(key = "admin_login", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
     public R<?> login(@RequestBody UserEntity entity, HttpServletRequest request) {
         String clientIP = CommonUtil.getClientIP(request);
         return userService.login(entity, clientIP);

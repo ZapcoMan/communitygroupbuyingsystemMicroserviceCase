@@ -40,14 +40,14 @@ class AddressServiceImplTest {
     private AddressEntity buildAddress(Long id, Long userId, Integer isDefault) {
         AddressEntity entity = new AddressEntity();
         entity.setId(id);
-        entity.setUserid(userId);
+        entity.setUserId(userId);
         entity.setDizhimingchen("测试地址");
         entity.setLianxidianhua("13800138000");
         entity.setShouhuoren("张三");
-        entity.setProvince("广东�?);
-        entity.setCity("深圳�?);
-        entity.setDistrict("南山�?);
-        entity.setDetailAddress("科技园南�?�?);
+        entity.setProvince("广东�?);
+        entity.setCity("深圳�?);
+        entity.setDistrict("南山�?);
+        entity.setDetailAddress("科技园南�?�?);
         entity.setIsdefault(isDefault);
         return entity;
     }
@@ -71,7 +71,7 @@ class AddressServiceImplTest {
         }
 
         @Test
-        @DisplayName("保存地址 - 指定为默认地址时保�?)
+        @DisplayName("保存地址 - 指定为默认地址时保�?)
         void save_withDefault_keepValue() {
             AddressEntity entity = buildAddress(null, 100L, 1);
             when(addressDao.insert(any(AddressEntity.class))).thenReturn(1);
@@ -156,13 +156,13 @@ class AddressServiceImplTest {
     class SetDefaultTests {
 
         @Test
-        @DisplayName("设置默认地址 - 先取消所有默认再设置新默�?)
+        @DisplayName("设置默认地址 - 先取消所有默认再设置新默�?)
         void setDefault_success() {
             when(addressDao.update(isNull(), any())).thenReturn(1, 1);
 
             addressService.setDefault(5L, 100L);
 
-            // 应调用两次update: 第一次取消所有默�? 第二次设置新默认
+            // 应调用两次update: 第一次取消所有默�? 第二次设置新默认
             verify(addressDao, times(2)).update(isNull(), any());
         }
     }
