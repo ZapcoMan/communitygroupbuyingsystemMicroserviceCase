@@ -27,13 +27,13 @@ public class MybatisPlusConfig {
         return new MetaObjectHandler() {
             @Override
             public void insertFill(MetaObject metaObject) {
-                this.strictInsertFill(metaObject, "addtime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "updatetime", LocalDateTime.class, LocalDateTime.now());
+                this.strictInsertFill(metaObject, "addTime", LocalDateTime.class, LocalDateTime.now());
+                this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
             }
 
             @Override
             public void updateFill(MetaObject metaObject) {
-                this.strictUpdateFill(metaObject, "updatetime", LocalDateTime.class, LocalDateTime.now());
+                this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
             }
         };
     }

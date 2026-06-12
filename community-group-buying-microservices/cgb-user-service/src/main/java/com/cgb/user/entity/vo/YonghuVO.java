@@ -4,8 +4,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 用户视图对象（脱敏，英文字段对外暴露）
- */
+ * 用户视图对象（脱敏，英文字段对外暴露�? */
 @Data
 public class YonghuVO {
     private Long id;
@@ -17,6 +16,5 @@ public class YonghuVO {
     private String avatar;        // 头像
     private Double points;        // 积分
     private Double balance;       // 余额
-    private Integer status;       // 状态
-    private LocalDateTime addtime;
+    private Integer status;       // 状�?    private LocalDateTime addTime;
 }
