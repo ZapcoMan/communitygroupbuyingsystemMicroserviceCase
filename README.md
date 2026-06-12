@@ -750,6 +750,23 @@ const uploadHeaders = ref({
 
 ## 📋 更新日志
 
+#### 2026-06-12 - 代码清理与精细化优化（最新批次）
+
+- 🧹 **BOM 清理收尾**：删除 `fix-all-bom.js`、`fix-bom.js` 两个脚本（共 162 行），移除 `ForumEntity_35e6e83.java`、`ForumEntity_clean.java` 两个临时文件，彻底清理项目中无用的 BOM 处理脚本和冗余代码
+- 📝 **论坛实体完善**：`ForumEntity` 新增逻辑删除注解、优化字段命名（`picture` → `coverImage`），完善帖子 CRUD 层
+- 🔔 **团购通知增强**：`GroupBuyMessage` DTO 新增 `currentMemberCount` 和 `targetMemberCount` 字段，`ContentGroupBuyConsumer` 团购成团通知内容展示精确参团进度（"当前X人/目标Y人"）
+- ❤️ **点赞防重优化**：`ForumServiceImpl` 中 Redis 点赞逻辑增强，使用 `SETNX` 防止重复点赞，增加异常捕获与日志记录
+- 🔥 **热门帖子缓存**：论坛热门帖子添加 Redis 缓存标记逻辑，提升热门内容查询性能
+- 🔄 **团购模块统一重构**：统整 `GroupBuy` / `GroupSlot` 实体和 DAO 命名，`GroupBuyCommentService` 中团购 ID 参数名修正；`GroupSlotDao` 原子更新语句优化（`currentCount→currentMemberCount`, `targetCount→targetMemberCount`），确保并发安全
+- 🛒 **订单服务优化**：`OrdersServiceImpl` 库存回补逻辑优化，订单状态消息发送日志完善（记录订单号和状态变更明细）
+- 📡 **MQ 消费者日志增强**：`GroupBuyStatusConsumer`、`ContentGroupBuyConsumer` 日志内容调整为英文描述，异常处理更细化
+- 📋 **Flyway 迁移表重命名**：新增 `V2__rename_yonghu_to_member.sql`（用户服务）、`V3__rename_tables_to_english.sql`（商品/团购/内容服务），数据库表名从拼音改为英文
+- 🔧 **服务层代码微调**：`MemberServiceImpl`、`MessageBoardServiceImpl`、`ProductServiceImpl`、`ProductOrderMessageConsumer`、`UserOrderMessageConsumer` 等 5 个文件代码结构调整，优化代码可读性和一致性
+
+> 📊 **本次变更统计**（合并最近 5 个 commit）：涉及 **78 个文件**，新增 244 行，删除 194 行；净增加 50 行，覆盖全部 6 个微服务模块 + 3 个 Flyway 迁移脚本
+
+---
+
 #### 2026-06-12 - 全量英文化与业务逻辑收尾
 
 - 🔤 **全量英文化**：23 个 Entity 拼音字段全部改为英文字段名（`@TableField` 映射），数据库列名保持不变；所有 Service/Controller/MQ 消费者的 getter/setter 统一调用英文方法
@@ -794,6 +811,14 @@ const uploadHeaders = ref({
 
 *最后更新时间：2026-06-12*
 
-*Git 提交记录：f18da1d (英文化收尾) → e03de48 (全量英文化) → 6a04cd0 (业务逻辑强化) → 35e6e83 (修复硬伤+Docker) → 0cf9a63 (中间件集成) → ... → 202d217 (Nacos)*
+*今日 Git 提交记录（共 20 个 commit）：*
+
+```
+68ce3a9 (最新) chore(build): 删除BOM处理脚本和临时实体类文件
+5884854 feat(content):  完善论坛实体及优化团购通知功能
+365c970 refactor(groupbuy): 统一并优化团购模块代码
+c1931af fix(bom): 修复项目多处文件的BOM问题，新增Flyway表重命名脚本
+
+```
 
 </div>
