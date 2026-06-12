@@ -138,4 +138,21 @@ public class YonghuServiceImpl implements YonghuService {
         yonghuDao.updateById(updateEntity);
         return R.ok("密码修改成功");
     }
+
+    /**
+     * 增加用户积分（订单支付成功后调用）
+     */
+    @Override
+    public void addPoints(Long userId, Double points) {
+        if (userId == null || points == null || points <= 0) {
+            throw new EIException("积分参数无效");
+        }
+        YonghuEntity user = yonghuDao.selectById(userId);
+        if (user == null) throw new EIException(ErrorCode.USER_NOT_FOUND);
+        YonghuEntity updateEntity = new YonghuEntity();
+        updateEntity.setId(userId);
+        updateEntity.setJifen(user.getJifen() + points);
+        yonghuDao.updateById(updateEntity);
+        log.info("用户积分增加: userId={}, points={}, total={}", userId, points, user.getJifen() + points);
+    }
 }

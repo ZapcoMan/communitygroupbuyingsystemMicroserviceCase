@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 订单服务 Feign 客户端
  */
-@FeignClient(name = "cgb-order-service", contextId = "order")
+@FeignClient(name = "cgb-order-service", contextId = "order", fallbackFactory = FeignOrderServiceFallbackFactory.class)
 public interface FeignOrderService {
 
-    @GetMapping("/order/internal/orderDetail")
+    @GetMapping("/orders/internal/orderDetail")
     R<?> getOrderDetail(@RequestParam("orderId") String orderId);
 
-    @PostMapping("/order/internal/cancel")
+    @PostMapping("/orders/internal/cancel")
     R<?> cancelOrder(@RequestParam("orderId") String orderId, @RequestParam("userId") Long userId);
 }

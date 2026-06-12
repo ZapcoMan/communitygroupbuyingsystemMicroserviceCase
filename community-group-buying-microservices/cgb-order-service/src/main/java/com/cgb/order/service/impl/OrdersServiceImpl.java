@@ -4,14 +4,22 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.EIException;
 import com.cgb.common.ErrorCode;
+import com.cgb.common.feign.FeignProductService;
+import com.cgb.common.feign.FeignUserService;
+import com.cgb.common.mq.MQTopics;
+import com.cgb.common.mq.OrderStatusMessage;
 import com.cgb.common.utils.*;
 import com.cgb.order.dao.OrdersDao;
 import com.cgb.order.entity.OrdersEntity;
 import com.cgb.order.service.OrdersService;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Slf4j
@@ -20,6 +28,9 @@ import java.util.Map;
 public class OrdersServiceImpl implements OrdersService {
 
     private final OrdersDao ordersDao;
+    private final FeignProductService feignProductService;
+    private final FeignUserService feignUserService;
+    private final RocketMQTemplate rocketMQTemplate;
 
     @Override
     public void save(OrdersEntity entity) {
@@ -75,6 +86,17 @@ public class OrdersServiceImpl implements OrdersService {
         if (order.getZhuangtai() != 0) throw new EIException("只能取消待支付订单");
         order.setZhuangtai(2);
         ordersDao.updateById(order);
+
+        // 取消订单 → 回补库存 + 发 RocketMQ 消息
+        try {
+            feignProductService.increaseStock(order.getShangpinid(), order.getShuliang());
+            log.info("取消订单，库存回补成功: productId={}, quantity={}", order.getShangpinid(), order.getShuliang());
+        } catch (Exception e) {
+            log.error("取消订单库存回补失败，需人工补偿: productId={}", order.getShangpinid(), e);
+        }
+
+        // 发送订单取消消息
+        sendOrderStatusMessage(order, MQTopics.TAG_ORDER_CANCELLED);
     }
 
     @Override
@@ -85,5 +107,73 @@ public class OrdersServiceImpl implements OrdersService {
         if (order.getZhuangtai() != 0) throw new EIException("订单状态不允许支付");
         order.setZhuangtai(1);
         ordersDao.updateById(order);
+
+        // 支付成功 → 增加用户积分 + 发 RocketMQ 消息
+        try {
+            // 积分规则：每消费1元得1积分
+            Double points = order.getZongjia() != null ? order.getZongjia().doubleValue() : 0.0;
+            feignUserService.addPoints(order.getUserid(), points);
+            log.info("支付成功，用户积分增加: userId={}, points={}", order.getUserid(), points);
+        } catch (Exception e) {
+            log.error("支付成功但积分增加失败，需人工补偿: userId={}", order.getUserid(), e);
+        }
+
+        // 发送订单支付消息
+        sendOrderStatusMessage(order, MQTopics.TAG_ORDER_PAID);
+    }
+
+    /**
+     * 创建订单（Seata 分布式事务）
+     * TM 端：下单 + 远程调商品服务扣库存，任一失败全局回滚
+     */
+    @Override
+    @GlobalTransactional(name = "cgb-create-order", rollbackFor = Exception.class)
+    public void createOrder(OrdersEntity entity) {
+        // 1. 生成订单编号
+        if (entity.getOrderid() == null || "".equals(entity.getOrderid())) {
+            entity.setOrderid(CommonUtil.generateOrderId());
+        }
+        if (entity.getZhuangtai() == null) entity.setZhuangtai(0);
+
+        // 2. 远程调用商品服务扣减库存（RM 端）
+        log.info("分布式事务开始 → 扣减库存: productId={}, quantity={}", entity.getShangpinid(), entity.getShuliang());
+        var stockResult = feignProductService.decreaseStock(entity.getShangpinid(), entity.getShuliang());
+        if (stockResult.getCode() != 0) {
+            throw new EIException("库存扣减失败: " + stockResult.getMsg());
+        }
+
+        // 3. 计算总价
+        if (entity.getZongjia() == null && entity.getJiage() != null && entity.getShuliang() != null) {
+            entity.setZongjia(entity.getJiage().multiply(BigDecimal.valueOf(entity.getShuliang())));
+        }
+
+        // 4. 保存订单
+        ordersDao.insert(entity);
+        log.info("分布式事务完成 → 订单创建成功: orderId={}", entity.getOrderid());
+
+        // 5. 发送订单创建消息（RocketMQ）
+        sendOrderStatusMessage(entity, MQTopics.TAG_ORDER_CREATED);
+    }
+
+    /**
+     * 发送订单状态变更消息到 RocketMQ
+     */
+    private void sendOrderStatusMessage(OrdersEntity order, String tag) {
+        try {
+            OrderStatusMessage msg = new OrderStatusMessage();
+            msg.setOrderId(order.getOrderid());
+            msg.setUserId(order.getUserid());
+            msg.setProductId(order.getShangpinid());
+            msg.setQuantity(order.getShuliang());
+            msg.setTotalPrice(order.getZongjia());
+            msg.setStatus(order.getZhuangtai());
+
+            String destination = MQTopics.ORDER_STATUS_CHANGE + ":" + tag;
+            rocketMQTemplate.syncSend(destination, MessageBuilder.withPayload(msg).build());
+            log.info("订单状态消息发送成功: orderId={}, tag={}", order.getOrderid(), tag);
+        } catch (Exception e) {
+            // 消息发送失败不影响主业务，仅记录日志
+            log.error("订单状态消息发送失败: orderId={}, tag={}", order.getOrderid(), tag, e);
+        }
     }
 }

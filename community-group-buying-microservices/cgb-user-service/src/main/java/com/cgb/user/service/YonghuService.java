@@ -14,4 +14,9 @@ public interface YonghuService {
     R<?> login(YonghuEntity params, String clientIP);
     R<?> register(YonghuEntity params);
     R<?> changePassword(String token, String oldPassword, String newPassword);
+
+    /**
+     * 增加用户积分
+     */
+    void addPoints(Long userId, Double points);
 }

@@ -131,4 +131,19 @@ public class YonghuController {
             return R.fail("用户不存在");
         }
     }
+
+    /**
+     * 增加用户积分（内部接口，订单支付成功后调用）
+     */
+    @Operation(summary = "增加用户积分（内部）")
+    @PostMapping("/internal/addPoints")
+    @IgnoreAuth
+    public R<?> internalAddPoints(@RequestParam Long userId, @RequestParam Double points) {
+        try {
+            yonghuService.addPoints(userId, points);
+            return R.ok("积分增加成功");
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
 }
