@@ -4,6 +4,35 @@ server:
 spring:
   application:
     name: cgb-gateway
+  profiles:
+    active: dev
+
+  # ==================== Nacos 配置中心 ====================
+  cloud:
+    nacos:
+      # Nacos 服务器地址
+      server-addr: 127.0.0.1:8848
+      # 统一命名空间（开发环境）
+      discovery:
+        namespace: cgb-dev
+        group: CGB_GROUP
+        # 服务元数据
+        metadata:
+          version: 1.0.0
+          env: dev
+      config:
+        namespace: cgb-dev
+        group: CGB_GROUP
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - data-id: common-redis.yml
+            group: SHARED_GROUP
+            refresh: true
+  # 从 Nacos 导入配置
+  config:
+    import:
+      - optional:nacos:cgb-gateway.yml?group=CGB_GROUP&refreshEnabled=true
 
   # Redis 配置
   data:
