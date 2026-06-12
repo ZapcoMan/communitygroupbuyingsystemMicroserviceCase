@@ -132,9 +132,9 @@ const fetchStats = async () => {
   try {
     // 这里需要根据实际API调整
     const [users, products, orders] = await Promise.all([
-      request.get('/yonghu/list', { params: { page: 1, limit: 1 } }),
-      request.get('/shangpinxinxi/list', { params: { page: 1, limit: 1 } }),
-      request.get('/orders/list', { params: { page: 1, limit: 10 } })
+      request.get('/user/yonghu/list', { params: { page: 1, limit: 1 } }),
+      request.get('/product/shangpin/list', { params: { page: 1, limit: 1 } }),
+      request.get('/order/orders/list', { params: { page: 1, limit: 10 } })
     ])
     
     stats.value.userCount = users.data?.total || 0

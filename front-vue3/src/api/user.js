@@ -21,7 +21,7 @@ export const register = (data) => {
 // 获取用户信息
 export const getUserInfo = (id) => {
   return request({
-    url: `/user/yonghu/detail/${id}`,
+    url: `/user/yonghu/${id}`,
     method: 'get'
   })
 }

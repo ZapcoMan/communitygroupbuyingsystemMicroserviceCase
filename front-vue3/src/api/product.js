@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取商品列表
 export const getProductList = (params) => {
   return request({
-    url: '/product/shangpinxinxi/list',
+    url: '/product/shangpin/list',
     method: 'get',
     params
   })
@@ -12,7 +12,7 @@ export const getProductList = (params) => {
 // 获取商品详情
 export const getProductDetail = (id) => {
   return request({
-    url: `/product/shangpinxinxi/detail/${id}`,
+    url: `/product/shangpin/${id}`,
     method: 'get'
   })
 }
@@ -91,7 +91,7 @@ export const getGroupBuyList = (params) => {
 // 获取团购详情
 export const getGroupBuyDetail = (id) => {
   return request({
-    url: `/groupbuy/tuanxinxi/detail/${id}`,
+    url: `/groupbuy/tuanxinxi/${id}`,
     method: 'get'
   })
 }
@@ -99,7 +99,7 @@ export const getGroupBuyDetail = (id) => {
 // 添加收藏
 export const addStoreup = (data) => {
   return request({
-    url: '/product/shangpincollection',
+    url: '/product/shangpin/collection',
     method: 'post',
     data
   })
@@ -108,7 +108,7 @@ export const addStoreup = (data) => {
 // 获取收藏列表
 export const getStoreupList = (params) => {
   return request({
-    url: '/product/shangpincollection/list',
+    url: '/product/shangpin/collection/my',
     method: 'get',
     params
   })
@@ -117,7 +117,7 @@ export const getStoreupList = (params) => {
 // 删除收藏
 export const deleteStoreup = (id) => {
   return request({
-    url: `/product/shangpincollection/${id}`,
+    url: `/product/shangpin/collection/${id}`,
     method: 'delete'
   })
 }

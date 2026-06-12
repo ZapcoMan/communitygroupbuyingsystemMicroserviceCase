@@ -113,7 +113,7 @@ const fetchData = async () => {
     
     if (searchForm.name) params.name = searchForm.name
     
-    const res = await request.get('/config/list', { params })
+    const res = await request.get('/content/config/list', { params })
     if (res.code === 0) {
       tableData.value = res.data.list || []
       total.value = res.data.total || 0
@@ -155,7 +155,7 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        const url = isEdit.value ? '/config/update' : '/config/save'
+        const url = isEdit.value ? '/content/config/update' : '/content/config/save'
         const res = await request.post(url, form)
         
         if (res.code === 0) {
@@ -174,7 +174,7 @@ const handleSubmit = async () => {
 const handleDelete = async (id) => {
   try {
     await ElMessageBox.confirm('确定要删除吗?', '提示', { type: 'warning' })
-    const res = await request.post('/config/delete', [id])
+    const res = await request.post('/content/config/delete', [id])
     if (res.code === 0) {
       ElMessage.success('删除成功')
       fetchData()
@@ -193,7 +193,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(`确定要删除选中的 ${multipleSelection.value.length} 条数据吗?`, '提示', { type: 'warning' })
     const ids = multipleSelection.value.map(item => item.id)
-    const res = await request.post('/config/delete', ids)
+    const res = await request.post('/content/config/delete', ids)
     if (res.code === 0) {
       ElMessage.success('批量删除成功')
       multipleSelection.value = []

@@ -182,7 +182,7 @@ const fetchData = async () => {
       params.yonghuxingming = searchForm.yonghuxingming
     }
     
-    const res = await request.get('/yonghu/list', { params })
+    const res = await request.get('/user/yonghu/list', { params })
     if (res.code === 0) {
       tableData.value = res.data.list || []
       total.value = res.data.total || 0
@@ -239,7 +239,7 @@ const handleDelete = async (id) => {
       type: 'warning'
     })
     
-    const res = await request.post('/yonghu/delete', [id])
+    const res = await request.post('/user/yonghu/delete', [id])
     if (res.code === 0) {
       ElMessage.success('删除成功')
       fetchData()
@@ -264,7 +264,7 @@ const handleBatchDelete = async () => {
     })
     
     const ids = multipleSelection.value.map(item => item.id)
-    const res = await request.post('/yonghu/delete', ids)
+    const res = await request.post('/user/yonghu/delete', ids)
     if (res.code === 0) {
       ElMessage.success('批量删除成功')
       multipleSelection.value = []
@@ -303,7 +303,7 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        const url = isEdit.value ? '/yonghu/update' : '/yonghu/save'
+        const url = isEdit.value ? '/user/yonghu/update' : '/user/yonghu/save'
         const res = await request.post(url, form)
         
         if (res.code === 0) {

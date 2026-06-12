@@ -204,7 +204,7 @@ const fetchData = async () => {
       params.tuangoumingcheng = searchForm.tuangoumingcheng
     }
     
-    const res = await request.get('/tuangouxinxi/list', { params })
+    const res = await request.get('/groupbuy/tuanwei/list', { params })
     if (res.code === 0) {
       tableData.value = res.data.list || []
       total.value = res.data.total || 0
@@ -255,7 +255,7 @@ const handleEdit = (row) => {
 const handleDelete = async (id) => {
   try {
     await ElMessageBox.confirm('确定要删除吗?', '提示', { type: 'warning' })
-    const res = await request.post('/tuangouxinxi/delete', [id])
+    const res = await request.post('/groupbuy/tuanwei/delete', [id])
     if (res.code === 0) {
       ElMessage.success('删除成功')
       fetchData()
@@ -276,7 +276,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(`确定要删除选中的 ${multipleSelection.value.length} 条数据吗?`, '提示', { type: 'warning' })
     const ids = multipleSelection.value.map(item => item.id)
-    const res = await request.post('/tuangouxinxi/delete', ids)
+    const res = await request.post('/groupbuy/tuanwei/delete', ids)
     if (res.code === 0) {
       ElMessage.success('批量删除成功')
       multipleSelection.value = []
@@ -311,7 +311,7 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        const url = isEdit.value ? '/tuangouxinxi/update' : '/tuangouxinxi/save'
+        const url = isEdit.value ? '/groupbuy/tuanwei/update' : '/groupbuy/tuanwei/save'
         const res = await request.post(url, form)
         
         if (res.code === 0) {

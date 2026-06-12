@@ -123,7 +123,7 @@ const fetchData = async () => {
       params.shangpinleixing = searchForm.shangpinleixing
     }
     
-    const res = await request.get('/shangpinleixing/list', { params })
+    const res = await request.get('/product/shangpinleixing/list', { params })
     if (res.code === 0) {
       tableData.value = res.data.list || []
       total.value = res.data.total || 0
@@ -167,7 +167,7 @@ const handleEdit = (row) => {
 const handleDelete = async (id) => {
   try {
     await ElMessageBox.confirm('确定要删除吗?', '提示', { type: 'warning' })
-    const res = await request.post('/shangpinleixing/delete', [id])
+    const res = await request.post('/product/shangpinleixing/delete', [id])
     if (res.code === 0) {
       ElMessage.success('删除成功')
       fetchData()
@@ -189,7 +189,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(`确定要删除选中的 ${multipleSelection.value.length} 条数据吗?`, '提示', { type: 'warning' })
     const ids = multipleSelection.value.map(item => item.id)
-    const res = await request.post('/shangpinleixing/delete', ids)
+    const res = await request.post('/product/shangpinleixing/delete', ids)
     if (res.code === 0) {
       ElMessage.success('批量删除成功')
       multipleSelection.value = []
@@ -220,7 +220,7 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        const url = isEdit.value ? '/shangpinleixing/update' : '/shangpinleixing/save'
+        const url = isEdit.value ? '/product/shangpinleixing/update' : '/product/shangpinleixing/save'
         const res = await request.post(url, form)
         
         if (res.code === 0) {

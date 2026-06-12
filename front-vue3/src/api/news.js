@@ -12,7 +12,7 @@ export const getNewsList = (params) => {
 // 获取新闻详情
 export const getNewsDetail = (id) => {
   return request({
-    url: `/content/news/detail/${id}`,
+    url: `/content/news/${id}`,
     method: 'get'
   })
 }
@@ -29,7 +29,7 @@ export const getNewsTypes = (params) => {
 // 添加评论（商品评论 → 商品服务）
 export const addComment = (data) => {
   return request({
-    url: '/product/shangpincomment',
+    url: '/product/shangpin/comment',
     method: 'post',
     data
   })
@@ -38,7 +38,7 @@ export const addComment = (data) => {
 // 获取评论列表
 export const getCommentList = (params) => {
   return request({
-    url: '/product/shangpincomment/list',
+    url: '/product/shangpin/comment/list',
     method: 'get',
     params
   })

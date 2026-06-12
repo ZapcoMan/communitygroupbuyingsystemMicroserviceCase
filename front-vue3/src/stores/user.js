@@ -37,7 +37,7 @@ export const useUserStore = defineStore('user', () => {
   const login = async (loginForm) => {
     try {
       const data = await request({
-        url: '/' + loginForm.table + '/login',
+        url: '/user/' + loginForm.table + '/login',
         method: 'post',
         data: {
           username: loginForm.username,

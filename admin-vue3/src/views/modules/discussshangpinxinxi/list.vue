@@ -107,7 +107,7 @@ const fetchData = async () => {
     
     if (searchForm.content) params.content = searchForm.content
     
-    const res = await request.get('/discussshangpinxinxi/list', { params })
+    const res = await request.get('/product/shangpin/comment/list', { params })
     if (res.code === 0) {
       tableData.value = res.data.list || []
       total.value = res.data.total || 0
@@ -138,7 +138,7 @@ const handleReply = (row) => {
 
 const handleSubmitReply = async () => {
   try {
-    const res = await request.post('/discussshangpinxinxi/update', replyForm)
+    const res = await request.post('/product/shangpin/comment/update', replyForm)
     if (res.code === 0) {
       ElMessage.success('回复成功')
       replyVisible.value = false
@@ -153,7 +153,7 @@ const handleSubmitReply = async () => {
 const handleDelete = async (id) => {
   try {
     await ElMessageBox.confirm('确定要删除吗?', '提示', { type: 'warning' })
-    const res = await request.post('/discussshangpinxinxi/delete', [id])
+    const res = await request.post('/product/shangpin/comment/delete', [id])
     if (res.code === 0) {
       ElMessage.success('删除成功')
       fetchData()
@@ -172,7 +172,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(`确定要删除选中的 ${multipleSelection.value.length} 条数据吗?`, '提示', { type: 'warning' })
     const ids = multipleSelection.value.map(item => item.id)
-    const res = await request.post('/discussshangpinxinxi/delete', ids)
+    const res = await request.post('/product/shangpin/comment/delete', ids)
     if (res.code === 0) {
       ElMessage.success('批量删除成功')
       multipleSelection.value = []
