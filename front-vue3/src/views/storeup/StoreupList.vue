@@ -65,7 +65,7 @@ const fetchStoreupList = async () => {
       order: 'desc'
     })
     if (res.code === 0) {
-      storeupList.value = res.data.list || []
+      storeupList.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {

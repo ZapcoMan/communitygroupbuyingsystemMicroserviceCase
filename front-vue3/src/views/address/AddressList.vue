@@ -104,7 +104,7 @@ const fetchAddressList = async () => {
       limit: 100
     })
     if (res.code === 0) {
-      addressList.value = res.data.list || []
+      addressList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取地址失败:', error)

@@ -92,7 +92,7 @@ const fetchGroupBuyList = async () => {
     
     const res = await getGroupBuyList(params)
     if (res.code === 0) {
-      groupBuyList.value = res.data.list || []
+      groupBuyList.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {

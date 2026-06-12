@@ -233,7 +233,7 @@ const fetchRecentOrders = async () => {
       order: 'desc'
     })
     if (res.code === 0) {
-      recentOrders.value = res.data.list || []
+      recentOrders.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取订单失败:', error)

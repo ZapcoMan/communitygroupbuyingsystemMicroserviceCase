@@ -123,7 +123,7 @@ const fetchProductList = async () => {
     
     const res = await getProductList(params)
     if (res.code === 0) {
-      productList.value = res.data.list || []
+      productList.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {
@@ -139,7 +139,7 @@ const fetchCategoryList = async () => {
   try {
     const res = await getProductTypes()
     if (res.code === 0) {
-      categoryList.value = res.data.list || []
+      categoryList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取分类失败:', error)

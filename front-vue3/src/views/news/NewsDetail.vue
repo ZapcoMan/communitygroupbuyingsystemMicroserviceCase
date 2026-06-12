@@ -125,7 +125,7 @@ const checkFavorite = async () => {
       limit: 10,
       refid: news.value.id
     })
-    if (res.code === 0 && res.data.list.length > 0) {
+    if (res.code === 0 && res.data.records.length > 0) {
       isFavorited.value = true
     }
   } catch (error) {
@@ -142,7 +142,7 @@ const fetchComments = async () => {
       refid: news.value.id
     })
     if (res.code === 0) {
-      commentList.value = res.data.list || []
+      commentList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取评论失败:', error)
@@ -185,8 +185,8 @@ const handleToggleFavorite = async () => {
         limit: 10,
         refid: news.value.id
       })
-      if (res.code === 0 && res.data.list.length > 0) {
-        await deleteStoreup([res.data.list[0].id])
+      if (res.code === 0 && res.data.records.length > 0) {
+        await deleteStoreup([res.data.records[0].id])
         isFavorited.value = false
         ElMessage.success('已取消收藏')
       }

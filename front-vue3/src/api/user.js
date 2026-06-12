@@ -14,7 +14,14 @@ export const register = (data) => {
   return request({
     url: '/user/yonghu/register',
     method: 'post',
-    data
+    data: {
+      zhanghao: data.zhanghao || data.username,
+      mima: data.mima || data.password,
+      xingming: data.xingming || data.name,
+      xingbie: data.xingbie || '男',
+      shouji: data.shouji || data.phone || '',
+      youxiang: data.youxiang || data.email || ''
+    }
   })
 }
 

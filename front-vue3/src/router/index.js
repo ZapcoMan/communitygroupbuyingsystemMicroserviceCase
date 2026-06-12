@@ -18,6 +18,12 @@ const routes = [
     component: () => import('@/views/login/Login.vue'),
     meta: { title: '登录' }
   },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/login/Register.vue'),
+    meta: { title: '注册' }
+  },
   // 商品信息
   {
     path: '/shangpinxinxi/list',

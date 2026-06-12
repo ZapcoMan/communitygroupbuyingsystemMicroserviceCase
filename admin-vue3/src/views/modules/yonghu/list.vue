@@ -184,7 +184,7 @@ const fetchData = async () => {
     
     const res = await request.get('/user/yonghu/list', { params })
     if (res.code === 0) {
-      tableData.value = res.data.list || []
+      tableData.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {

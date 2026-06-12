@@ -70,7 +70,7 @@ const fetchBanner = async () => {
   try {
     const res = await getBannerList({ name: 'homepage' })
     if (res.code === 0) {
-      bannerList.value = res.data.list || []
+      bannerList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取轮播图失败:', error)
@@ -87,7 +87,7 @@ const fetchRecommendProducts = async () => {
       order: 'desc'
     })
     if (res.code === 0) {
-      recommendProducts.value = res.data.list || []
+      recommendProducts.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取推荐商品失败:', error)
@@ -104,7 +104,7 @@ const fetchNews = async () => {
       order: 'desc'
     })
     if (res.code === 0) {
-      newsList.value = res.data.list || []
+      newsList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取新闻失败:', error)

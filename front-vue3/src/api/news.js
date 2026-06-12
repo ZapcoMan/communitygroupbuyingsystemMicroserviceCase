@@ -20,9 +20,9 @@ export const getNewsDetail = (id) => {
 // 获取新闻类型列表
 export const getNewsTypes = (params) => {
   return request({
-    url: '/content/newstype/list',
+    url: '/content/config/list',
     method: 'get',
-    params
+    params: { ...params, name: 'newstype' }
   })
 }
 

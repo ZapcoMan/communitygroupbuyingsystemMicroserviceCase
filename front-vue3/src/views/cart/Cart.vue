@@ -122,7 +122,7 @@ const fetchCartList = async () => {
       limit: 100
     })
     if (res.code === 0) {
-      cartList.value = res.data.list || []
+      cartList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取购物车失败:', error)

@@ -120,7 +120,7 @@ const fetchOrderList = async () => {
     
     const res = await getOrderList(params)
     if (res.code === 0) {
-      orderList.value = res.data.list || []
+      orderList.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {

@@ -187,7 +187,7 @@ const fetchTypeList = async () => {
   try {
     const res = await request.get('/product/shangpinleixing/list', { params: { page: 1, limit: 100 } })
     if (res.code === 0) {
-      typeList.value = res.data.list || []
+      typeList.value = res.data.records || []
     }
   } catch (error) {
     console.error('获取类型列表失败:', error)
@@ -214,7 +214,7 @@ const fetchData = async () => {
     
     const res = await request.get('/product/shangpin/list', { params })
     if (res.code === 0) {
-      tableData.value = res.data.list || []
+      tableData.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {

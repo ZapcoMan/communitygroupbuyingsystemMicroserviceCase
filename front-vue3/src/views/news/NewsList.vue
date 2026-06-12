@@ -62,7 +62,7 @@ const fetchNewsList = async () => {
       order: 'desc'
     })
     if (res.code === 0) {
-      newsList.value = res.data.list || []
+      newsList.value = res.data.records || []
       total.value = res.data.total || 0
     }
   } catch (error) {

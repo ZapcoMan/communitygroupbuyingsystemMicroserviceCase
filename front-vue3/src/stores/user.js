@@ -36,13 +36,15 @@ export const useUserStore = defineStore('user', () => {
   
   const login = async (loginForm) => {
     try {
+      // 根据登录角色使用不同的字段名
+      const loginData = loginForm.table === 'yonghu'
+        ? { zhanghao: loginForm.username, mima: loginForm.password }
+        : { username: loginForm.username, password: loginForm.password }
+      
       const data = await request({
         url: '/user/' + loginForm.table + '/login',
         method: 'post',
-        data: {
-          username: loginForm.username,
-          password: loginForm.password
-        }
+        data: loginData
       })
       
       if (data.code === 0) {
