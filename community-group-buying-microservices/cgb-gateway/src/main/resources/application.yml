@@ -136,3 +136,21 @@ rocketmq:
     max-message-size: 4194304
     retry-times-when-send-failed: 2
     retry-next-server: true
+
+# ==================== Seata 分布式事务配置 ====================
+seata:
+  application-id: cgb-gateway
+  tx-service-group: cgb-gateway-tx-group
+  config:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+  registry:
+    type: nacos
+    nacos:
+      namespace: cgb-dev
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
