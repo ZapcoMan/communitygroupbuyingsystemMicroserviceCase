@@ -26,44 +26,45 @@
 ### ✨ 核心特性
 
 - 🏗️ **微服务架构**：Spring Boot 3.4.1 + Spring Cloud 2024.0.0，6 个微服务模块独立部署，各服务拥有独立数据库
-- 🌐 **Spring Cloud Gateway 网关**：统一入口（端口 8000），动态路由（`lb://`）、全局 CORS、请求大小限制、白名单鉴权
+- 🌐 **Spring Cloud Gateway 网关**：统一入口（端口 8000），动态路由（`lb://`）、全局 CORS、请求大小限制、白名单鉴权、内部接口 Token 认证
 - 🔐 **JWT + Redis 认证**：网关层 JWT 签名验证 + Redis Token 会话存储，Token 绑定客户端 IP，支持主动失效（退出登录）
-- 🔗 **OpenFeign 服务间调用**：cgb-common 定义 Feign 客户端接口（FeignUserService / FeignProductService / FeignOrderService），各服务间松耦合通信
+- 🔗 **OpenFeign 服务间调用**：cgb-common 定义 4 个 Feign 客户端接口，支持熔断降级（FallbackFactory）
 - 🗄️ **Flyway 数据库版本管理**：每个微服务独立 Flyway 迁移，`baseline-on-migrate: true`，启动即自动执行建表 + 种子数据
-- 🛡️ **Redis + Lua 接口限流**：`@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE 计数限流，按客户端 IP 隔离
+- 🛡️ **Redis + Lua 接口限流**：`@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE 计数限流，按客户端 IP 隔离，已在 10+ 核心接口启用
 - 📡 **Swagger API 文档**：各服务集成 SpringDoc OpenAPI，自动生成接口文档，支持在线调试
 - 📊 **Actuator 监控端点**：各服务集成 Spring Boot Actuator，暴露 health / info / metrics 端点；网关额外暴露 gateway 端点
 - 🏥 **Druid 连接池**：各服务集成 Druid 数据库连接池（initial-size: 5, min-idle: 5, max-active: 20），test-while-idle 保活
-- 🌍 **MyBatis Plus 逻辑删除**：全局配置 `isdelete` 字段逻辑删除（1=已删除 / 0=未删除）
+- 🌍 **MyBatis Plus 逻辑删除**：全局配置 `isDelete` 字段逻辑删除（1=已删除 / 0=未删除），驼峰自动映射
 - 👥 **双端设计**：管理后台（admin-vue3，端口 8081）+ 用户前台（front-vue3，端口 8084）独立运行
 - 📊 **ECharts 数据可视化**：后台首页集成数据图表展示
 - 🛒 **完整电商流程**：商品浏览 → 购物车 → 下单 → 订单管理
-- 🤝 **团购状态流转**：团长发起团购 → 用户参团 → 状态流转（进行中 / 已成团 / 已过期）
-- 🧪 **28 个测试类**：覆盖工具类、服务实现层、网关鉴权等核心模块
+- 🤝 **团购状态流转**：团长发起团购 → 用户参团 → 状态流转（进行中 / 已成团 / 已过期），Seata 分布式事务保障一致性
+- 🧪 **28+ 个测试类**：覆盖工具类、服务实现层、网关鉴权等核心模块
 - 🔄 **Vite 开发代理**：开发环境自动代理后端 API（网关 8000 端口），无需跨域配置
-- ☁️ **Nacos 服务注册/配置中心**：所有微服务注册到 Nacos，支持动态配置刷新、热更新
-- 📨 **RocketMQ 消息队列**：服务间异步通信、事件驱动、订单状态流转通知
-- 🔗 **Seata 分布式事务**：跨服务事务一致性、AT 模式自动回滚
-- ⚡ **服务降级与熔断**：Spring Cloud Circuit Breaker (Resilience4j) 支持
+- ☁️ **Nacos 服务注册/配置中心**：所有微服务注册到 Nacos，支持动态配置刷新、热更新；敏感配置外置到 Nacos 配置中心
+- 📨 **RocketMQ 消息队列**：4 个消费者处理异步事件（订单状态变更通知、用户积分增加、团购成团公告、过期团购库存回补）
+- 🔗 **Seata 分布式事务**：跨服务事务一致性，AT 模式自动回滚，已在参团、订单创建、购物车结算等核心流程启用
+- ⚡ **服务降级与熔断**：OpenFeign + Sentinel/FallbackFactory 支持熔断降级，所有 Feign 客户端均配置降级工厂
+- 📝 **内部接口鉴权**：`InternalAuthFilter` 拦截 `/internal/**` 路径，验证 `X-Internal-Token` 请求头
 
 ### 🛠️ 技术栈
 
 | 分类 | 技术 |
 |------|------|
 | **后端框架** | Spring Boot 3.4.1, Spring Cloud 2024.0.0, MyBatis Plus 3.5.9, Flyway, JSqlParser |
-| **API 网关** | Spring Cloud Gateway（动态路由、全局过滤器、鉴权过滤器） |
-| **服务间通信** | Spring Cloud OpenFeign（声明式 REST 客户端） |
-| **认证与安全** | JWT (jjwt 0.12.6), Redis (Spring Data Redis + Lettuce), MD5, Spring Security (仅 BCryptPasswordEncoder) |
-| **缓存与限流** | Redis 7 + Lettuce 连接池, Redis Lua 原子限流 |
+| **API 网关** | Spring Cloud Gateway（动态路由、全局过滤器、鉴权过滤器 + 内部接口认证） |
+| **服务间通信** | Spring Cloud OpenFeign 4 个声明式 REST 客户端 + FallbackFactory 熔断降级 |
+| **认证与安全** | JWT (jjwt 0.12.6), Redis (Spring Data Redis + Lettuce), BCryptPasswordEncoder |
+| **缓存与限流** | Redis 7 + Lettuce 连接池, Redis Lua 原子限流（滑动窗口） |
 | **数据库** | MySQL 8.0（每服务独立库）, Druid 1.2.24 连接池 |
-| **API 文档** | SpringDoc OpenAPI (Swagger UI) |
+| **API 文档** | SpringDoc OpenAPI 2.8.15 (Swagger UI) |
 | **监控** | Spring Boot Actuator |
 | **前端（后台）** | Vue 3.5.34, Vite 8, Element Plus 2.14.1, Pinia 3, ECharts 6, Axios |
 | **前端（前台）** | Vue 3.5.34, Vite 8, Element Plus 2.14.1, Pinia 3, Axios |
-| **测试** | JUnit 5, Mockito, SpringBootTest (28 test classes) |
-| **服务注册/配置中心** | Nacos 2023.0.1.2 (服务发现、配置中心、命名空间) |
-| **消息队列** | RocketMQ 2.3.1 (可靠消息投递、事件驱动) |
-| **分布式事务** | Seata 2.0.0 (AT 模式、@GlobalTransactional) |
+| **测试** | JUnit 5, Mockito, SpringBootTest |
+| **服务注册/配置中心** | Nacos 2023.0.1.2 (Spring Cloud Alibaba 集成) |
+| **消息队列** | RocketMQ 2.3.1 (4 个消费者：订单状态/用户积分/团购成团/过期回补) |
+| **分布式事务** | Seata 2.0.0 (AT 模式, @GlobalTransactional) |
 | **工具** | Maven, Hutool 5.8.25, FastJSON 1.2.83, Lombok |
 
 ---
@@ -120,18 +121,13 @@ seata-server.bat -p 8091 -h 127.0.0.1 -m file
 
 > 💡 各服务配置文件中已预设默认地址，如中间件部署在其他机器请修改对应配置
 
-#### 3. 修改数据库连接配置
+#### 3. Nacos 配置中心
 
-各服务的 `application.yml` 中默认配置为 `root/root`，如需修改请编辑对应服务的配置文件：
+首次使用需在 Nacos 控制台（http://localhost:8848/nacos）导入配置文件：
 
-```yaml
-# 以 cgb-user-service 为例（src/main/resources/application.yml）
-spring:
-  datasource:
-    url: jdbc:mysql://127.0.0.1:3306/cgb_user?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
-    username: root
-    password: 你的数据库密码
-```
+路径：`community-group-buying-microservices/nacos-config/nacos-config-templates.yml`
+
+该模板包含所有服务的敏感配置（数据源密码、RocketMQ 地址、Seata 事务组等）。
 
 #### 4. 启动后端微服务
 
@@ -244,6 +240,11 @@ communitygroupbuyingsystemMicroserviceCase/
 ├── 📂 community-group-buying-microservices/   # 后端微服务（Spring Cloud）
 │   ├── 📄 pom.xml                            # 父 POM（统一依赖版本管理）
 │   │
+│   ├── 📂 nacos-config/                      # Nacos 配置文件模板
+│   │   ├── nacos-config-templates.yml        # 全部服务配置模板（敏感信息）
+│   │   ├── shared-common-mybatis.yml         # 共享 MyBatis Plus 配置
+│   │   └── shared-common-redis.yml           # 共享 Redis 配置
+│   │
 │   ├── 📂 cgb-common/                        # 公共模块（不独立部署，被各服务引用）
 │   │   ├── src/main/java/com/cgb/common/
 │   │   │   ├── EIException.java              # 自定义异常
@@ -258,10 +259,16 @@ communitygroupbuyingsystemMicroserviceCase/
 │   │   │   │   ├── CorsConfig.java           # CORS 跨域配置
 │   │   │   │   ├── GlobalExceptionHandler.java # 全局异常处理
 │   │   │   │   └── RedisConfig.java          # Redis 序列化配置
-│   │   │   ├── feign/                        # Feign 客户端接口
+│   │   │   ├── feign/                        # Feign 客户端接口（4个）
 │   │   │   │   ├── FeignUserService.java     # 用户服务 Feign 客户端
 │   │   │   │   ├── FeignProductService.java  # 商品服务 Feign 客户端
-│   │   │   │   └── FeignOrderService.java    # 订单服务 Feign 客户端
+│   │   │   │   ├── FeignOrderService.java    # 订单服务 Feign 客户端
+│   │   │   │   ├── FeignGroupbuyService.java # 团购服务 Feign 客户端
+│   │   │   │   └── *FallbackFactory.java     # 各 Feign 降级工厂
+│   │   │   ├── mq/                           # MQ 消息体 DTO
+│   │   │   │   ├── MQTopics.java             # MQ 主题/标签常量
+│   │   │   │   ├── GroupBuyMessage.java      # 团购状态变更消息
+│   │   │   │   └── OrderStatusMessage.java   # 订单状态变更消息
 │   │   │   └── utils/                        # 工具类（8 个）
 │   │   │       ├── CommonUtil.java           # 通用工具
 │   │   │       ├── FileUtil.java             # 文件处理
@@ -275,11 +282,13 @@ communitygroupbuyingsystemMicroserviceCase/
 │   │
 │   ├── 📂 cgb-gateway/                       # API 网关（端口 8000）
 │   │   ├── src/main/java/com/cgb/gateway/
-│   │   │   ├── CgbGatewayApplication.java    # 网关启动类
+│   │   │   ├── CgbGatewayApplication.java
 │   │   │   ├── config/
-│   │   │   │   └── RedisConfig.java          # Redis 配置
+│   │   │   │   ├── RedisConfig.java          # Redis 配置
+│   │   │   │   └── RateLimitConfig.java     # 限流 Lua 脚本配置
 │   │   │   ├── filter/
-│   │   │   │   └── GatewayAuthFilter.java    # 网关鉴权过滤器
+│   │   │   │   ├── GatewayAuthFilter.java    # JWT 鉴权过滤器
+│   │   │   │   └── InternalAuthFilter.java  # 内部接口 Token 认证过滤器
 │   │   │   ├── service/
 │   │   │   │   └── RedisTokenService.java    # Redis Token 会话服务
 │   │   │   └── utils/
@@ -295,10 +304,11 @@ communitygroupbuyingsystemMicroserviceCase/
 │   │   │   ├── controller/                   # UserController, YonghuController
 │   │   │   ├── dao/                          # UserDao, YonghuDao
 │   │   │   ├── entity/                       # UserEntity, YonghuEntity + VO
-│   │   │   ├── service/                      # UserService, YonghuService, RedisTokenService + impl
+│   │   │   ├── service/                      # UserService, YonghuService + impl
+│   │   │   ├── mq/                          # UserOrderMessageConsumer（积分异步增加）
 │   │   │   └── utils/                        # JwtUtils
 │   │   ├── src/main/resources/
-│   │   │   ├── application.yml               # 服务配置
+│   │   │   ├── application.yml               # 服务配置（Nacos 导入）
 │   │   │   └── db/migration/                 # Flyway 迁移脚本
 │   │   └── src/test/                         # 用户服务测试（4 个测试类）
 │   │
@@ -307,9 +317,11 @@ communitygroupbuyingsystemMicroserviceCase/
 │   │   │   ├── CgbProductServiceApplication.java
 │   │   │   ├── config/                       # 配置类
 │   │   │   ├── controller/                   # 4 个 Controller（商品/收藏/评论/留言）
-│   │   │   ├── dao/                          # 4 个 Mapper
+│   │   │   ├── dao/                          # 4 个 Mapper（ShangpinDao 含原子库存操作）
 │   │   │   ├── entity/                       # 4 个 Entity + VO
-│   │   │   └── service/                      # 4 个 Service + impl
+│   │   │   ├── service/                      # 4 个 Service + impl（含 Redis 预扣库存）
+│   │   │   ├── mq/                          # ProductOrderMessageConsumer（销量统计）
+│   │   │   └── config/                        # GlobalExceptionHandler
 │   │   ├── src/main/resources/
 │   │   │   ├── application.yml
 │   │   │   └── db/migration/
@@ -320,9 +332,11 @@ communitygroupbuyingsystemMicroserviceCase/
 │   │   │   ├── CgbGroupbuyServiceApplication.java
 │   │   │   ├── config/                       # 配置类
 │   │   │   ├── controller/                   # 2 个 Controller（团购信息/团位）
-│   │   │   ├── dao/                          # 2 个 Mapper
+│   │   │   ├── dao/                          # 2 个 Mapper（TuanweiDao 含原子操作）
 │   │   │   ├── entity/                       # 2 个 Entity + VO
-│   │   │   └── service/                      # 2 个 Service + impl
+│   │   │   ├── service/                      # 2 个 Service + impl（含 Seata 分布式事务）
+│   │   │   ├── mq/                          # GroupBuyStatusConsumer（成团通知/过期回补）
+│   │   │   └── config/                        # GlobalExceptionHandler
 │   │   ├── src/main/resources/
 │   │   │   ├── application.yml
 │   │   │   └── db/migration/
@@ -333,9 +347,10 @@ communitygroupbuyingsystemMicroserviceCase/
 │   │   │   ├── CgbOrderServiceApplication.java
 │   │   │   ├── config/                       # 配置类
 │   │   │   ├── controller/                   # 3 个 Controller（订单/购物车/地址）
-│   │   │   ├── dao/                          # 3 个 Mapper
-│   │   │   ├── entity/                       # 3 个 Entity + VO
-│   │   │   └── service/                      # 3 个 Service + impl
+│   │   │   ├── dao/                          # 3 个 Mapper（OrdersDao/YonghuDao/CartDao）
+│   │   │   ├── entity/                       # 3 个 Entity + VO/DTO
+│   │   │   ├── service/                      # 3 个 Service + impl（含 Seata 事务）
+│   │   │   └── mq/                          # （通过 Feign 调用商品/用户服务）
 │   │   ├── src/main/resources/
 │   │   │   ├── application.yml
 │   │   │   └── db/migration/
@@ -348,7 +363,8 @@ communitygroupbuyingsystemMicroserviceCase/
 │       │   ├── controller/                   # 4 个 Controller（新闻/论坛/留言/资讯）
 │       │   ├── dao/                          # 4 个 Mapper
 │       │   ├── entity/                       # 4 个 Entity + VO
-│       │   └── service/                      # 4 个 Service + impl
+│       │   ├── service/                      # 4 个 Service + impl（含 Redis 热门缓存）
+│       │   └── mq/                          # ContentGroupBuyConsumer（成团自动生成社区公告）
 │       ├── src/main/resources/
 │       │   ├── application.yml
 │       │   └── db/migration/
@@ -434,11 +450,11 @@ communitygroupbuyingsystemMicroserviceCase/
 | 服务 | 端口 | 数据库 | 说明 |
 |------|------|--------|------|
 | `cgb-gateway` | 8000 | — | API 网关，统一入口、鉴权、路由 |
-| `cgb-user-service` | 8001 | `cgb_user` | 用户注册、登录、管理员管理 |
-| `cgb-product-service` | 8002 | `cgb_product` | 商品信息、收藏、评论、留言 |
-| `cgb-groupbuy-service` | 8003 | `cgb_groupbuy` | 团购信息、团位管理 |
-| `cgb-order-service` | 8004 | `cgb_order` | 订单、购物车、收货地址 |
-| `cgb-content-service` | 8005 | `cgb_content` | 新闻、论坛、留言板、资讯 |
+| `cgb-user-service` | 8001 | `cgb_user` | 用户注册、登录、管理员管理、积分管理 |
+| `cgb-product-service` | 8002 | `cgb_product` | 商品信息、收藏、评论、留言、库存管理 |
+| `cgb-groupbuy-service` | 8003 | `cgb_groupbuy` | 团购信息、团位管理、参团 Seata 事务 |
+| `cgb-order-service` | 8004 | `cgb_order` | 订单、购物车、收货地址、Seata 分布式事务 |
+| `cgb-content-service` | 8005 | `cgb_content` | 新闻、论坛（Redis 热门缓存）、留言板、资讯 |
 
 ### 网关路由规则
 
@@ -447,10 +463,21 @@ communitygroupbuyingsystemMicroserviceCase/
 | 路径前缀 | 路由目标 | StripPrefix |
 |----------|---------|-------------|
 | `/user/**` | `lb://cgb-user-service` | 1 |
+| `/yonghu/**` | `lb://cgb-user-service` | 1 |
 | `/product/**` | `lb://cgb-product-service` | 1 |
+| `/shangpin/**` | `lb://cgb-product-service` | 1 |
 | `/groupbuy/**` | `lb://cgb-groupbuy-service` | 1 |
+| `/tuanxinxi/**` | `lb://cgb-groupbuy-service` | 1 |
+| `/tuanwei/**` | `lb://cgb-groupbuy-service` | 1 |
 | `/order/**` | `lb://cgb-order-service` | 1 |
+| `/orders/**` | `lb://cgb-order-service` | 1 |
+| `/cart/**` | `lb://cgb-order-service` | 1 |
+| `/address/**` | `lb://cgb-order-service` | 1 |
 | `/content/**` | `lb://cgb-content-service` | 1 |
+| `/news/**` | `lb://cgb-content-service` | 1 |
+| `/forum/**` | `lb://cgb-content-service` | 1 |
+| `/messages/**` | `lb://cgb-content-service` | 1 |
+| `/zixun/**` | `lb://cgb-content-service` | 1 |
 
 > 💡 `StripPrefix=1` 表示转发时去掉第一级路径前缀，例如 `/user/yonghu/list` 转发为 `/yonghu/list`
 
@@ -458,11 +485,31 @@ communitygroupbuyingsystemMicroserviceCase/
 
 通过 **OpenFeign** 声明式 REST 客户端进行服务间调用，Feign 接口定义在 `cgb-common` 模块中：
 
-| Feign 客户端 | 目标服务 | 用途 |
-|-------------|---------|------|
-| `FeignUserService` | cgb-user-service | 查询用户信息、验证用户身份 |
-| `FeignProductService` | cgb-product-service | 查询商品信息、库存校验 |
-| `FeignOrderService` | cgb-order-service | 订单创建、订单状态查询 |
+| Feign 客户端 | 目标服务 | 用途 | 降级工厂 |
+|-------------|---------|------|---------|
+| `FeignUserService` | cgb-user-service | 查询用户信息、验证用户身份、加积分 | ✅ |
+| `FeignProductService` | cgb-product-service | 查询商品、扣库存/回补库存 | ✅ |
+| `FeignOrderService` | cgb-order-service | 订单创建、订单状态查询 | ✅ |
+| `FeignGroupbuyService` | cgb-groupbuy-service | 获取团购详情、参团人数管理 | ✅ |
+
+### RocketMQ 消息消费者
+
+| 消费者 | 主题 | 标签 | 服务 | 业务逻辑 |
+|--------|------|------|------|---------|
+| `UserOrderMessageConsumer` | `ORDER_STATUS_CHANGE` | `order_paid` | 用户服务 | 订单支付成功 → 异步增加用户积分 |
+| `ProductOrderMessageConsumer` | `ORDER_STATUS_CHANGE` | `*` | 商品服务 | 订单状态变更 → 更新商品销量统计（日志） |
+| `GroupBuyStatusConsumer` | `GROUPBUY_STATUS_CHANGE` | `*` | 团购服务 | 团购成团/过期 → 日志记录；过期 → 回补库存 |
+| `ContentGroupBuyConsumer` | `GROUPBUY_STATUS_CHANGE` | `groupbuy_completed` | 内容服务 | 团购成团 → 自动生成社区公告（NewsService.save） |
+
+### Seata 分布式事务
+
+| 事务边界 | 方法 | 说明 |
+|---------|------|------|
+| 订单创建 | `OrdersServiceImpl.createOrder` | 创建订单 + 扣库存 + 记录用户积分变更（异步 MQ） |
+| 购物车结算 | `CartServiceImpl.checkout` | 批量创建订单 + 批量扣库存 + 清空购物车 |
+| 参团 | `TuanweiServiceImpl.joinGroupBuy` | 原子增加参团人数 + 扣库存 + 发 MQ + 成团原子判定 |
+
+> ⚠️ Seata 事务嵌套已修复：内层方法不再声明 `@GlobalTransactional`，仅在顶层业务编排方法声明，避免事务嵌套冲突。
 
 ---
 
@@ -472,43 +519,44 @@ communitygroupbuyingsystemMicroserviceCase/
 
 ### 用户服务（cgb-user-service:8001）
 
-| 接口路径 | 说明 |
-|---------|------|
-| `/user/*` | 管理员登录、用户注册、信息管理 |
-| `/yonghu/*` | 用户注册、登录、信息管理 |
+| 接口路径 | 说明 | 限流 |
+|---------|------|------|
+| `/user/*` | 管理员登录、用户注册、信息管理 | — |
+| `/yonghu/*` | 用户注册、登录、信息管理 | ✅ register/login |
 
 ### 商品服务（cgb-product-service:8002）
 
-| 接口路径 | 说明 |
-|---------|------|
-| `/shangpin/*` | 商品信息 CRUD、点赞、详情 |
-| `/shangpincollection/*` | 商品收藏管理 |
-| `/shangpincomment/*` | 商品评论管理 |
-| `/shangpinliuyan/*` | 商品留言管理 |
+| 接口路径 | 说明 | 限流 |
+|---------|------|------|
+| `/shangpin/*` | 商品信息 CRUD、点赞、详情 | ✅ create |
+| `/shangpincollection/*` | 商品收藏管理 | — |
+| `/shangpincomment/*` | 商品评论管理 | — |
+| `/shangpinliuyan/*` | 商品留言管理 | — |
 
 ### 团购服务（cgb-groupbuy-service:8003）
 
-| 接口路径 | 说明 |
-|---------|------|
-| `/tuanxinxi/*` | 团购活动管理、点赞、详情 |
-| `/tuanwei/*` | 团位管理、参团记录 |
+| 接口路径 | 说明 | 限流 |
+|---------|------|------|
+| `/tuanxinxi/*` | 团购活动管理、点赞、详情 | ✅ join |
+| `/tuanwei/*` | 团位管理、参团记录 | ✅ create/join |
+| `/tuanwei/internal/*` | 内部接口（Feign 调用） | X-Internal-Token |
 
 ### 订单服务（cgb-order-service:8004）
 
-| 接口路径 | 说明 |
-|---------|------|
-| `/cart/*` | 购物车增删改查 |
-| `/orders/*` | 订单创建、状态管理 |
-| `/address/*` | 收货地址管理 |
+| 接口路径 | 说明 | 限流 |
+|---------|------|------|
+| `/cart/*` | 购物车增删改查 | ✅ checkout/add |
+| `/orders/*` | 订单创建、状态管理 | ✅ create/pay |
+| `/address/*` | 收货地址管理 | — |
 
 ### 内容服务（cgb-content-service:8005）
 
-| 接口路径 | 说明 |
-|---------|------|
-| `/news/*` | 新闻资讯发布与管理 |
-| `/forum/*` | 论坛帖子管理 |
-| `/messages/*` | 留言板管理 |
-| `/zixun/*` | 社区资讯管理 |
+| 接口路径 | 说明 | 限流 |
+|---------|------|------|
+| `/news/*` | 新闻资讯发布与管理 | — |
+| `/forum/*` | 论坛帖子管理、热门列表 | ✅ post/thumbUp |
+| `/messages/*` | 留言板管理 | ✅ post/reply |
+| `/zixun/*` | 社区资讯管理 | — |
 
 > 💡 **Swagger 在线文档**：各服务可访问 `http://localhost:{服务端口}/swagger-ui.html` 查看完整 API 文档并在线调试
 
@@ -557,6 +605,7 @@ proxy: {
 | 机制 | 说明 |
 |------|------|
 | **GatewayAuthFilter** | Spring Cloud Gateway 全局过滤器，统一校验 JWT Token |
+| **InternalAuthFilter** | 拦截 `/internal/**` 内部接口，校验 `X-Internal-Token` 请求头 |
 | **JWT 签名验证** | `JwtUtils` 验证 Token 签名、过期时间、IP 绑定 |
 | **Redis Token 会话** | `RedisTokenService` 管理 Token 在 Redis 中的存储/查询/删除，支持主动失效 |
 | **IP 绑定验证** | JWT Token 绑定客户端 IP，防止 Token 被盗用后在其他设备使用 |
@@ -568,11 +617,11 @@ proxy: {
 
 | 机制 | 说明 |
 |------|------|
-| **MD5 密码加密** | 用户密码 MD5 加密存储 |
-| **Redis + Lua 限流** | `@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE，按 IP 隔离 |
+| **BCrypt 密码加密** | 用户密码 BCrypt 加密存储（Spring Security） |
+| **Redis + Lua 限流** | `@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE，滑动窗口限流，按 IP 隔离 |
 | **注解控制** | `@LoginUser` 标记需登录接口，`@IgnoreAuth` 标记公开接口 |
 | **SQL 注入过滤** | `SQLFilter` 工具类过滤用户输入中的 SQL 关键字 |
-| **逻辑删除** | MyBatis Plus 全局逻辑删除配置，数据不物理删除 |
+| **逻辑删除** | MyBatis Plus 全局逻辑删除配置（`isDelete` 字段），数据不物理删除 |
 
 ### 前端安全
 
@@ -593,41 +642,41 @@ proxy: {
 
 | 表名 | 说明 | 核心字段 |
 |------|------|---------|
-| `yonghu` | 用户表 | 账号、密码、姓名、性别、手机、邮箱、积分、余额 |
+| `yonghu` | 用户表 | 账号、密码（BCrypt）、姓名、性别、手机、邮箱、积分、余额 |
 | `users` | 管理员表 | 用户名、密码、角色 |
 
 ### cgb_product（商品服务）
 
 | 表名 | 说明 | 核心字段 |
 |------|------|---------|
-| `shangpin` | 商品信息 | 编号、名称、类型、数量、供货地址、价格、图片、积分 |
+| `shangpin` | 商品信息 | 编号、名称、类型、数量（stock）、供货地址、价格、图片、积分 |
 | `shangpincollection` | 商品收藏 | 用户ID、商品ID、收藏时间 |
-| `shangpincomment` | 商品评论 | 关联ID、用户ID、评论内容、回复 |
+| `shangpincomment` | 商品评论 | 关联ID、用户ID、评论内容、评分(rating)、回复 |
 | `shangpinliuyan` | 商品留言 | 关联ID、用户ID、留言内容 |
 
 ### cgb_groupbuy（团购服务）
 
 | 表名 | 说明 | 核心字段 |
 |------|------|---------|
-| `tuanxinxi` | 团购信息 | 编号、名称、类型、数量、团购价、活动时间、图片 |
-| `tuanwei` | 团位（参团记录） | 团购ID、用户ID、参团时间、状态 |
+| `tuanxinxi` | 团购信息 | 编号、名称、类型、数量、价格、团购价、活动时间、图片 |
+| `tuanwei` | 团位（参团记录） | 团购ID、用户ID、参团时间、状态、购买数量、价格 |
 
 ### cgb_order（订单服务）
 
 | 表名 | 说明 | 核心字段 |
 |------|------|---------|
-| `orders` | 订单表 | 订单编号、商品ID、数量、价格、状态、地址、收货人 |
+| `orders` | 订单表 | 订单编号、商品ID、数量、价格（totalPrice）、状态、地址、收货人 |
 | `cart` | 购物车 | 用户ID、商品ID、购买数量、单价、会员价 |
-| `address` | 收货地址 | 用户ID、地址、收货人、电话、是否默认 |
+| `address` | 收货地址 | 用户ID、地址标签(label)、收货人、地区、省市区、详细地址、是否默认 |
 
 ### cgb_content（内容服务）
 
 | 表名 | 说明 | 核心字段 |
 |------|------|---------|
-| `news` | 新闻资讯 | 标题、简介、图片、内容 |
-| `forum` | 论坛帖子 | 标题、内容、用户ID |
-| `messages` | 留言板 | 用户ID、留言内容 |
-| `zixun` | 社区资讯 | 标题、内容、图片 |
+| `news` | 新闻资讯 | 标题、简介、封面图(coverImage)、内容 |
+| `forum` | 论坛帖子 | 标题、内容、用户ID、封面图、点赞数、状态 |
+| `messages` | 留言板 | 用户ID、留言内容、回复内容、父级ID(parentId) |
+| `zixun` | 社区资讯 | 标题、内容、封面图(coverImage) |
 
 ---
 
@@ -638,25 +687,36 @@ proxy: {
 - 检查 `cgb-gateway/src/main/resources/application.yml` 中的 Redis 配置
 
 ### 2. 微服务间调用失败（Feign）
-- 确认所有相关微服务已启动
+- 确认所有相关微服务已启动且注册到 Nacos
 - 检查 `cgb-common` 中的 Feign 客户端接口 `@FeignClient` 注解的 `name` 属性是否与目标服务名一致
 - 查看调用方日志是否有 `Load balancer does not have available server` 错误
+- 检查内部接口是否正确传递 `X-Internal-Token` 请求头
 
-### 3. 数据库连接失败
+### 3. Seata 分布式事务失败
+- 确认 Seata Server 已启动（默认端口 8091）
+- 检查各服务 `application.yml` 中的 `seata.tx-service-group` 配置是否一致
+- Seata AT 模式依赖 UNDO_LOG 表，确认数据库已执行相关 Flyway 迁移
+
+### 4. RocketMQ 消息消费失败
+- 确认 RocketMQ NameServer 和 Broker 已启动
+- 检查 MQ 消费者是否正确订阅了对应主题和标签
+- 消费者异常会被捕获并记录日志，不会影响主业务流程
+
+### 5. 数据库连接失败
 - 确认 MySQL 服务已启动
 - 确认对应的数据库已创建（`cgb_user` / `cgb_product` / `cgb_groupbuy` / `cgb_order` / `cgb_content`）
-- 检查各服务 `application.yml` 中的数据库用户名和密码
+- 检查各服务 `application.yml` 中的数据库用户名和密码（通过 Nacos 配置中心管理）
 
-### 4. Flyway 迁移报错
+### 6. Flyway 迁移报错
 - 若数据库已存在旧数据，Flyway 以 `baseline-version: 0` 为基线
 - 检查 `db/migration/` 目录下的迁移脚本文件名是否符合 `V{版本号}__{描述}.sql` 格式
 
-### 5. 前端页面空白
+### 7. 前端页面空白
 - 确认网关服务已启动（端口 8000）
 - 确认 Vite 开发代理配置正确（target 指向 `http://localhost:8000`）
 - 检查浏览器控制台是否有报错信息
 
-### 6. el-upload 上传报 401 错误
+### 8. el-upload 上传报 401 错误
 el-upload 组件不经过 Axios 拦截器，需显式配置 headers：
 ```javascript
 const uploadHeaders = ref({
@@ -690,26 +750,36 @@ const uploadHeaders = ref({
 
 ## 📋 更新日志
 
+#### 2026-06-12 - 全量英文化与业务逻辑收尾
+
+- 🔤 **全量英文化**：23 个 Entity 拼音字段全部改为英文字段名（`@TableField` 映射），数据库列名保持不变；所有 Service/Controller/MQ 消费者的 getter/setter 统一调用英文方法
+- 🔧 **命名微调**：TuanweiEntity (`currentCount→currentMemberCount`, `targetCount→targetMemberCount`, `userId→leaderUserId`)、AddressEntity (`addressName→addressLabel`, `consignee→receiverName`, `provinces→city→district→detailAddress`)、ForumEntity/NewsEntity/ZixunEntity (`picture→coverImage`)、GroupBuyMessage DTO 同步重命名
+- 📨 **ContentGroupBuyConsumer 业务逻辑补全**：团购成团时自动调用 `NewsService.save()` 生成社区公告，不再是空壳消费者
+- 🛡️ **MessagesController 限流**：留言和回复接口添加 `@RateLimit`（20次/分钟）
+- 📝 **Nacos 共享配置模板**：新增 `shared-common-mybatis.yml`（mybatis-plus 全局配置）、`shared-common-redis.yml`（Redis 连接配置）
+- 🔄 **mybatis-plus 逻辑删除字段修正**：`logic-delete-field: isdelete` → `isDelete`，匹配 Java 字段名
+- 🚫 **移除 yml 冗余配置**：5 个服务 `application.yml` 中的 `global-config.db-config` 块移除（由 Nacos 共享配置统一管理）
+
 #### 2026-06-12 - 企业级中间件集成
 
-- ☁️ **Nacos 服务注册/配置中心**：为所有微服务添加 Nacos 依赖，配置服务发现（命名空间: cgb-dev，分组: CGB_GROUP）和配置中心，支持动态配置热刷新
-- 📨 **RocketMQ 消息队列**：为所有微服务添加 RocketMQ 依赖，每个服务配置独立 Producer Group，支持服务间异步通信、订单状态流转通知
-- 🔗 **Seata 分布式事务**：为所有微服务添加 Seata 依赖，配置独立事务组（tx-service-group），支持跨服务事务一致性
-- 📝 **Git 提交记录**：3 次详细提交记录（Nacos / RocketMQ / Seata），每步骤可追溯
+- ☁️ **Nacos 服务注册/配置中心**：为所有微服务添加 Nacos 依赖，配置服务发现（命名空间: cgb-dev，分组: CGB_GROUP）和配置中心，支持动态配置热刷新；敏感配置（数据源、RocketMQ、Seata）外置到 Nacos
+- 📨 **RocketMQ 消息队列**：为所有微服务添加 RocketMQ 依赖，4 个消费者处理异步事件（订单状态变更、用户积分增加、团购成团公告、过期团购库存回补）
+- 🔗 **Seata 分布式事务**：为所有微服务添加 Seata 依赖，配置独立事务组（tx-service-group），支持跨服务事务一致性；已修复事务嵌套问题
+- 📝 **Git 提交记录**：详细提交记录（Nacos / RocketMQ / Seata），每步骤可追溯
 
 #### 2026-06-12 - 微服务架构搭建
 
 - 🏗️ **Spring Cloud 微服务拆分**：将系统拆分为 6 个独立微服务（cgb-gateway / cgb-user-service / cgb-product-service / cgb-groupbuy-service / cgb-order-service / cgb-content-service），每服务独立数据库、独立部署
-- 🌐 **Spring Cloud Gateway 网关**：统一 API 入口（端口 8000），配置动态路由（`lb://`）、全局 CORS、请求大小限制（10MB）、`GatewayAuthFilter` 鉴权过滤器
+- 🌐 **Spring Cloud Gateway 网关**：统一 API 入口（端口 8000），配置动态路由（`lb://`）、全局 CORS、请求大小限制（10MB）、`GatewayAuthFilter` 鉴权过滤器 + `InternalAuthFilter` 内部接口认证
 - 🔐 **网关层 JWT + Redis 认证**：`JwtUtils` JWT 签名验证 + `RedisTokenService` Redis 会话管理，Token 绑定客户端 IP，支持主动失效
-- 🔗 **OpenFeign 服务间通信**：`cgb-common` 定义 `FeignUserService` / `FeignProductService` / `FeignOrderService` 声明式 REST 客户端，各服务间松耦合调用
+- 🔗 **OpenFeign 服务间通信**：`cgb-common` 定义 4 个 Feign 客户端接口，全部配置 FallbackFactory 熔断降级工厂
 - 🗄️ **每服务独立 Flyway 迁移**：各业务服务配置独立 Flyway（`baseline-on-migrate: true`），启动时自动执行建表 + 种子数据
-- 🛡️ **Redis + Lua 接口限流**：`@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE 计数限流，按客户端 IP 隔离
+- 🛡️ **Redis + Lua 接口限流**：`@RateLimit` 注解 + Redis Lua 脚本原子性 INCR + EXPIRE 计数限流，滑动窗口算法，按客户端 IP 隔离，已在 10+ 核心接口启用
 - 📡 **SpringDoc OpenAPI**：各微服务集成 Swagger UI，支持独立 API 文档查看和在线调试
 - 📊 **Spring Boot Actuator**：各服务集成 Actuator 监控端点（health / info / metrics），网关额外暴露 gateway 端点
 - 🏥 **Druid 连接池**：各服务集成 Druid 连接池（initial-size: 5, min-idle: 5, max-active: 20），test-while-idle 保活策略
-- 🌍 **MyBatis Plus 增强**：全局逻辑删除配置（`isdelete` 字段，1=已删除 / 0=未删除），驼峰命名自动映射
-- 🧪 **28 个单元测试类**：覆盖公共工具类（9）、网关鉴权（2）、用户服务（4）、商品服务（4）、团购服务（2）、订单服务（3）、内容服务（4）
+- 🌍 **MyBatis Plus 增强**：全局逻辑删除配置（`isDelete` 字段，1=已删除 / 0=未删除），驼峰命名自动映射
+- 🧪 **28+ 个单元测试类**：覆盖公共工具类（9）、网关鉴权（2）、用户服务（4）、商品服务（4）、团购服务（2）、订单服务（3）、内容服务（4）
 
 #### 2026-06-12 - 前端双端
 
@@ -724,6 +794,6 @@ const uploadHeaders = ref({
 
 *最后更新时间：2026-06-12*
 
-*Git 提交记录：202d217 (Nacos) → 4cf3c23 (RocketMQ) → b63e12a (Seata)*
+*Git 提交记录：f18da1d (英文化收尾) → e03de48 (全量英文化) → 6a04cd0 (业务逻辑强化) → 35e6e83 (修复硬伤+Docker) → 0cf9a63 (中间件集成) → ... → 202d217 (Nacos)*
 
 </div>
