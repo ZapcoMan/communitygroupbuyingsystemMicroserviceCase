@@ -29,7 +29,7 @@ public class ZixunController {
     @GetMapping("/list")
     public R<?> list(@Parameter(hidden = true) ZixunEntity params) {
         IPage<ZixunEntity> result = zixunService.queryPage(params);
-        return R.ok(result.getRecords());
+        return R.ok(result);
     }
 
     @Operation(summary = "资讯详情")
