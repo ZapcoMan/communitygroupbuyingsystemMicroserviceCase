@@ -41,6 +41,10 @@
 - 🤝 **团购状态流转**：团长发起团购 → 用户参团 → 状态流转（进行中 / 已成团 / 已过期）
 - 🧪 **28 个测试类**：覆盖工具类、服务实现层、网关鉴权等核心模块
 - 🔄 **Vite 开发代理**：开发环境自动代理后端 API（网关 8000 端口），无需跨域配置
+- ☁️ **Nacos 服务注册/配置中心**：所有微服务注册到 Nacos，支持动态配置刷新、热更新
+- 📨 **RocketMQ 消息队列**：服务间异步通信、事件驱动、订单状态流转通知
+- 🔗 **Seata 分布式事务**：跨服务事务一致性、AT 模式自动回滚
+- ⚡ **服务降级与熔断**：Spring Cloud Circuit Breaker (Resilience4j) 支持
 
 ### 🛠️ 技术栈
 
@@ -57,6 +61,9 @@
 | **前端（后台）** | Vue 3.5.34, Vite 8, Element Plus 2.14.1, Pinia 3, ECharts 6, Axios |
 | **前端（前台）** | Vue 3.5.34, Vite 8, Element Plus 2.14.1, Pinia 3, Axios |
 | **测试** | JUnit 5, Mockito, SpringBootTest (28 test classes) |
+| **服务注册/配置中心** | Nacos 2023.0.1.2 (服务发现、配置中心、命名空间) |
+| **消息队列** | RocketMQ 2.3.1 (可靠消息投递、事件驱动) |
+| **分布式事务** | Seata 2.0.0 (AT 模式、@GlobalTransactional) |
 | **工具** | Maven, Hutool 5.8.25, FastJSON 1.2.83, Lombok |
 
 ---
@@ -70,6 +77,9 @@
 - **Node.js** >= 16
 - **MySQL** >= 8.0
 - **Redis** >= 7
+- **Nacos** >= 2023.0 (服务注册/配置中心)
+- **RocketMQ** >= 4.9 (消息队列)
+- **Seata** >= 2.0 (分布式事务)
 - 推荐使用：**谷歌浏览器**
 
 ### 💻 手动部署（开发模式）
@@ -90,7 +100,27 @@ CREATE DATABASE cgb_content DEFAULT CHARACTER SET utf8mb4;
 
 > 💡 Flyway 配置了 `baseline-on-migrate: true`，若数据库已存在数据，会以 baseline 为基线，仅执行未应用的迁移脚本。
 
-#### 2. 修改数据库连接配置
+#### 2. 启动中间件
+
+确保以下中间件已启动：
+
+```bash
+# Nacos（默认端口 8848）
+startup.cmd -m standalone
+
+# RocketMQ NameServer（默认端口 9876）
+start mqnamesrv.cmd
+
+# RocketMQ Broker（默认端口 10911）
+start mqbroker.cmd -n 127.0.0.1:9876 autoCreateTopicEnable=true
+
+# Seata Server（默认端口 8091）
+seata-server.bat -p 8091 -h 127.0.0.1 -m file
+```
+
+> 💡 各服务配置文件中已预设默认地址，如中间件部署在其他机器请修改对应配置
+
+#### 3. 修改数据库连接配置
 
 各服务的 `application.yml` 中默认配置为 `root/root`，如需修改请编辑对应服务的配置文件：
 
@@ -103,7 +133,7 @@ spring:
     password: 你的数据库密码
 ```
 
-#### 3. 启动后端微服务
+#### 4. 启动后端微服务
 
 按以下顺序依次启动各微服务：
 
@@ -140,7 +170,7 @@ mvn spring-boot:run        # 端口 8005
 ✅ 网关地址：http://localhost:8000
 ✅ 各服务 Swagger 文档：`http://localhost:{服务端口}/swagger-ui.html`
 
-#### 4. 启动管理后台
+#### 5. 启动管理后台
 
 ```bash
 cd admin-vue3
@@ -150,7 +180,7 @@ npm run dev
 
 ✅ 管理后台地址：http://localhost:8081
 
-#### 5. 启动用户前台
+#### 6. 启动用户前台
 
 ```bash
 cd front-vue3
@@ -660,6 +690,13 @@ const uploadHeaders = ref({
 
 ## 📋 更新日志
 
+#### 2026-06-12 - 企业级中间件集成
+
+- ☁️ **Nacos 服务注册/配置中心**：为所有微服务添加 Nacos 依赖，配置服务发现（命名空间: cgb-dev，分组: CGB_GROUP）和配置中心，支持动态配置热刷新
+- 📨 **RocketMQ 消息队列**：为所有微服务添加 RocketMQ 依赖，每个服务配置独立 Producer Group，支持服务间异步通信、订单状态流转通知
+- 🔗 **Seata 分布式事务**：为所有微服务添加 Seata 依赖，配置独立事务组（tx-service-group），支持跨服务事务一致性
+- 📝 **Git 提交记录**：3 次详细提交记录（Nacos / RocketMQ / Seata），每步骤可追溯
+
 #### 2026-06-12 - 微服务架构搭建
 
 - 🏗️ **Spring Cloud 微服务拆分**：将系统拆分为 6 个独立微服务（cgb-gateway / cgb-user-service / cgb-product-service / cgb-groupbuy-service / cgb-order-service / cgb-content-service），每服务独立数据库、独立部署
@@ -686,5 +723,7 @@ const uploadHeaders = ref({
 <div align="center">
 
 *最后更新时间：2026-06-12*
+
+*Git 提交记录：202d217 (Nacos) → 4cf3c23 (RocketMQ) → b63e12a (Seata)*
 
 </div>
