@@ -1,13 +1,13 @@
-package com.cgb.groupbuy.controller;
+﻿package com.cgb.groupbuy.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
 import com.cgb.common.annotation.RateLimit;
-import com.cgb.groupbuy.dao.TuanweiDao;
-import com.cgb.groupbuy.entity.TuanweiEntity;
-import com.cgb.groupbuy.entity.TuanxinxiEntity;
-import com.cgb.groupbuy.service.TuanweiService;
-import com.cgb.groupbuy.service.TuanxinxiService;
+import com.cgb.groupbuy.dao.GroupSlotDao;
+import com.cgb.groupbuy.entity.GroupSlotEntity;
+import com.cgb.groupbuy.entity.GroupBuyEntity;
+import com.cgb.groupbuy.service.GroupSlotService;
+import com.cgb.groupbuy.service.GroupBuyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/tuanwei")
 @RequiredArgsConstructor
-public class TuanweiController {
+public class GroupSlotController {
 
-    private final TuanweiService tuanweiService;
-    private final TuanxinxiService tuanxinxiService;
-    private final TuanweiDao tuanweiDao;
+    private final GroupSlotService tuanweiService;
+    private final GroupBuyService tuanxinxiService;
+    private final GroupSlotDao tuanweiDao;
 
     @Operation(summary = "发起团购")
     @PostMapping
     @RateLimit(key = "groupbuy_create", count = 5, period = 1, unit = RateLimit.TimeUnit.MINUTES)
-    public R<?> save(@RequestBody TuanweiEntity entity, HttpServletRequest request) {
+    public R<?> save(@RequestBody GroupSlotEntity entity, HttpServletRequest request) {
         Long userId = Long.parseLong(request.getHeader("X-User-Id"));
         entity.setUserId(userId);
         tuanweiService.save(entity);
@@ -48,8 +48,8 @@ public class TuanweiController {
 
     @Operation(summary = "分页查询团购")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) TuanweiEntity params) {
-        IPage<TuanweiEntity> result = tuanweiService.queryPage(params);
+    public R<?> list(@Parameter(hidden = true) GroupSlotEntity params) {
+        IPage<GroupSlotEntity> result = tuanweiService.queryPage(params);
         return R.ok(result);
     }
 
@@ -61,7 +61,7 @@ public class TuanweiController {
 
     @Operation(summary = "修改团购")
     @PutMapping
-    public R<?> update(@RequestBody TuanweiEntity entity) {
+    public R<?> update(@RequestBody GroupSlotEntity entity) {
         tuanweiService.update(entity);
         return R.ok("更新成功");
     }

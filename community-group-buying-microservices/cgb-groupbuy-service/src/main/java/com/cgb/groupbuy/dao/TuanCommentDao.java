@@ -1,9 +1,9 @@
-package com.cgb.groupbuy.dao;
+﻿package com.cgb.groupbuy.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cgb.groupbuy.entity.TuanCommentEntity;
+import com.cgb.groupbuy.entity.GroupBuyCommentEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface TuanCommentDao extends BaseMapper<TuanCommentEntity> {
+public interface GroupBuyCommentDao extends BaseMapper<GroupBuyCommentEntity> {
 }

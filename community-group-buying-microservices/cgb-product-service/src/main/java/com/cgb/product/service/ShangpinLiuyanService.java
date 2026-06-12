@@ -1,10 +1,10 @@
-package com.cgb.product.service;
+﻿package com.cgb.product.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.product.entity.ShangpinLiuyanEntity;
+import com.cgb.product.entity.ProductInquiryEntity;
 
-public interface ShangpinLiuyanService {
-    void save(ShangpinLiuyanEntity entity);
+public interface ProductInquiryService {
+    void save(ProductInquiryEntity entity);
     void delete(Long id);
-    IPage<ShangpinLiuyanEntity> queryPage(ShangpinLiuyanEntity params);
+    IPage<ProductInquiryEntity> queryPage(ProductInquiryEntity params);
 }

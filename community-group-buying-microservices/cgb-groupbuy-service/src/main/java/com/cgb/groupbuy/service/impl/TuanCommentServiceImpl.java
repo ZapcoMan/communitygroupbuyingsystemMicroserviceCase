@@ -1,11 +1,11 @@
-package com.cgb.groupbuy.service.impl;
+﻿package com.cgb.groupbuy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.utils.*;
-import com.cgb.groupbuy.dao.TuanCommentDao;
-import com.cgb.groupbuy.entity.TuanCommentEntity;
-import com.cgb.groupbuy.service.TuanCommentService;
+import com.cgb.groupbuy.dao.GroupBuyCommentDao;
+import com.cgb.groupbuy.entity.GroupBuyCommentEntity;
+import com.cgb.groupbuy.service.GroupBuyCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +13,17 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class TuanCommentServiceImpl implements TuanCommentService {
+public class GroupBuyCommentServiceImpl implements GroupBuyCommentService {
 
-    private final TuanCommentDao dao;
+    private final GroupBuyCommentDao dao;
 
     @Override
-    public void save(TuanCommentEntity entity) {
+    public void save(GroupBuyCommentEntity entity) {
         dao.insert(entity);
     }
 
     @Override
-    public void update(TuanCommentEntity entity) {
+    public void update(GroupBuyCommentEntity entity) {
         dao.updateById(entity);
     }
 
@@ -33,12 +33,12 @@ public class TuanCommentServiceImpl implements TuanCommentService {
     }
 
     @Override
-    public IPage<TuanCommentEntity> queryPage(TuanCommentEntity params) {
-        IPage<TuanCommentEntity> page = new Query<TuanCommentEntity>().getPage(
+    public IPage<GroupBuyCommentEntity> queryPage(GroupBuyCommentEntity params) {
+        IPage<GroupBuyCommentEntity> page = new Query<GroupBuyCommentEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
-        return dao.selectPage(page, new LambdaQueryWrapper<TuanCommentEntity>()
-                .eq(params.getTuanweiid() != null, TuanCommentEntity::getTuanweiid, params.getTuanweiid())
-                .like(params.getContent() != null, TuanCommentEntity::getContent, params.getContent())
-                .orderByDesc(TuanCommentEntity::getId));
+        return dao.selectPage(page, new LambdaQueryWrapper<GroupBuyCommentEntity>()
+                .eq(params.getTuanweiid() != null, GroupBuyCommentEntity::getTuanweiid, params.getTuanweiid())
+                .like(params.getContent() != null, GroupBuyCommentEntity::getContent, params.getContent())
+                .orderByDesc(GroupBuyCommentEntity::getId));
     }
 }

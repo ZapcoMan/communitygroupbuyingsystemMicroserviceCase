@@ -1,4 +1,4 @@
-package com.cgb.groupbuy.entity;
+﻿package com.cgb.groupbuy.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @TableName("tuan_comment")
-public class TuanCommentEntity implements Serializable {
+public class GroupBuyCommentEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.AUTO)

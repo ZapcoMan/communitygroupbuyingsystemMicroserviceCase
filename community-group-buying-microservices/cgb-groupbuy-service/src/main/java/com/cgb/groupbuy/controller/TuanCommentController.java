@@ -1,9 +1,9 @@
-package com.cgb.groupbuy.controller;
+﻿package com.cgb.groupbuy.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cgb.common.R;
-import com.cgb.groupbuy.entity.TuanCommentEntity;
-import com.cgb.groupbuy.service.TuanCommentService;
+import com.cgb.groupbuy.entity.GroupBuyCommentEntity;
+import com.cgb.groupbuy.service.GroupBuyCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,29 +14,29 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/tuancomment")
 @RequiredArgsConstructor
-public class TuanCommentController {
+public class GroupBuyCommentController {
 
-    private final TuanCommentService service;
+    private final GroupBuyCommentService service;
 
     @Operation(summary = "分页查询团购评论")
     @GetMapping("/list")
-    public R<?> list(@Parameter(hidden = true) TuanCommentEntity params,
+    public R<?> list(@Parameter(hidden = true) GroupBuyCommentEntity params,
                      @RequestParam(defaultValue = "1") Integer page,
                      @RequestParam(defaultValue = "10") Integer limit) {
-        IPage<TuanCommentEntity> result = service.queryPage(params);
+        IPage<GroupBuyCommentEntity> result = service.queryPage(params);
         return R.ok(result);
     }
 
     @Operation(summary = "发表团购评论")
     @PostMapping
-    public R<?> save(@RequestBody TuanCommentEntity entity) {
+    public R<?> save(@RequestBody GroupBuyCommentEntity entity) {
         service.save(entity);
         return R.ok("评论成功");
     }
 
     @Operation(summary = "更新评论/回复")
     @PutMapping
-    public R<?> update(@RequestBody TuanCommentEntity entity) {
+    public R<?> update(@RequestBody GroupBuyCommentEntity entity) {
         service.update(entity);
         return R.ok("更新成功");
     }

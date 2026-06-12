@@ -1,11 +1,11 @@
-package com.cgb.groupbuy.service;
+﻿package com.cgb.groupbuy.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cgb.groupbuy.entity.TuanCommentEntity;
+import com.cgb.groupbuy.entity.GroupBuyCommentEntity;
 
-public interface TuanCommentService {
-    void save(TuanCommentEntity entity);
-    void update(TuanCommentEntity entity);
+public interface GroupBuyCommentService {
+    void save(GroupBuyCommentEntity entity);
+    void update(GroupBuyCommentEntity entity);
     void delete(Long id);
-    IPage<TuanCommentEntity> queryPage(TuanCommentEntity params);
+    IPage<GroupBuyCommentEntity> queryPage(GroupBuyCommentEntity params);
 }

@@ -1,4 +1,4 @@
-package com.cgb.product.service.impl;
+﻿package com.cgb.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -6,9 +6,9 @@ import com.cgb.common.EIException;
 import com.cgb.common.ErrorCode;
 import com.cgb.common.R;
 import com.cgb.common.utils.*;
-import com.cgb.product.dao.ShangpinDao;
-import com.cgb.product.entity.ShangpinEntity;
-import com.cgb.product.service.ShangpinService;
+import com.cgb.product.dao.ProductDao;
+import com.cgb.product.entity.ProductEntity;
+import com.cgb.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,15 +20,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ShangpinServiceImpl implements ShangpinService {
+public class ProductServiceImpl implements ProductService {
 
-    private final ShangpinDao shangpinDao;
+    private final ProductDao shangpinDao;
     private final RedisTemplate<String, Object> redisTemplate;
 
     private static final String STOCK_KEY_PREFIX = "cgb:stock:";
 
     @Override
-    public void save(ShangpinEntity entity) {
+    public void save(ProductEntity entity) {
         shangpinDao.insert(entity);
         // 初始化库存缓存
         if (entity.getStock() != null) {
@@ -37,7 +37,7 @@ public class ShangpinServiceImpl implements ShangpinService {
     }
 
     @Override
-    public void update(ShangpinEntity entity) {
+    public void update(ProductEntity entity) {
         if (entity.getId() == null) throw new EIException("商品ID不能为空");
         shangpinDao.updateById(entity);
     }
@@ -49,27 +49,27 @@ public class ShangpinServiceImpl implements ShangpinService {
     }
 
     @Override
-    public ShangpinEntity getById(Long id) {
-        ShangpinEntity entity = shangpinDao.selectById(id);
+    public ProductEntity getById(Long id) {
+        ProductEntity entity = shangpinDao.selectById(id);
         if (entity == null) throw new EIException(ErrorCode.RESOURCE_NOT_FOUND);
         return entity;
     }
 
     @Override
-    public IPage<ShangpinEntity> queryPage(ShangpinEntity params) {
-        IPage<ShangpinEntity> page = new Query<ShangpinEntity>().getPage(
+    public IPage<ProductEntity> queryPage(ProductEntity params) {
+        IPage<ProductEntity> page = new Query<ProductEntity>().getPage(
                 CommonUtil.convert(params, Map.class));
-        LambdaQueryWrapper<ShangpinEntity> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<ProductEntity> wrapper = new LambdaQueryWrapper<>();
         if (CommonUtil.isNotEmpty(params.getProductName())) {
-            wrapper.like(ShangpinEntity::getProductName, params.getProductName());
+            wrapper.like(ProductEntity::getProductName, params.getProductName());
         }
         if (CommonUtil.isNotEmpty(params.getCategory())) {
-            wrapper.eq(ShangpinEntity::getCategory, params.getCategory());
+            wrapper.eq(ProductEntity::getCategory, params.getCategory());
         }
         if (params.getStatus() != null) {
-            wrapper.eq(ShangpinEntity::getStatus, params.getStatus());
+            wrapper.eq(ProductEntity::getStatus, params.getStatus());
         }
-        wrapper.orderByDesc(ShangpinEntity::getId);
+        wrapper.orderByDesc(ProductEntity::getId);
         return shangpinDao.selectPage(page, wrapper);
     }
 
