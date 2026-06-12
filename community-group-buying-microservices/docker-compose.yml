@@ -1,0 +1,239 @@
+version: '3.8'
+
+services:
+  # ==================== 中间件 ====================
+  mysql:
+    image: mysql:8.0
+    container_name: cgb-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-root}
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cgb-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: cgb-nacos
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: mysql
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: ${MYSQL_PASSWORD:-root}
+      JVM_XMS: 256m
+      JVM_XMX: 512m
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.1.4
+    container_name: cgb-rocketmq-namesrv
+    ports:
+      - "9876:9876"
+    command: sh mqnamesrv
+    environment:
+      JVM_XMS: 256m
+      JVM_XMX: 256m
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 9876"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.1.4
+    container_name: cgb-rocketmq-broker
+    ports:
+      - "10911:10911"
+      - "10909:10909"
+    command: sh mqbroker -n rocketmq-namesrv:9876 -c /home/rocketmq/conf/broker.conf
+    environment:
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_healthy
+
+  seata-server:
+    image: seataio/seata-server:2.0.0
+    container_name: cgb-seata
+    ports:
+      - "7091:7091"
+      - "8091:8091"
+    environment:
+      SEATA_IP: seata-server
+      STORE_MODE: db
+      SEATA_CONFIG_NAME: nacos
+    depends_on:
+      nacos:
+        condition: service_healthy
+
+  # ==================== 微服务 ====================
+  cgb-gateway:
+    build:
+      context: .
+      dockerfile: cgb-gateway/Dockerfile
+    container_name: cgb-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NACOS_ADDR: nacos:8848
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  cgb-user-service:
+    build:
+      context: .
+      dockerfile: cgb-user-service/Dockerfile
+    container_name: cgb-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NACOS_ADDR: nacos:8848
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
+      SEATA_ADDR: seata-server:8091
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+
+  cgb-product-service:
+    build:
+      context: .
+      dockerfile: cgb-product-service/Dockerfile
+    container_name: cgb-product-service
+    ports:
+      - "8082:8082"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NACOS_ADDR: nacos:8848
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
+      SEATA_ADDR: seata-server:8091
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+
+  cgb-order-service:
+    build:
+      context: .
+      dockerfile: cgb-order-service/Dockerfile
+    container_name: cgb-order-service
+    ports:
+      - "8083:8083"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NACOS_ADDR: nacos:8848
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
+      SEATA_ADDR: seata-server:8091
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+
+  cgb-groupbuy-service:
+    build:
+      context: .
+      dockerfile: cgb-groupbuy-service/Dockerfile
+    container_name: cgb-groupbuy-service
+    ports:
+      - "8084:8084"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NACOS_ADDR: nacos:8848
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+
+  cgb-content-service:
+    build:
+      context: .
+      dockerfile: cgb-content-service/Dockerfile
+    container_name: cgb-content-service
+    ports:
+      - "8085:8085"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NACOS_ADDR: nacos:8848
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+
+volumes:
+  mysql-data:
+  redis-data:

@@ -147,12 +147,8 @@ public class YonghuServiceImpl implements YonghuService {
         if (userId == null || points == null || points <= 0) {
             throw new EIException("积分参数无效");
         }
-        YonghuEntity user = yonghuDao.selectById(userId);
-        if (user == null) throw new EIException(ErrorCode.USER_NOT_FOUND);
-        YonghuEntity updateEntity = new YonghuEntity();
-        updateEntity.setId(userId);
-        updateEntity.setJifen(user.getJifen() + points);
-        yonghuDao.updateById(updateEntity);
-        log.info("用户积分增加: userId={}, points={}, total={}", userId, points, user.getJifen() + points);
+        int rows = yonghuDao.addPoints(userId, points);
+        if (rows == 0) throw new EIException(ErrorCode.USER_NOT_FOUND);
+        log.info("用户积分增加(原子操作): userId={}, points={}", userId, points);
     }
 }

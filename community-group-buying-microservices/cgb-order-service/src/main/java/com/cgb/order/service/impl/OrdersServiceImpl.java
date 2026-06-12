@@ -11,6 +11,8 @@ import com.cgb.common.mq.OrderStatusMessage;
 import com.cgb.common.utils.*;
 import com.cgb.order.dao.OrdersDao;
 import com.cgb.order.entity.OrdersEntity;
+import com.cgb.order.entity.dto.CreateOrderDTO;
+import com.cgb.order.entity.vo.OrderVO;
 import com.cgb.order.service.OrdersService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -78,6 +81,7 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    @GlobalTransactional(name = "cgb-cancel-order", rollbackFor = Exception.class)
     public void cancel(String orderId, Long userId) {
         OrdersEntity order = ordersDao.selectOne(new LambdaQueryWrapper<OrdersEntity>()
                 .eq(OrdersEntity::getOrderid, orderId)
@@ -108,17 +112,7 @@ public class OrdersServiceImpl implements OrdersService {
         order.setZhuangtai(1);
         ordersDao.updateById(order);
 
-        // 支付成功 → 增加用户积分 + 发 RocketMQ 消息
-        try {
-            // 积分规则：每消费1元得1积分
-            Double points = order.getZongjia() != null ? order.getZongjia().doubleValue() : 0.0;
-            feignUserService.addPoints(order.getUserid(), points);
-            log.info("支付成功，用户积分增加: userId={}, points={}", order.getUserid(), points);
-        } catch (Exception e) {
-            log.error("支付成功但积分增加失败，需人工补偿: userId={}", order.getUserid(), e);
-        }
-
-        // 发送订单支付消息
+        // 支付成功 → 发 RocketMQ 消息（积分由 MQ 消费者异步增加，避免重复）
         sendOrderStatusMessage(order, MQTopics.TAG_ORDER_PAID);
     }
 
@@ -175,5 +169,54 @@ public class OrdersServiceImpl implements OrdersService {
             // 消息发送失败不影响主业务，仅记录日志
             log.error("订单状态消息发送失败: orderId={}, tag={}", order.getOrderid(), tag, e);
         }
+    }
+
+    @Override
+    public OrderVO createOrderFromDTO(CreateOrderDTO dto, Long userId) {
+        // 远程获取商品信息填充订单
+        Object productData = feignProductService.getProductDetail(dto.getProductId()).getData();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> productMap = productData instanceof Map ? (Map<String, Object>) productData : new HashMap<>();
+
+        OrdersEntity entity = new OrdersEntity();
+        entity.setUserid(userId);
+        entity.setShangpinid(dto.getProductId());
+        entity.setShangpinming(productMap.get("mingcheng") != null ? productMap.get("mingcheng").toString() : "");
+        entity.setShangpintupian(productMap.get("tupian") != null ? productMap.get("tupian").toString() : "");
+        entity.setShuliang(dto.getQuantity());
+        entity.setJiage(dto.getQuantity() != null && productMap.get("jiage") != null
+                ? new BigDecimal(productMap.get("jiage").toString()) : null);
+        entity.setLianxidianhua(dto.getContactPhone());
+        entity.setShouhuodizhi(dto.getShippingAddress());
+        entity.setFukuanfangshi(dto.getPaymentMethod());
+        entity.setBeizhu(dto.getRemark());
+        entity.setTuanduiid(dto.getGroupBuyId());
+
+        createOrder(entity);
+        return toVO(entity);
+    }
+
+    @Override
+    public OrderVO toVO(OrdersEntity e) {
+        if (e == null) return null;
+        OrderVO vo = new OrderVO();
+        vo.setId(e.getId());
+        vo.setOrderId(e.getOrderid());
+        vo.setUserId(e.getUserid());
+        vo.setProductId(e.getShangpinid());
+        vo.setProductName(e.getShangpinming());
+        vo.setProductImage(e.getShangpintupian());
+        vo.setQuantity(e.getShuliang());
+        vo.setUnitPrice(e.getJiage());
+        vo.setTotalPrice(e.getZongjia());
+        vo.setContactPhone(e.getLianxidianhua());
+        vo.setShippingAddress(e.getShouhuodizhi());
+        vo.setStatus(e.getZhuangtai());
+        vo.setPaymentMethod(e.getFukuanfangshi());
+        vo.setRemark(e.getBeizhu());
+        vo.setGroupBuyId(e.getTuanduiid());
+        vo.setCreateTime(e.getAddtime());
+        vo.setUpdateTime(e.getUpdatetime());
+        return vo;
     }
 }

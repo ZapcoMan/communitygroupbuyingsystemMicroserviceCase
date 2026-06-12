@@ -73,21 +73,20 @@ public class ShangpinServiceImpl implements ShangpinService {
             redisTemplate.opsForValue().increment(key, quantity);
             throw new EIException("库存不足");
         }
-        // 异步更新数据库
-        shangpinDao.update(null,
-                new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<ShangpinEntity>()
-                        .eq(ShangpinEntity::getId, id)
-                        .ge(ShangpinEntity::getKucun, quantity)
-                        .setSql("kucun = kucun - " + quantity));
+        // 原子更新数据库（含库存校验）
+        int rows = shangpinDao.decreaseStock(id, quantity);
+        if (rows == 0) {
+            // 数据库库存不足，回补 Redis
+            redisTemplate.opsForValue().increment(key, quantity);
+            throw new EIException("库存不足");
+        }
     }
 
     @Override
     public void increaseStock(Long id, Integer quantity) {
         String key = STOCK_KEY_PREFIX + id;
         redisTemplate.opsForValue().increment(key, quantity);
-        shangpinDao.update(null,
-                new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<ShangpinEntity>()
-                        .eq(ShangpinEntity::getId, id)
-                        .setSql("kucun = kucun + " + quantity));
+        // 原子更新数据库
+        shangpinDao.increaseStock(id, quantity);
     }
 }
