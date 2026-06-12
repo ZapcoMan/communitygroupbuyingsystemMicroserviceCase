@@ -28,11 +28,12 @@ public class ShangpinLiuyanEntity implements Serializable {
     @TableField("parentid")
     private Long parentId;              // 父留言ID
 
-    private LocalDateTime addtime;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

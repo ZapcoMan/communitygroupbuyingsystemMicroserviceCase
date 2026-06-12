@@ -24,7 +24,7 @@ public class ShangpinEntity implements Serializable {
     private String category;            // 商品类型
 
     @TableField("tupian")
-    private String picture;             // 商品图片
+    private String coverImage;           // 商品图片
 
     @TableField("jieshao")
     private String description;         // 商品介绍
@@ -47,11 +47,11 @@ public class ShangpinEntity implements Serializable {
     private Long merchantId;            // 所属商家用户ID
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

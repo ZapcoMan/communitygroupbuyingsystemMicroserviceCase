@@ -13,9 +13,7 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 团购服务 - 消费团购状态消息
- * 处理：成团后通知、过期团购库存回补
- */
+ * 团购服务 - 消费团购状态消�? * 处理：成团后通知、过期团购库存回�? */
 @Slf4j
 @Component
 @RocketMQMessageListener(
@@ -31,17 +29,17 @@ public class GroupBuyStatusConsumer implements RocketMQListener<GroupBuyMessage>
 
     @Override
     public void onMessage(GroupBuyMessage message) {
-        log.info("团购服务收到团购状态消息: groupBuyId={}, status={}, currentCount={}/{}",
+        log.info("团购服务收到团购状态消�? groupBuyId={}, status={}, currentCount={}/{}",
                 message.getGroupBuyId(), message.getStatus(),
-                message.getCurrentCount(), message.getTargetCount());
+                message.getCurrentMemberCount(), message.getTargetMemberCount());
 
         switch (message.getStatus()) {
             case 1: // 成团
-                log.info("团购成团! groupBuyId={}, 共{}人参团", message.getGroupBuyId(), message.getCurrentCount());
+                log.info("团购成团! groupBuyId={}, 共{}人参�?, message.getGroupBuyId(), message.getCurrentMemberCount());
                 break;
             case 2: // 过期
                 log.info("团购过期: groupBuyId={}", message.getGroupBuyId());
-                // 过期团购 → 回补库存
+                // 过期团购 �?回补库存
                 if (message.getProductId() != null && message.getQuantity() != null) {
                     try {
                         feignProductService.increaseStock(message.getProductId(), message.getQuantity());
@@ -53,11 +51,11 @@ public class GroupBuyStatusConsumer implements RocketMQListener<GroupBuyMessage>
                 }
                 break;
             case 0: // 参团
-                log.info("新用户参团: groupBuyId={}, 当前{}/{}人",
-                        message.getGroupBuyId(), message.getCurrentCount(), message.getTargetCount());
+                log.info("新用户参�? groupBuyId={}, 当前{}/{}�?,
+                        message.getGroupBuyId(), message.getCurrentMemberCount(), message.getTargetMemberCount());
                 break;
             default:
-                log.warn("未知团购状态: {}", message.getStatus());
+                log.warn("未知团购状�? {}", message.getStatus());
         }
     }
 }

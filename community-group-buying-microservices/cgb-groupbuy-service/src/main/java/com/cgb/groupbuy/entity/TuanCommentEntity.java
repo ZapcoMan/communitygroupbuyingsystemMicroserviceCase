@@ -25,11 +25,11 @@ public class TuanCommentEntity implements Serializable {
     private String tablename;           // 类型标识
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

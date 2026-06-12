@@ -36,11 +36,11 @@ public class TuanxinxiEntity implements Serializable {
     private Integer status;             // 状态 0待支付 1已支付 2已取消
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

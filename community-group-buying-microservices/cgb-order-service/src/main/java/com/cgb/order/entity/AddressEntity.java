@@ -20,29 +20,35 @@ public class AddressEntity implements Serializable {
     private Long userId;                // 用户ID
 
     @TableField("dizhimingchen")
-    private String addressName;         // 地址名称
+    private String addressLabel;        // 地址名称（如"家"、"公司"）
 
     @TableField("lianxidianhua")
     private String contactPhone;        // 联系电话
 
     @TableField("shouhuoren")
-    private String consignee;           // 收货人
+    private String receiverName;        // 收货人
 
-    private String provinces;           // 省
-    private String citys;               // 市
-    private String areas;               // 区/县
+    @TableField("provinces")
+    private String province;            // 省
 
-    private String detailedaddress;     // 详细地址
+    @TableField("citys")
+    private String city;                // 市
+
+    @TableField("areas")
+    private String district;            // 区/县
+
+    @TableField("detailedaddress")
+    private String detailAddress;       // 详细地址
 
     @TableField("isdefault")
     private Integer isDefault;          // 是否默认 0否 1是
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

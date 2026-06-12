@@ -17,29 +17,27 @@ public class ForumEntity implements Serializable {
     private Long id;
     private String title;               // 标题
     private String content;             // 内容
-    private String picture;             // 封面图
 
+    @TableField("picture")
+    private String coverImage;          // 封面�?
     @TableField("parentid")
     private String parentId;            // 父帖子ID
 
     @TableField("userid")
     private Long userId;                // 发帖用户
 
-    private String username;            // 用户名
-    private String avatar;              // 头像
+    private String username;            // 用户�?    private String avatar;              // 头像
 
     @TableField("thumbsupnum")
-    private Integer thumbUpCount;       // 点赞数
-
+    private Integer likeCount;          // 点赞�?
     @TableField("cainixihao")
-    private Integer dislikeCount;       // 踩
-
+    private Integer dislikeCount;       // �?
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

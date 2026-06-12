@@ -47,11 +47,11 @@ public class YonghuEntity implements Serializable {
     private Integer status;             // 账号状态 0-正常 1-禁用
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;           // 逻辑删除
+    private Integer isDelete;           // 逻辑删除
 }

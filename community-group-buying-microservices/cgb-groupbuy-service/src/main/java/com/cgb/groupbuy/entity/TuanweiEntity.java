@@ -21,7 +21,7 @@ public class TuanweiEntity implements Serializable {
     private String groupName;           // 团购名称
 
     @TableField("tupian")
-    private String picture;             // 团购图片
+    private String coverImage;          // 团购图片
 
     @TableField("jieshao")
     private String description;         // 团购介绍
@@ -33,10 +33,10 @@ public class TuanweiEntity implements Serializable {
     private Integer status;             // 状态 0进行中 1已成团 2已过期
 
     @TableField("lirenjia")
-    private Integer targetCount;        // 成团人数
+    private Integer targetMemberCount;  // 成团人数
 
     @TableField("xianxiarenshu")
-    private Integer currentCount;       // 当前人数
+    private Integer currentMemberCount; // 当前人数
 
     @TableField("yuanjia")
     private BigDecimal originalPrice;   // 原价
@@ -48,14 +48,14 @@ public class TuanweiEntity implements Serializable {
     private LocalDateTime endTime;      // 截止时间
 
     @TableField("userid")
-    private Long userId;                // 团长用户ID
+    private Long leaderUserId;          // 团长用户ID
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

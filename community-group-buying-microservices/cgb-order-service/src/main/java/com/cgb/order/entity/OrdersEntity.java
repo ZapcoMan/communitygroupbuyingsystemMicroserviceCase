@@ -54,17 +54,17 @@ public class OrdersEntity implements Serializable {
     private Integer paymentMethod;      // 付款方式
 
     @TableField("beizhu")
-    private String remark;               // 备注
+    private String remark;              // 备注
 
     @TableField("tuanduiid")
     private Long groupBuyId;            // 团购ID（可选）
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

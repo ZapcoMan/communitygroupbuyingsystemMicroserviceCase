@@ -29,7 +29,7 @@ class ZixunServiceImplTest {
         entity.setId(id);
         entity.setTitle("团购资讯");
         entity.setContent("资讯内容详情");
-        entity.setPicture("/images/zixun/1.jpg");
+        entity.setCoverImage("/images/zixun/1.jpg");
         entity.setSource("官方");
         entity.setPublishtime("2025-01-01");
         return entity;

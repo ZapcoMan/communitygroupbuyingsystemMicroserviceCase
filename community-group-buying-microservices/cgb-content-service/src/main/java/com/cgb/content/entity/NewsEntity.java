@@ -17,16 +17,21 @@ public class NewsEntity implements Serializable {
     private Long id;
     private String title;          // 标题
     private String content;         // 内容
-    private String picture;         // 封面图
+
+    @TableField("picture")
+    private String coverImage;      // 封面图
+
     private String type;            // 类型
-    private String publishtime;    // 发布时间
+
+    @TableField("publishtime")
+    private String publishTime;     // 发布时间
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime addtime;
+    private LocalDateTime addTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatetime;
+    private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 }

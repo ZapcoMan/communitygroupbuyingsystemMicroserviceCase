@@ -29,7 +29,7 @@ class NewsServiceImplTest {
         entity.setId(id);
         entity.setTitle("社区公告");
         entity.setContent("公告内容");
-        entity.setPicture("/images/news/1.jpg");
+        entity.setCoverImage("/images/news/1.jpg");
         entity.setType("公告");
         entity.setPublishtime("2025-01-01");
         return entity;

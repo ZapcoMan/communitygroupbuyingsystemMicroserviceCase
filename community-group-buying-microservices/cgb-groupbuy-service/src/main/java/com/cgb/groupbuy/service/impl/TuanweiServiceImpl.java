@@ -38,25 +38,23 @@ public class TuanweiServiceImpl implements TuanweiService {
     @Override
     public void save(TuanweiEntity entity) {
         if (entity.getStatus() == null) entity.setStatus(0);
-        if (entity.getCurrentCount() == null) entity.setCurrentCount(1);
+        if (entity.getCurrentMemberCount() == null) entity.setCurrentMemberCount(1);
         if (entity.getEndTime() == null) {
-            entity.setEndTime(LocalDateTime.now().plusDays(7)); // 默认7天
-        }
+            entity.setEndTime(LocalDateTime.now().plusDays(7)); // 默认7�?        }
         // 发起团购时扣减团长购买的库存
         if (entity.getProductId() != null) {
             try {
                 feignProductService.decreaseStock(entity.getProductId(), 1);
-                log.info("发起团购，团长库存扣减成功: productId={}", entity.getProductId());
+                log.info("发起团购，团长库存扣减成�? productId={}", entity.getProductId());
             } catch (Exception e) {
-                log.error("发起团购，库存扣减失败: productId={}", entity.getProductId(), e);
-                throw new EIException("库存不足，无法发起团购");
+                log.error("发起团购，库存扣减失�? productId={}", entity.getProductId(), e);
+                throw new EIException("库存不足，无法发起团�?);
             }
         }
         tuanweiDao.insert(entity);
         // 缓存团购信息
         cacheGroupBuy(entity);
-        // 发送团购创建消息
-        sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_JOINED);
+        // 发送团购创建消�?        sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_JOINED);
     }
 
     @Override
@@ -107,39 +105,36 @@ public class TuanweiServiceImpl implements TuanweiService {
     }
 
     /**
-     * 参团（Seata分布式事务：人数+1 + 扣库存 + 发MQ）
-     * 注意：仅在此方法声明 @GlobalTransactional，内部调用的方法不再声明
+     * 参团（Seata分布式事务：人数+1 + 扣库�?+ 发MQ�?     * 注意：仅在此方法声明 @GlobalTransactional，内部调用的方法不再声明
      */
     @Override
     @GlobalTransactional(name = "cgb-join-groupbuy", rollbackFor = Exception.class)
     public void joinGroupBuy(Long groupBuyId, Long userId, Integer quantity) {
         // 1. 查询团购信息
         TuanweiEntity groupBuy = tuanweiDao.selectById(groupBuyId);
-        if (groupBuy == null) throw new EIException("团购不存在");
-        if (groupBuy.getStatus() != 0) throw new EIException("团购已结束");
+        if (groupBuy == null) throw new EIException("团购不存�?);
+        if (groupBuy.getStatus() != 0) throw new EIException("团购已结�?);
         if (groupBuy.getEndTime() != null && groupBuy.getEndTime().isBefore(LocalDateTime.now())) {
-            throw new EIException("团购已过期");
+            throw new EIException("团购已过�?);
         }
-        if (groupBuy.getCurrentCount() >= groupBuy.getTargetCount()) {
+        if (groupBuy.getCurrentMemberCount() >= groupBuy.getTargetMemberCount()) {
             throw new EIException("团购人数已满");
         }
 
         // 2. 原子增加参团人数
         int rows = tuanweiDao.increaseMember(groupBuyId, 1);
-        if (rows == 0) throw new EIException("参团失败，团购已满或已结束");
+        if (rows == 0) throw new EIException("参团失败，团购已满或已结�?);
 
         // 3. 远程调用商品服务扣减库存
-        log.info("参团分布式事务 → 扣减库存: productId={}, quantity={}", groupBuy.getProductId(), quantity);
+        log.info("参团分布式事�?�?扣减库存: productId={}, quantity={}", groupBuy.getProductId(), quantity);
         var stockResult = feignProductService.decreaseStock(groupBuy.getProductId(), quantity);
         if (stockResult.getCode() != 0) {
             throw new EIException("库存扣减失败: " + stockResult.getMsg());
         }
 
-        // 4. 发送参团消息（RocketMQ）
-        sendGroupBuyMessage(groupBuy, MQTopics.TAG_GROUPBUY_JOINED);
+        // 4. 发送参团消息（RocketMQ�?        sendGroupBuyMessage(groupBuy, MQTopics.TAG_GROUPBUY_JOINED);
 
-        // 5. 检查是否成团
-        checkAndCompleteGroupBuy(groupBuyId);
+        // 5. 检查是否成�?        checkAndCompleteGroupBuy(groupBuyId);
 
         // 6. 清除缓存
         evictGroupBuyCache(groupBuyId);
@@ -178,7 +173,7 @@ public class TuanweiServiceImpl implements TuanweiService {
                 count++;
                 sendGroupBuyMessage(entity, MQTopics.TAG_GROUPBUY_EXPIRED);
                 evictGroupBuyCache(entity.getId());
-                log.info("团购已过期: groupBuyId={}", entity.getId());
+                log.info("团购已过�? groupBuyId={}", entity.getId());
             }
         }
         return count;
@@ -191,20 +186,20 @@ public class TuanweiServiceImpl implements TuanweiService {
         try {
             GroupBuyMessage msg = new GroupBuyMessage();
             msg.setGroupBuyId(entity.getId());
-            msg.setLeaderUserId(entity.getUserId());
+            msg.setLeaderUserId(entity.getLeaderUserId());
             msg.setProductId(entity.getProductId());
             msg.setGroupPrice(entity.getGroupPrice());
-            msg.setTargetCount(entity.getTargetCount());
-            msg.setCurrentCount(entity.getCurrentCount());
+            msg.setTargetMemberCount(entity.getTargetMemberCount());
+            msg.setCurrentMemberCount(entity.getCurrentMemberCount());
             if (tag.equals(MQTopics.TAG_GROUPBUY_COMPLETED)) msg.setStatus(1);
             else if (tag.equals(MQTopics.TAG_GROUPBUY_EXPIRED)) msg.setStatus(2);
             else msg.setStatus(0);
 
             String destination = MQTopics.GROUPBUY_STATUS_CHANGE + ":" + tag;
             rocketMQTemplate.syncSend(destination, MessageBuilder.withPayload(msg).build());
-            log.info("团购状态消息发送成功: groupBuyId={}, tag={}", entity.getId(), tag);
+            log.info("团购状态消息发送成�? groupBuyId={}, tag={}", entity.getId(), tag);
         } catch (Exception e) {
-            log.error("团购状态消息发送失败: groupBuyId={}, tag={}", entity.getId(), tag, e);
+            log.error("团购状态消息发送失�? groupBuyId={}, tag={}", entity.getId(), tag, e);
         }
     }
 

@@ -29,7 +29,7 @@ public class ForumServiceImpl implements ForumService {
 
     @Override
     public void save(ForumEntity entity) {
-        if (entity.getThumbUpCount() == null) entity.setThumbUpCount(0);
+        if (entity.getLikeCount() == null) entity.setLikeCount(0);
         if (entity.getDislikeCount() == null) entity.setDislikeCount(0);
         forumDao.insert(entity);
         redisTemplate.delete(HOT_POSTS_KEY);
@@ -67,16 +67,16 @@ public class ForumServiceImpl implements ForumService {
     @Override
     public void thumbUp(Long id) {
         ForumEntity entity = forumDao.selectById(id);
-        if (entity == null) throw new EIException("帖子不存在");
+        if (entity == null) throw new EIException("帖子不存�?);
 
         // 使用 Redis SETNX 防重复（简化版：用帖子ID作为key，每个帖子每人只能赞一次）
         String dedupeKey = THUMB_UP_KEY + ":" + id;
         Boolean isNew = redisTemplate.opsForValue().setIfAbsent(dedupeKey, "1", 24, TimeUnit.HOURS);
         if (Boolean.TRUE.equals(isNew)) {
             // 首次点赞，更新数据库
-            entity.setThumbUpCount(entity.getThumbUpCount() + 1);
+            entity.setLikeCount(entity.getLikeCount() + 1);
             forumDao.updateById(entity);
-            log.info("帖子点赞成功: id={}, 当前点赞数={}", id, entity.getThumbUpCount());
+            log.info("帖子点赞成功: id={}, 当前点赞�?{}", id, entity.getLikeCount());
         } else {
             log.info("帖子已点赞，跳过: id={}", id);
         }
@@ -93,12 +93,11 @@ public class ForumServiceImpl implements ForumService {
         IPage<ForumEntity> pageResult = new Query<ForumEntity>().getPage(
                 Map.of("page", page, "limit", limit));
         LambdaQueryWrapper<ForumEntity> wrapper = new LambdaQueryWrapper<ForumEntity>()
-                .orderByDesc(ForumEntity::getThumbUpCount)
-                .gt(ForumEntity::getThumbUpCount, 0);
+                .orderByDesc(ForumEntity::getLikeCount)
+                .gt(ForumEntity::getLikeCount, 0);
         IPage<ForumEntity> result = forumDao.selectPage(pageResult, wrapper);
 
-        // 标记缓存（简化：仅做标记，实际可缓存完整分页结果）
-        try {
+        // 标记缓存（简化：仅做标记，实际可缓存完整分页结果�?        try {
             redisTemplate.opsForValue().set(HOT_POSTS_KEY, "cached", HOT_CACHE_TTL_MINUTES, TimeUnit.MINUTES);
         } catch (Exception e) {
             log.warn("热门帖子缓存写入失败", e);

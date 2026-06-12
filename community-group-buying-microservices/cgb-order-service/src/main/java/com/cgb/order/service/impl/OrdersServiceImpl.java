@@ -96,22 +96,21 @@ public class OrdersServiceImpl implements OrdersService {
                 .eq(OrdersEntity::getOrderNo, orderId)
                 .eq(OrdersEntity::getUserId, userId));
         if (order == null) throw new EIException(ErrorCode.RESOURCE_NOT_FOUND);
-        if (order.getStatus() != 0) throw new EIException("只能取消待支付订单");
+        if (order.getStatus() != 0) throw new EIException("只能取消待支付订�?);
         order.setStatus(2);
         ordersDao.updateById(order);
 
-        // 取消订单 → 回补库存
+        // 取消订单 �?回补库存
         try {
             feignProductService.increaseStock(order.getProductId(), order.getQuantity());
-            log.info("取消订单，库存回补成功: productId={}, quantity={}", order.getProductId(), order.getQuantity());
+            log.info("取消订单，库存回补成�? productId={}, quantity={}", order.getProductId(), order.getQuantity());
         } catch (Exception e) {
             log.error("取消订单库存回补失败，需人工补偿: productId={}", order.getProductId(), e);
         }
 
         evictOrderCache(order.getId());
 
-        // 发送订单取消消息
-        sendOrderStatusMessage(order, MQTopics.TAG_ORDER_CANCELLED);
+        // 发送订单取消消�?        sendOrderStatusMessage(order, MQTopics.TAG_ORDER_CANCELLED);
     }
 
     @Override
@@ -125,13 +124,12 @@ public class OrdersServiceImpl implements OrdersService {
 
         evictOrderCache(order.getId());
 
-        // 支付成功 → 发 RocketMQ 消息（积分由 MQ 消费者异步增加）
+        // 支付成功 �?�?RocketMQ 消息（积分由 MQ 消费者异步增加）
         sendOrderStatusMessage(order, MQTopics.TAG_ORDER_PAID);
     }
 
     /**
-     * 发货（管理员操作）
-     */
+     * 发货（管理员操作�?     */
     @Override
     public void ship(String orderId) {
         OrdersEntity order = ordersDao.selectOne(new LambdaQueryWrapper<OrdersEntity>()
@@ -174,7 +172,7 @@ public class OrdersServiceImpl implements OrdersService {
         if (entity.getStatus() == null) entity.setStatus(0);
 
         // 2. 远程调用商品服务扣减库存（RM 端）
-        log.info("分布式事务开始 → 扣减库存: productId={}, quantity={}", entity.getProductId(), entity.getQuantity());
+        log.info("分布式事务开�?�?扣减库存: productId={}, quantity={}", entity.getProductId(), entity.getQuantity());
         var stockResult = feignProductService.decreaseStock(entity.getProductId(), entity.getQuantity());
         if (stockResult.getCode() != 0) {
             throw new EIException("库存扣减失败: " + stockResult.getMsg());
@@ -187,10 +185,9 @@ public class OrdersServiceImpl implements OrdersService {
 
         // 4. 保存订单
         ordersDao.insert(entity);
-        log.info("分布式事务完成 → 订单创建成功: orderId={}", entity.getOrderNo());
+        log.info("分布式事务完�?�?订单创建成功: orderId={}", entity.getOrderNo());
 
-        // 5. 发送订单创建消息（RocketMQ）
-        sendOrderStatusMessage(entity, MQTopics.TAG_ORDER_CREATED);
+        // 5. 发送订单创建消息（RocketMQ�?        sendOrderStatusMessage(entity, MQTopics.TAG_ORDER_CREATED);
     }
 
     /**
@@ -208,9 +205,9 @@ public class OrdersServiceImpl implements OrdersService {
 
             String destination = MQTopics.ORDER_STATUS_CHANGE + ":" + tag;
             rocketMQTemplate.syncSend(destination, MessageBuilder.withPayload(msg).build());
-            log.info("订单状态消息发送成功: orderId={}, tag={}", order.getOrderNo(), tag);
+            log.info("订单状态消息发送成�? orderId={}, tag={}", order.getOrderNo(), tag);
         } catch (Exception e) {
-            log.error("订单状态消息发送失败: orderId={}, tag={}", order.getOrderNo(), tag, e);
+            log.error("订单状态消息发送失�? orderId={}, tag={}", order.getOrderNo(), tag, e);
         }
     }
 
@@ -258,8 +255,8 @@ public class OrdersServiceImpl implements OrdersService {
         vo.setPaymentMethod(e.getPaymentMethod());
         vo.setRemark(e.getRemark());
         vo.setGroupBuyId(e.getGroupBuyId());
-        vo.setCreateTime(e.getAddtime());
-        vo.setUpdateTime(e.getUpdatetime());
+        vo.setCreateTime(e.getAddTime());
+        vo.setUpdateTime(e.getUpdateTime());
         return vo;
     }
 
