@@ -190,7 +190,7 @@ const handleView = (row) => {
 const handleUpdateStatus = async (id, status) => {
   try {
     await ElMessageBox.confirm(`确定要更新订单状态为"${status}"吗?`, '提示', { type: 'warning' })
-    const res = await request.post('/order/orders/update', { id, status })
+    const res = await request.put('/order/orders', { id, status })
     if (res.code === 0) {
       ElMessage.success('更新成功')
       fetchData()
@@ -205,7 +205,7 @@ const handleUpdateStatus = async (id, status) => {
 const handleDelete = async (id) => {
   try {
     await ElMessageBox.confirm('确定要删除吗?', '提示', { type: 'warning' })
-    const res = await request.post('/order/orders/delete', [id])
+    const res = await request.delete('/order/orders/' + id)
     if (res.code === 0) {
       ElMessage.success('删除成功')
       fetchData()
@@ -226,7 +226,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(`确定要删除选中的 ${multipleSelection.value.length} 条数据吗?`, '提示', { type: 'warning' })
     const ids = multipleSelection.value.map(item => item.id)
-    const res = await request.post('/order/orders/delete', ids)
+    const res = await request.delete('/order/orders/batch', { data: ids })
     if (res.code === 0) {
       ElMessage.success('批量删除成功')
       multipleSelection.value = []
