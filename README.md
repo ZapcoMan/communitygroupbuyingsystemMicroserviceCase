@@ -1,6 +1,6 @@
 
 <div align="center">
-<p style="font-size: 35px">社区团购系统（微服务版）</p>
+<p style="font-size: 65px">社区团购系统（微服务版）</p>
 
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen)
 ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2024.0.0-blue)
