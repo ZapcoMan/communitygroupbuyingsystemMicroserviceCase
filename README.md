@@ -1,6 +1,5 @@
 
 <div align="center">
-<p style="font-size: 65px">社区团购系统（微服务版）</p>
 
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen)
 ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2024.0.0-blue)
@@ -9,7 +8,7 @@
 ![Redis](https://img.shields.io/badge/Redis-7-red)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-**基于 Spring Boot 3 + Spring Cloud 2024 + Vue 3 的微服务社区团购系统 · 管理后台与用户前台双端架构**
+# **基于 Spring Boot 3 + Spring Cloud 2024 + Vue 3 的微服务社区团购系统 · 管理后台与用户前台双端架构**
 
 [快速开始](#-快速开始) • [功能特性](#-功能特性) • [项目结构](#-项目结构) • [API 接口](#-api-接口) • [更新日志](#-更新日志)
 
