@@ -8,8 +8,12 @@ COPY cgb-common/ cgb-common/
 COPY cgb-gateway/ cgb-gateway/
 RUN mvn -B package -pl cgb-gateway -am -DskipTests
 
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
+RUN addgroup -S cgb && adduser -S cgb -G cgb
 COPY --from=build /app/cgb-gateway/target/*.jar app.jar
+RUN chown cgb:cgb app.jar
+USER cgb
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-XX:+UseG1GC", "-jar", "app.jar"]
