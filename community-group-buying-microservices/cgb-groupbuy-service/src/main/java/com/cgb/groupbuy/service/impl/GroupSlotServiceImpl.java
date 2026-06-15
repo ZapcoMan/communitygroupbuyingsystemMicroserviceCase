@@ -11,7 +11,7 @@ import com.cgb.common.utils.*;
 import com.cgb.groupbuy.dao.GroupSlotDao;
 import com.cgb.groupbuy.entity.GroupSlotEntity;
 import com.cgb.groupbuy.service.GroupSlotService;
-import io.seata.spring.annotation.GlobalTransactional;
+import org.apache.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;

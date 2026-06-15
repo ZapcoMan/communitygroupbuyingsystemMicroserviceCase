@@ -29,14 +29,14 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>3.4.1</spring-boot.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.1.2</spring-cloud-alibaba.version>
+        <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
         <hutool.version>5.8.25</hutool.version>
-        <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.53</fastjson2.version>
         <jjwt.version>0.12.6</jjwt.version>
-        <springdoc.version>2.8.15</springdoc.version>
+        <springdoc.version>2.8.18</springdoc.version>
         <rocketmq-spring.version>2.3.1</rocketmq-spring.version>
-        <seata.version>2.0.0</seata.version>
+        <seata.version>2.2.0</seata.version>
     </properties>
 
     <dependencyManagement>
@@ -73,7 +73,7 @@
             </dependency>
             <!-- Seata -->
             <dependency>
-                <groupId>io.seata</groupId>
+                <groupId>org.apache.seata</groupId>
                 <artifactId>seata-spring-boot-starter</artifactId>
                 <version>${seata.version}</version>
             </dependency>

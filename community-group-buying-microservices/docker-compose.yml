@@ -88,7 +88,7 @@ services:
         condition: service_healthy
 
   seata-server:
-    image: seataio/seata-server:2.0.0
+    image: seataio/seata-server:2.2.0
     container_name: cgb-seata
     ports:
       - "7091:7091"

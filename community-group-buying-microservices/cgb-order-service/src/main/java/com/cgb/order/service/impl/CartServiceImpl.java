@@ -11,7 +11,7 @@ import com.cgb.order.entity.dto.CreateOrderDTO;
 import com.cgb.order.entity.vo.OrderVO;
 import com.cgb.order.service.CartService;
 import com.cgb.order.service.OrdersService;
-import io.seata.spring.annotation.GlobalTransactional;
+import org.apache.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
