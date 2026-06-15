@@ -101,6 +101,26 @@ services:
       nacos:
         condition: service_healthy
 
+  # ==================== 可观测性 ====================
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: cgb-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    depends_on:
+      - cgb-gateway
+
+  zipkin:
+    image: openzipkin/zipkin:3.4.3
+    container_name: cgb-zipkin
+    ports:
+      - "9411:9411"
+    environment:
+      STORAGE_TYPE: mem
+
   # ==================== 微服务 ====================
   cgb-gateway:
     build:
@@ -117,6 +137,7 @@ services:
       REDIS_PORT: 6379
       NACOS_ADDR: nacos:8848
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     depends_on:
       nacos:
         condition: service_healthy
@@ -140,6 +161,7 @@ services:
       ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       SEATA_ADDR: seata-server:8091
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -163,6 +185,7 @@ services:
       ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       SEATA_ADDR: seata-server:8091
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -186,6 +209,7 @@ services:
       ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       SEATA_ADDR: seata-server:8091
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -207,6 +231,7 @@ services:
       REDIS_PORT: 6379
       NACOS_ADDR: nacos:8848
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -228,6 +253,7 @@ services:
       REDIS_PORT: 6379
       NACOS_ADDR: nacos:8848
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-cgb-internal-service-token-change-in-production}
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -237,3 +263,4 @@ services:
 volumes:
   mysql-data:
   redis-data:
+  prometheus-data:

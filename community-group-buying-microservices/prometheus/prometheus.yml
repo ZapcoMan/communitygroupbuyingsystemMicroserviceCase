@@ -1,0 +1,52 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # 网关
+  - job_name: 'cgb-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['cgb-gateway:8080']
+        labels:
+          service: cgb-gateway
+
+  # 用户服务
+  - job_name: 'cgb-user-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['cgb-user-service:8081']
+        labels:
+          service: cgb-user-service
+
+  # 商品服务
+  - job_name: 'cgb-product-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['cgb-product-service:8082']
+        labels:
+          service: cgb-product-service
+
+  # 团购服务
+  - job_name: 'cgb-groupbuy-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['cgb-groupbuy-service:8084']
+        labels:
+          service: cgb-groupbuy-service
+
+  # 订单服务
+  - job_name: 'cgb-order-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['cgb-order-service:8083']
+        labels:
+          service: cgb-order-service
+
+  # 内容服务
+  - job_name: 'cgb-content-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['cgb-content-service:8085']
+        labels:
+          service: cgb-content-service

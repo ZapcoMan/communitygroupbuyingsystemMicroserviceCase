@@ -1,3 +1,17 @@
 jwt:
   secret: ${JWT_SECRET:cgb-community-group-buying-secret-key-2024-change-this-in-production}
   expiration: ${JWT_EXPIRATION:3600}
+
+# 网关鉴权白名单（支持动态更新，无需重启网关）
+gateway:
+  auth:
+    white-list:
+      - /user/users/login
+      - /user/users/register
+      - /user/yonghu/register
+      - /user/yonghu/login
+      - /user/users/forgot
+      - /doc.html
+      - /swagger-ui
+      - /v3/api-docs
+      - /actuator

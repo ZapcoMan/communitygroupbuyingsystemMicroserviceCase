@@ -1,5 +1,6 @@
 package com.cgb.gateway.filter;
 
+import com.cgb.gateway.config.GatewayAuthProperties;
 import com.cgb.gateway.service.RedisTokenService;
 import com.cgb.gateway.utils.JwtUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,20 +33,8 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
 
     private final JwtUtils jwtUtils;
     private final RedisTokenService redisTokenService;
+    private final GatewayAuthProperties authProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    /** 放行的路径（无需登录） */
-    private static final List<String> WHITE_LIST = List.of(
-        "/user/users/login",
-        "/user/users/register",
-        "/user/yonghu/register",
-        "/user/yonghu/login",
-        "/user/users/forgot",
-        "/doc.html",
-        "/swagger-ui",
-        "/v3/api-docs",
-        "/actuator"
-    );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -57,8 +46,8 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        // 放行白名单路径
-        for (String whitePath : WHITE_LIST) {
+        // 放行白名单路径（从 Nacos 配置中心动态读取）
+        for (String whitePath : authProperties.getWhiteList()) {
             if (path.startsWith(whitePath)) {
                 return chain.filter(exchange);
             }
