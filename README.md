@@ -1,5 +1,6 @@
-# 社区团购系统（微服务版）
 <div align="center">
+
+# 社区团购系统（微服务版）
 
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen)
 ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2024.0.0-blue)
