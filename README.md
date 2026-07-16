@@ -7,12 +7,16 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
 ![Redis](https://img.shields.io/badge/Redis-7-red)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Build](https://img.shields.io/badge/Build-Maven-steelblue)
+![JDK](https://img.shields.io/badge/JDK-17%2B-purple)
 
-## 基于 Spring Boot 3 + Spring Cloud 2024 + Vue 3 的微服务社区团购系统
+### **基于 Spring Boot 3 + Spring Cloud 2024 + Vue 3 的微服务社区团购平台**
 
-**管理后台与用户前台双端架构**
-
-[快速开始](docs/quick-start.md) • [架构设计](docs/architecture.md) • [API 接口](docs/api.md) • [数据库](docs/database.md) • [安全机制](docs/security.md) • [常见问题](docs/faq.md)
+[![快速开始](https://img.shields.io/badge/📖-快速开始-brightgreen)](docs/quick-start.md)
+[![架构设计](https://img.shields.io/badge/🏗️-架构设计-blue)](docs/architecture.md)
+[![API文档](https://img.shields.io/badge/📡-API文档-orange)](docs/api.md)
+[![数据库](https://img.shields.io/badge/🗄️-数据库-design)](docs/database.md)
+[![常见问题](https://img.shields.io/badge/❓-FAQ-yellow)](docs/faq.md)
 
 </div>
 
@@ -22,22 +26,77 @@
 
 社区团购系统是一个功能完善的**微服务电商应用**，以微信小程序式社区团购为业务蓝本，提供商品信息管理、团购活动发布（团长发起/参团记录/状态流转）、购物车、订单管理、收藏管理、社区资讯发布、论坛互动等核心业务功能。
 
-系统分为**管理后台**和**用户前台**两套独立界面，分别满足管理员运营和用户使用的需求。
+系统分为**管理后台**和**用户前台**两套独立界面，分别满足管理员运营和普通用户使用的需求。
+
+---
+
+## 系统架构
+
+```mermaid
+graph TB
+    Client[用户浏览器/移动端] --> Gateway[API Gateway:8000]
+    Admin[管理后台浏览器] --> Gateway
+    
+    Gateway --> User[用户服务:8001]
+    Gateway --> Product[商品服务:8002]
+    Gateway --> GroupBuy[团购服务:8003]
+    Gateway --> Order[订单服务:8004]
+    Gateway --> Content[内容服务:8005]
+    
+    User --> DB1[(cgb_user)]
+    Product --> DB2[(cgb_product)]
+    GroupBuy --> DB3[(cgb_groupbuy)]
+    Order --> DB4[(cgb_order)]
+    Content --> DB5[(cgb_content)]
+    
+    User -.-> Redis[Redis 缓存/限流]
+    Product -.-> Redis
+    GroupBuy -.-> Redis
+    Order -.-> Redis
+    
+    Order -.-> MQ[RocketMQ]
+    MQ -.-> GroupBuy
+    MQ -.-> Content
+    
+    Order -.-> Seata[Seata 分布式事务]
+    GroupBuy -.-> Seata
+```
+
+### 核心业务流程
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant GB as 团购服务
+    participant O as 订单服务
+    participant P as 商品服务
+    participant MQ as RocketMQ
+    
+    U->>GB: 发起/参与团购
+    GB->>GB: 校验团购状态
+    GB->>O: 创建订单
+    O->>P: 扣减库存
+    O-->>MQ: 发送订单事件
+    MQ-->>GB: 更新团购人数
+    GB-->>U: 参团成功
+```
 
 ---
 
 ## 核心特性
 
-- 🏗️ **微服务架构**：6 个微服务模块独立部署，各服务拥有独立数据库
-- 🌐 **API 网关**：统一入口，动态路由、全局 CORS、鉴权过滤器
-- 🔐 **JWT + Redis 认证**：Token 绑定客户端 IP，支持主动失效
-- 🔗 **OpenFeign 服务间调用**：4 个 Feign 客户端接口，支持熔断降级
-- 🗄️ **Flyway 数据库迁移**：启动即自动执行建表 + 种子数据
-- 🛡️ **Redis + Lua 接口限流**：按客户端 IP 隔离，10+ 核心接口启用
-- 📨 **RocketMQ 消息队列**：4 个消费者处理异步事件
-- 🔗 **Seata 分布式事务**：AT 模式，覆盖参团、订单、购物车等核心流程
-- 👥 **双端设计**：管理后台（端口 8081）+ 用户前台（端口 8084）
-- 📊 **ECharts 数据可视化**：后台首页集成数据图表展示
+| 特性 | 说明 |
+|------|------|
+| 🏗️ **微服务架构** | 6 个微服务模块独立部署，各服务拥有独立数据库 |
+| 🌐 **API 网关** | 统一入口，动态路由、全局 CORS、鉴权过滤器 |
+| 🔐 **JWT + Redis 认证** | Token 绑定客户端 IP，支持主动失效 |
+| 🔗 **OpenFeign 服务间调用** | 4 个 Feign 客户端接口，支持熔断降级 |
+| 🗄️ **Flyway 数据库迁移** | 启动即自动执行建表 + 种子数据 |
+| 🛡️ **Redis + Lua 接口限流** | 按客户端 IP 隔离，10+ 核心接口启用 |
+| 📨 **RocketMQ 消息队列** | 4 个消费者处理异步事件 |
+| 🔗 **Seata 分布式事务** | AT 模式，覆盖参团、订单、购物车等核心流程 |
+| 👥 **双端设计** | 管理后台（端口 8081）+ 用户前台（端口 8084） |
+| 📊 **ECharts 数据可视化** | 后台首页集成数据图表展示 |
 
 ---
 
@@ -72,13 +131,28 @@
 - RocketMQ >= 4.9
 - Seata >= 2.0
 
-### 启动步骤
+### 一键启动（Docker Compose）
+
+```bash
+cd community-group-buying-microservices
+docker-compose up -d
+```
+
+### 手动启动
 
 1. **创建数据库**：`cgb_user` / `cgb_product` / `cgb_groupbuy` / `cgb_order` / `cgb_content`
 2. **启动中间件**：Nacos (8848) / RocketMQ (9876) / Seata (8091)
 3. **导入 Nacos 配置**：`nacos-config/nacos-config-templates.yml`
-4. **编译并启动后端**：`mvn clean install` → 依次启动 6 个微服务
-5. **启动前端**：`npm install && npm run dev`
+4. **编译并启动后端**：
+   ```bash
+   mvn clean install -DskipTests
+   # 依次启动 6 个微服务
+   ```
+5. **启动前端**：
+   ```bash
+   cd admin-vue3 && npm install && npm run dev
+   cd ../front-vue3 && npm install && npm run dev
+   ```
 
 详细步骤请参阅 [快速开始文档](docs/quick-start.md)。
 
@@ -106,7 +180,8 @@ communitygroupbuyingsystemMicroserviceCase/
 
 ## 功能模块
 
-### 管理后台（admin-vue3）
+<details>
+<summary><b>管理后台（admin-vue3）- 点击展开</b></summary>
 
 | 模块 | 说明 |
 |------|------|
@@ -124,7 +199,10 @@ communitygroupbuyingsystemMicroserviceCase/
 | 团购评论 | 团购评论审核与回复 |
 | 系统配置 | 系统参数配置管理 |
 
-### 用户前台（front-vue3）
+</details>
+
+<details>
+<summary><b>用户前台（front-vue3）- 点击展开</b></summary>
 
 | 模块 | 说明 |
 |------|------|
@@ -137,6 +215,8 @@ communitygroupbuyingsystemMicroserviceCase/
 | 我的地址 | 收货地址增删改、默认地址设置 |
 | 我的收藏 | 收藏商品/团购列表 |
 | 个人中心 | 个人信息修改、密码修改 |
+
+</details>
 
 ---
 
@@ -169,9 +249,9 @@ communitygroupbuyingsystemMicroserviceCase/
 
 ---
 
-## 响应格式
+## API 响应格式
 
-后端接口统一响应格式：
+所有后端接口统一响应格式：
 
 ```json
 {
@@ -203,7 +283,7 @@ proxy: {
 
 > 💡 请求链路：`/api/user/yonghu/list` → Vite 代理去 `/api` → 网关 `/user/yonghu/list` → StripPrefix → 用户服务 `/yonghu/list`
 
-### Swagger 文档
+### Swagger API 文档
 
 各服务访问 `http://localhost:{服务端口}/swagger-ui.html` 查看 API 文档并在线调试。
 
@@ -235,18 +315,20 @@ proxy: {
 
 ## 许可证
 
-本项目仅供学习交流使用。
+本项目仅供学习交流使用，采用 MIT 许可证。
 
 ---
 
 ## 联系方式
 
-如有问题或建议，欢迎提 Issue。
+如有问题或建议，欢迎提 Issue 或在社区讨论。
 
 ---
 
 <div align="center">
 
 *最后更新时间：2026-06-14*
+
+⭐ 如果这个项目对你有帮助，请给它一个 Star！
 
 </div>
