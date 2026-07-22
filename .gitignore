@@ -37,3 +37,4 @@ node_modules/
 *.ps1
 admin/
 *.txt
+/.feisuan/
